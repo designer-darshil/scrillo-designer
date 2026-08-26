@@ -60,10 +60,10 @@ export const CustomCursor: React.FC = () => {
       }
     };
 
-    window.addEventListener('mousemove', moveMouse);
-    window.addEventListener('mouseover', handleElementHover);
-    document.addEventListener('mouseleave', handleMouseLeave);
-    document.addEventListener('mouseenter', handleMouseEnter);
+    window.addEventListener('mousemove', moveMouse, { passive: true });
+    window.addEventListener('mouseover', handleElementHover, { passive: true });
+    document.addEventListener('mouseleave', handleMouseLeave, { passive: true });
+    document.addEventListener('mouseenter', handleMouseEnter, { passive: true });
 
     return () => {
       window.removeEventListener('mousemove', moveMouse);

@@ -6,7 +6,7 @@ import { LikesDislikes } from '../components/ui/LikesDislikes';
 import { FinalCTA } from '../components/sections/FinalCTA';
 import { siteConfig } from '../data/site';
 import { media } from '../data/media';
-import { Laptop, Terminal, Coffee } from 'lucide-react';
+import { Laptop, Terminal, Coffee, CheckCircle2, Layers, Cpu } from 'lucide-react';
 
 export const AboutPage: React.FC = () => {
   return (
@@ -21,20 +21,20 @@ export const AboutPage: React.FC = () => {
                 ABOUT SCRILLO
               </span>
               <span className="text-white/30">/</span>
-              <span className="text-white/60">CRAFT, CODE & INTENTION</span>
+              <span className="text-white/60">SENIOR DESIGN & FRONTEND CRAFT</span>
             </div>
 
             <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-extrabold tracking-tighter text-white uppercase leading-[0.92] mb-8">
-              DESIGNER. <br />
+              8+ YRS UI/UX. <br />
               <span className="font-editorial-serif italic font-normal text-[#FF3E00] lowercase text-[1.05em]">
-                builder.
+                4+ yrs web
               </span>{' '}
               <br />
-              PROBLEM SOLVER.
+              ENGINEERING.
             </h1>
 
             <p className="max-w-3xl text-lg sm:text-xl text-muted-primary leading-relaxed">
-              I am an independent UI/UX and frontend web designer based in Bangalore, working with ambitious product teams worldwide. I believe the best digital experiences happen when visual craft and technical execution are conceived by the same mind.
+              I am an independent UI/UX and frontend web designer based in Bangalore, working with venture-backed product teams worldwide. I design digital products from user journeys and token systems to production-grade React and TypeScript code.
             </p>
           </div>
 
@@ -45,14 +45,15 @@ export const AboutPage: React.FC = () => {
                 <img
                   src={media.designerPortrait}
                   alt="Scrillo Portrait"
-                  className="w-full h-full object-cover grayscale contrast-125 group-hover:grayscale-0 transition-all duration-700"
+                  className="w-full h-full object-cover grayscale contrast-125 group-hover:grayscale-0 transition-all duration-500"
+                  decoding="async"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-6">
                   <span className="text-xs font-mono uppercase tracking-widest text-[#FF3E00] font-bold">
                     BANGALORE, INDIA
                   </span>
                   <p className="text-sm font-bold text-white mt-1">
-                    Independent Digital Craft & Engineering
+                    Senior UI/UX & Frontend Web Design
                   </p>
                 </div>
               </div>
@@ -63,10 +64,10 @@ export const AboutPage: React.FC = () => {
                 Closing the Chasm Between Canvas and Code
               </h2>
               <p>
-                In the conventional product cycle, a designer creates static mockups in Figma, hands them to an engineering team, and hopes the nuances don't get lost in translation. Inevitably, padding shifts, font line-heights break, animations lose their spring tension, and edge cases get ignored.
+                In the conventional product cycle, a designer creates static mockups in Figma, hands them to an engineering team, and hopes the nuances don't get lost in translation. Inevitably, padding shifts, line-heights break, animations lose their spring tension, and state edge cases get overlooked.
               </p>
               <p>
-                I eliminate that friction by designing directly with the DOM in mind. When I craft a layout in Figma, I already know how the CSS Grid will collapse, how the TypeScript interface will model the state, and how the spring curve will feel under the user's thumb.
+                I eliminate that friction by designing directly with DOM architecture in mind. When I craft a layout in Figma, I already know how the CSS Grid will collapse, how the TypeScript interface will model the state, and how the spring curve will feel under the user's thumb.
               </p>
               <div className="p-6 rounded-2xl bg-white/5 border border-white/5 space-y-2">
                 <p className="font-handwritten text-2xl text-[#FF3E00]">
@@ -76,11 +77,44 @@ export const AboutPage: React.FC = () => {
             </div>
           </div>
 
+          {/* Proven Disciplines Breakdown */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 py-16 border-t border-white/10">
+            <div className="p-8 rounded-2xl border border-white/10 bg-[#0C0C0C] space-y-3">
+              <span className="text-xs font-mono uppercase tracking-widest text-[#FF3E00] font-bold block">
+                01. PRODUCT UI/UX (8+ YRS)
+              </span>
+              <h3 className="text-xl font-bold text-white">Information Architecture & Systems</h3>
+              <p className="text-xs text-muted-primary leading-relaxed">
+                Specialized in multi-tenant SaaS dashboards, complex data density, command canvas navigation (Cmd+K), and ergonomic dark interfaces with WCAG AAA contrast.
+              </p>
+            </div>
+
+            <div className="p-8 rounded-2xl border border-white/10 bg-[#0C0C0C] space-y-3">
+              <span className="text-xs font-mono uppercase tracking-widest text-[#FF3E00] font-bold block">
+                02. FRONTEND CODE (4+ YRS)
+              </span>
+              <h3 className="text-xl font-bold text-white">Production React & TypeScript</h3>
+              <p className="text-xs text-muted-primary leading-relaxed">
+                Translating Figma tokens into modular, zero-dependency React components, Tailwind CSS utility hierarchies, and 60fps spring animations with 0ms layout shift.
+              </p>
+            </div>
+
+            <div className="p-8 rounded-2xl border border-white/10 bg-[#0C0C0C] space-y-3">
+              <span className="text-xs font-mono uppercase tracking-widest text-[#FF3E00] font-bold block">
+                03. DESIGN SYSTEMS
+              </span>
+              <h3 className="text-xl font-bold text-white">1:1 Token Sync & Governance</h3>
+              <p className="text-xs text-muted-primary leading-relaxed">
+                Building scalable token pipelines linking Figma variables directly to JSON schema, Tailwind configs, and strongly typed component props.
+              </p>
+            </div>
+          </div>
+
           {/* Personality Section: I LIKE vs I DON'T LIKE */}
           <div className="py-20 border-t border-white/10">
             <SectionHeading
               number="01"
-              tag="PERSONAL TASTE & PERSPECTIVE"
+              tag="TASTE & CRAFT VALUES"
               title="DESIGN"
               serifWord="predilections"
               description="A direct look at the principles I champion and the superficial anti-patterns I reject."
@@ -97,7 +131,7 @@ export const AboutPage: React.FC = () => {
               tag="REAL-TIME FOCUS"
               title="CURRENTLY"
               serifWord="active & exploring"
-              description="Ongoing design systems, micro-interaction research, and engineering experiments."
+              description="Active client product work, design system token architecture, and technical research."
             />
             <div className="mt-8">
               <CurrentlySection />
@@ -108,7 +142,7 @@ export const AboutPage: React.FC = () => {
           <div className="py-20 border-t border-white/10">
             <SectionHeading
               number="03"
-              tag="CORE VALUES"
+              tag="CORE PRINCIPLES"
               title="DESIGN"
               serifWord="philosophy"
               description="The foundational tenets that govern every wireframe, token scale, and code commit."
@@ -134,7 +168,7 @@ export const AboutPage: React.FC = () => {
             </div>
           </div>
 
-          {/* Studio Setup & Personal Notes */}
+          {/* Studio Setup & Hardware Notes */}
           <div className="py-20 border-t border-white/10">
             <SectionHeading
               number="04"

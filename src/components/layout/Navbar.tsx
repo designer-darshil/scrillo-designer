@@ -11,8 +11,13 @@ export const Navbar: React.FC = () => {
   const location = useLocation();
 
   useEffect(() => {
+    let lastScrolled = window.scrollY > 40;
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 40);
+      const nowScrolled = window.scrollY > 40;
+      if (nowScrolled !== lastScrolled) {
+        lastScrolled = nowScrolled;
+        setIsScrolled(nowScrolled);
+      }
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);

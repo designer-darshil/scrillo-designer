@@ -1,59 +1,57 @@
 export const siteConfig = {
   name: 'SCRILLO',
-  title: 'SCRILLO — UI/UX Designer & Frontend Web Designer',
-  role: 'UI/UX Designer & Frontend Web Designer',
-  tagline: 'Designing digital products that look distinct and work clearly.',
-  heroHeadline: 'I DESIGN DIGITAL EXPERIENCES.',
-  heroSubheadline: 'Bridging the chasm between meticulous interface craft and production-ready frontend code.',
-  annotation: 'UI / UX / WEB / CODE',
+  title: 'SCRILLO — Senior UI/UX Designer & Frontend Web Designer',
+  role: 'Senior UI/UX Designer & Frontend Web Designer',
+  tagline: 'Designing digital products and interfaces, then building them for the web.',
+  heroHeadline: 'UI/UX DESIGN + FRONTEND ENGINEERING.',
+  heroSubheadline: '8+ years designing digital products and 4+ years building production web systems.',
+  annotation: '8+ YRS UI/UX • 4+ YRS FRONTEND',
   location: 'Bangalore, India — Available Worldwide',
-  availability: 'Available for Select Client Projects & Design-to-Code Partnerships (Q3/Q4 2026)',
+  availability: 'Available for Select Client Projects & Design-to-Code Engagements (Q3/Q4 2026)',
   email: 'hello@scrillo.design',
   phone: '+91 (0) 98765 43210',
-  yearsOfCraft: '7+',
-  designStatement: `Scrillo is an independent UI/UX and frontend web designer dedicated to building thoughtful digital interfaces, modular design systems, and responsive web products. Every interface is designed with editorial precision and built with clean, modern code.`,
+  yearsOfCraft: '8+',
+  designStatement: `I design digital products and interfaces, then build them for the web. Combining 8+ years of UI/UX design leadership with 4+ years of production frontend engineering in React and TypeScript.`,
   socials: {
     github: 'https://github.com/scrillo-design',
     twitter: 'https://twitter.com/scrillocraft',
     linkedin: 'https://linkedin.com/in/scrillo-design',
     dribbble: 'https://dribbble.com/scrillo',
-    behance: 'https://behance.net/scrillo',
-    instagram: 'https://instagram.com/scrillo.design'
+    behance: 'https://behance.net/scrillo'
   },
   currently: [
-    'Designing telemetry & distributed system interfaces',
-    'Building lightweight CSS 3D & spring physics micro-interactions',
-    'Refining token sync engines between Figma variables and Tailwind CSS',
-    'Exploring kinetic variable typography in responsive viewports'
+    'Leading end-to-end product design for enterprise telemetry & SaaS platforms',
+    'Architecting token pipelines bridging Figma variables to React / Tailwind CSS',
+    'Building responsive web experiences with zero layout shift and sub-16ms render loops',
+    'Auditing accessibility, spatial typographic hierarchy, and keyboard navigation'
   ],
   exploring: [
-    'OKLCH Perceptual color models',
-    'Subgrid & CSS container queries',
-    'Keyboard-first spatial navigation patterns',
+    'OKLCH Perceptual color scales for high-contrast dark modes',
+    'CSS Subgrid and modern container query layouts',
+    'Keyboard-first command canvas interaction patterns',
     'Zero-runtime DOM performance profiling'
   ],
   likes: [
-    'Good typography & intentional whitespace',
+    'Intentional typographic rhythm and generous whitespace',
     'Fast websites with 0ms layout shift',
-    'Clear visual hierarchy',
-    'Unexpected tactile interactions',
-    'Simple, predictable interfaces',
-    'Ergonomic dark modes',
+    'Clear, uncluttered visual hierarchy',
+    'Design systems with true 1:1 code fidelity',
+    'Simple, predictable user journeys',
+    'Ergonomic, low-fatigue dark modes',
     'Meticulous sub-pixel details'
   ],
   dislikes: [
-    'Pointless entrance animations that waste user time',
-    'Bloated UI kits with excessive dependencies',
-    'Generic AI-generated portfolio layouts',
-    'Design without architectural purpose',
-    'Interfaces that look good in static screenshots but feel terrible to use',
-    'Fake metric claims and manufactured awards'
+    'Pointless continuous animations that waste user battery and time',
+    'Bloated UI component libraries with unnecessary dependencies',
+    'Generic AI-generated portfolio layouts and superficial mockups',
+    'Interfaces that look good in static screenshots but feel sluggish in code',
+    'Fabricated performance metrics and vanity numbers'
   ],
   principles: [
     {
       number: '01',
-      title: 'Craft Over Hype',
-      description: 'Prioritizing spatial harmony, clear typography, and intentional feedback over transient design gimmicks.'
+      title: 'Problem-First Craft',
+      description: 'Every interaction must solve a concrete user problem before it earns the right to visual ornamentation.'
     },
     {
       number: '02',
@@ -62,13 +60,13 @@ export const siteConfig = {
     },
     {
       number: '03',
-      title: 'Maximum Personality, Minimum Noise',
-      description: 'The work must remain the visual hero. The interface is the bespoke frame that gives it authority.'
+      title: 'The Work Is The Hero',
+      description: 'The interface is the bespoke frame that gives authority to the work, never an overwhelming distraction.'
     },
     {
       number: '04',
-      title: 'Human-Centered Utility',
-      description: 'Every interaction must solve a concrete user problem before it earns the right to delight.'
+      title: 'Performance Is UX',
+      description: 'A 60fps responsive interface with 0ms layout shift respects the user more than any decorative effect.'
     }
   ]
 };

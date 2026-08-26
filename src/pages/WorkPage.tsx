@@ -11,12 +11,10 @@ import { ArrowUpRight, Filter, Sparkles } from 'lucide-react';
 
 const filterCategories: Array<{ id: ProjectCategory; label: string; count: number }> = [
   { id: 'all', label: 'ALL WORK', count: 8 },
-  { id: 'ui-ux', label: 'UI/UX', count: 1 },
-  { id: 'web-design', label: 'WEB DESIGN', count: 2 },
   { id: 'product', label: 'PRODUCT', count: 2 },
-  { id: 'frontend', label: 'FRONTEND', count: 1 },
-  { id: 'landing-pages', label: 'LANDING PAGES', count: 1 },
-  { id: 'experiments', label: 'EXPERIMENTS', count: 1 },
+  { id: 'web-design', label: 'WEB DESIGN', count: 2 },
+  { id: 'ui-ux', label: 'UI/UX SYSTEMS', count: 2 },
+  { id: 'frontend', label: 'FRONTEND', count: 2 },
 ];
 
 export const WorkPage: React.FC = () => {

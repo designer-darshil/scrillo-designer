@@ -3,9 +3,7 @@ export type ProjectCategory =
   | 'ui-ux'
   | 'web-design'
   | 'product'
-  | 'frontend'
-  | 'landing-pages'
-  | 'experiments';
+  | 'frontend';
 
 export interface ProjectMedia {
   type: 'image' | 'video' | 'interactive';

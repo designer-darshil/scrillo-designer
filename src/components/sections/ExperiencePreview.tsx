@@ -11,11 +11,11 @@ export const ExperiencePreview: React.FC = () => {
       <div className="max-w-7xl mx-auto px-6 md:px-12">
         
         <SectionHeading
-          number="07"
-          tag="CAREER & TOOLING"
+          number="04"
+          tag="CAREER TIMELINE & TOOLING"
           title="EXPERIENCE"
           serifWord="& technical stack"
-          description="A track record of designing and coding resilient web interfaces for high-growth tech teams."
+          description="8+ years designing complex product interfaces and 4+ years implementing production frontend web code."
           align="split"
         >
           <Link

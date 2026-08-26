@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PageTransition } from '../components/layout/PageTransition';
 import { siteConfig } from '../data/site';
-import { Mail, MapPin, Calendar, ArrowRight, CheckCircle2, Sparkles, Send, RefreshCw, Layers } from 'lucide-react';
+import { Mail, MapPin, ArrowRight, CheckCircle2, Send, RefreshCw } from 'lucide-react';
 
 const projectTypes = [
   'Website',

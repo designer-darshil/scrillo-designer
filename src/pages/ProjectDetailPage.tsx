@@ -8,7 +8,7 @@ import { Lightbox } from '../components/ui/Lightbox';
 import { ProjectReceipt } from '../components/ui/ProjectReceipt';
 import { DecisionLog } from '../components/ui/DecisionLog';
 import { BeforeAfter } from '../components/ui/BeforeAfter';
-import { ArrowLeft, ArrowUpRight, CheckCircle2, Code2, Layers, Sparkles } from 'lucide-react';
+import { ArrowLeft, ArrowUpRight, CheckCircle2, Code2 } from 'lucide-react';
 
 import { NotFoundPage } from './NotFoundPage';
 

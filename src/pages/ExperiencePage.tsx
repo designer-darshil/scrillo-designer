@@ -59,7 +59,7 @@ export const ExperiencePage: React.FC = () => {
               tag="CAREER TIMELINE"
               title="EDITORIAL"
               serifWord="work history"
-              description="Clearly structured, editable demo experience representing progressive design engineering roles."
+              description="A progressive trajectory of product UI/UX design leadership and production frontend engineering."
             />
 
             <div className="space-y-8 mt-8">

@@ -7,7 +7,7 @@ import { PageTransition } from '../components/layout/PageTransition';
 import { SectionHeading } from '../components/ui/SectionHeading';
 import { PerspectiveCard } from '../components/ui/PerspectiveCard';
 import { FinalCTA } from '../components/sections/FinalCTA';
-import { ArrowUpRight, Filter, Sparkles } from 'lucide-react';
+import { ArrowUpRight, Filter } from 'lucide-react';
 
 const filterCategories: Array<{ id: ProjectCategory; label: string; count: number }> = [
   { id: 'all', label: 'ALL WORK', count: 8 },

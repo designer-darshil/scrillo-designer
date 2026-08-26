@@ -1,9 +1,8 @@
 import React from 'react';
 import { experienceData, craftStats } from '../../data/experience';
-import { toolsData } from '../../data/tools';
 import { SectionHeading } from '../ui/SectionHeading';
 import { Link } from 'react-router-dom';
-import { ArrowUpRight, CheckCircle, Briefcase, Calendar } from 'lucide-react';
+import { ArrowUpRight, Calendar } from 'lucide-react';
 
 export const ExperiencePreview: React.FC = () => {
   return (

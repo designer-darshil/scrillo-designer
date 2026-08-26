@@ -8,24 +8,23 @@ export interface NavLink {
 export const navLinks: NavLink[] = [
   { label: 'WORK', href: '/work', number: '01', description: 'Selected digital product interfaces & web case studies' },
   { label: 'ABOUT', href: '/about', number: '02', description: '8+ yrs UI/UX & 4+ yrs frontend experience' },
-  { label: 'CONTACT', href: '/contact', number: '03', description: 'Inquire for projects & collaborations' }
+  { label: 'EXPERIENCE', href: '/experience', number: '03', description: 'Career timeline & technical stack' },
+  { label: 'CONTACT', href: '/contact', number: '04', description: 'Inquire for projects & collaborations' }
 ];
 
 export const secondaryLinks: NavLink[] = [
-  { label: 'SERVICES', href: '/services', number: '04', description: 'Capabilities & deliverables' },
-  { label: 'EXPERIENCE', href: '/experience', number: '05', description: 'Career timeline & technical stack' },
-  { label: 'THINKING', href: '/thinking', number: '06', description: 'Design observations & architectural essays' }
+  // { label: 'SERVICES', href: '/services', number: '05', description: 'Capabilities & deliverables' },
+  // { label: 'THINKING', href: '/thinking', number: '06', description: 'Design observations & architectural essays' }
 ];
 
 export const footerLinks = {
-  navigation: [...navLinks, ...secondaryLinks],
+  navigation: navLinks,
   categories: [
     { label: 'Product Interfaces', href: '/work?category=product' },
     { label: 'Creative Web Design', href: '/work?category=web-design' },
     { label: 'UI/UX Systems', href: '/work?category=ui-ux' },
     { label: 'Frontend Engineering', href: '/work?category=frontend' },
-    { label: 'Career Experience', href: '/experience' },
-    { label: 'Thinking & Notes', href: '/thinking' }
+    { label: 'Career Timeline', href: '/experience' }
   ],
   socials: [
     { label: 'GitHub', href: 'https://github.com/scrillo-design', handle: '@scrillo-design' },

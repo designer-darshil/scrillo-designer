@@ -5,7 +5,7 @@ import { PersonalStatement } from '../components/sections/PersonalStatement';
 import { SelectedWork } from '../components/sections/SelectedWork';
 import { SignatureDesignCode } from '../components/sections/SignatureDesignCode';
 import { ExperiencePreview } from '../components/sections/ExperiencePreview';
-import { ClientNotes } from '../components/sections/ClientNotes';
+// import { ClientNotes } from '../components/sections/ClientNotes';
 import { FinalCTA } from '../components/sections/FinalCTA';
 
 export const HomePage: React.FC = () => {
@@ -27,8 +27,8 @@ export const HomePage: React.FC = () => {
         {/* 05: Career Timeline & Tooling Proficiency */}
         <ExperiencePreview />
 
-        {/* 06: Client & Peer Collaborative Notes */}
-        <ClientNotes />
+        {/* 06: Client / Collaborator Notes (Commented out to avoid dummy/placeholder text) */}
+        {/* <ClientNotes /> */}
 
         {/* 07: Final Conversion CTA */}
         <FinalCTA />

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { navLinks, footerLinks } from '../../data/navigation';
 import { siteConfig } from '../../data/site';
-import { ArrowUpRight, ArrowUp, Sparkles } from 'lucide-react';
+import { ArrowUpRight, ArrowUp } from 'lucide-react';
 
 export const Footer: React.FC = () => {
   const [localTime, setLocalTime] = useState('');
@@ -170,10 +170,6 @@ export const Footer: React.FC = () => {
           </div>
           
           <div className="flex items-center space-x-6">
-            <span className="flex items-center gap-1">
-              <Sparkles size={12} className="text-[#FF3E00]" />
-              Zero Three.js • 100% Native CSS & React
-            </span>
             <button
               onClick={scrollToTop}
               className="flex items-center space-x-1 hover:text-white transition-colors"

@@ -6,7 +6,7 @@ import { LikesDislikes } from '../components/ui/LikesDislikes';
 import { FinalCTA } from '../components/sections/FinalCTA';
 import { siteConfig } from '../data/site';
 import { media } from '../data/media';
-import { Laptop, Terminal, Coffee, CheckCircle2, Layers, Cpu } from 'lucide-react';
+import { Laptop, Terminal, Coffee } from 'lucide-react';
 
 export const AboutPage: React.FC = () => {
   return (

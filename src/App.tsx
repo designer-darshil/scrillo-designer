@@ -12,9 +12,9 @@ import { ErrorBoundary } from './components/layout/ErrorBoundary';
 import { HomePage } from './pages/HomePage';
 import { WorkPage } from './pages/WorkPage';
 import { ProjectDetailPage } from './pages/ProjectDetailPage';
-import { ThinkingPage } from './pages/ThinkingPage';
+// import { ThinkingPage } from './pages/ThinkingPage';
 import { AboutPage } from './pages/AboutPage';
-import { ServicesPage } from './pages/ServicesPage';
+// import { ServicesPage } from './pages/ServicesPage';
 import { ExperiencePage } from './pages/ExperiencePage';
 import { ContactPage } from './pages/ContactPage';
 import { NotFoundPage } from './pages/NotFoundPage';
@@ -48,9 +48,9 @@ export function App() {
               <Route path="/" element={<HomePage />} />
               <Route path="/work" element={<WorkPage />} />
               <Route path="/work/:slug" element={<ProjectDetailPage />} />
-              <Route path="/thinking" element={<ThinkingPage />} />
+              {/* <Route path="/thinking" element={<ThinkingPage />} /> */}
               <Route path="/about" element={<AboutPage />} />
-              <Route path="/services" element={<ServicesPage />} />
+              {/* <Route path="/services" element={<ServicesPage />} /> */}
               <Route path="/experience" element={<ExperiencePage />} />
               <Route path="/contact" element={<ContactPage />} />
               <Route path="/404" element={<NotFoundPage />} />

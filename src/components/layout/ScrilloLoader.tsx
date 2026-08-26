@@ -1,10 +1,9 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, memo } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useReducedMotion } from 'framer-motion';
 
 /**
  * Configurable Minimum Loader Display Duration (ms)
- * Allows developers/reviewers to adjust the presentation window easily.
  */
 export const MIN_LOADER_DURATION = 2500;
 
@@ -14,6 +13,40 @@ interface ScrilloLoaderProps {
   /** Optional manual readiness override */
   isReady?: boolean;
 }
+
+/**
+ * Minimal Progress Sub-Component
+ * Clean horizontal line + small percentage with GPU-accelerated scaleX
+ */
+const MinimalProgress = memo(function MinimalProgress({ progress }: { progress: number }) {
+  const clampedProgress = Math.max(0, Math.min(progress, 100));
+
+  return (
+    <div className="flex items-center gap-3 sm:gap-4 font-mono text-xs">
+      {/* 1.5px minimal hairline track without card or container glow */}
+      <div
+        className="w-20 sm:w-32 md:w-40 h-[1.5px] bg-white/10 relative overflow-hidden"
+        role="progressbar"
+        aria-valuenow={clampedProgress}
+        aria-valuemin={0}
+        aria-valuemax={100}
+      >
+        <div
+          className="absolute inset-0 bg-[#FF3E00] origin-left will-change-transform"
+          style={{
+            transform: `scaleX(${clampedProgress / 100})`,
+            transition: 'transform 80ms cubic-bezier(0.2, 0, 0, 1)',
+          }}
+        />
+      </div>
+
+      {/* Small percentage */}
+      <span className="text-white/60 tabular-nums w-[3.5ch] text-right font-normal tracking-normal">
+        {clampedProgress}%
+      </span>
+    </div>
+  );
+});
 
 /**
  * Utility: Wait for critical above-the-fold images in destination page
@@ -81,6 +114,8 @@ export function ScrilloLoader({ isReady }: ScrilloLoaderProps) {
   const prefersReducedMotion = useReducedMotion();
 
   const [state, setState] = useState<LoaderState>('ACTIVE');
+  const [progress, setProgress] = useState(0);
+
   const navIdRef = useRef(0);
   const isFirstMountRef = useRef(true);
 
@@ -98,29 +133,57 @@ export function ScrilloLoader({ isReady }: ScrilloLoaderProps) {
   // Navigation and refresh transition coordinator
   const runTransition = useCallback((targetNavId: number) => {
     setState('ACTIVE');
+    setProgress(0);
 
     const startTime = performance.now();
     let isDestinationReady = false;
     let isMinTimeElapsed = false;
     let hasExited = false;
+    let animFrameId: number;
 
     let minTimerId: ReturnType<typeof setTimeout> | undefined;
     let finishTimeout: ReturnType<typeof setTimeout> | undefined;
     let safeguardTimer: ReturnType<typeof setTimeout> | undefined;
 
-    // Attempt exit only when BOTH conditions are satisfied
+    // Trigger exit only when BOTH destination is ready and minimum time has elapsed
     const attemptExit = () => {
       if (hasExited || navIdRef.current !== targetNavId) return;
       if (!isDestinationReady || !isMinTimeElapsed) return;
 
       hasExited = true;
-      setState('EXITING');
+      setProgress(100);
 
-      finishTimeout = setTimeout(() => {
+      // Brief hold at 100% before running upward exit slide
+      setTimeout(() => {
         if (navIdRef.current !== targetNavId) return;
-        setState('IDLE');
-      }, prefersReducedMotion ? 180 : 550);
+        setState('EXITING');
+
+        finishTimeout = setTimeout(() => {
+          if (navIdRef.current !== targetNavId) return;
+          setState('IDLE');
+        }, prefersReducedMotion ? 180 : 550);
+      }, 90);
     };
+
+    // Smooth visual progress loop
+    const tick = (now: number) => {
+      if (navIdRef.current !== targetNavId || hasExited) return;
+
+      const elapsed = now - startTime;
+
+      if (!isDestinationReady || !isMinTimeElapsed) {
+        // Smoothly ramp towards 98% during the loading window, then hold
+        const ratio = Math.min(elapsed / (MIN_LOADER_DURATION * 0.9), 1);
+        // Easing curve for smooth progression
+        const eased = 1 - Math.pow(1 - ratio, 3);
+        const currentProg = Math.min(98, Math.floor(eased * 98));
+
+        setProgress(currentProg);
+        animFrameId = requestAnimationFrame(tick);
+      }
+    };
+
+    animFrameId = requestAnimationFrame(tick);
 
     // 1. Minimum duration timer
     minTimerId = setTimeout(() => {
@@ -146,7 +209,7 @@ export function ScrilloLoader({ isReady }: ScrilloLoaderProps) {
 
     checkReadiness();
 
-    // 3. Catastrophic fallback safeguard (MIN_LOADER_DURATION + 2500ms max)
+    // 3. Catastrophic fallback safeguard
     safeguardTimer = setTimeout(() => {
       if (navIdRef.current === targetNavId && !hasExited) {
         isDestinationReady = true;
@@ -156,6 +219,7 @@ export function ScrilloLoader({ isReady }: ScrilloLoaderProps) {
     }, Math.max(MIN_LOADER_DURATION + 2500, 5000));
 
     return () => {
+      if (animFrameId) cancelAnimationFrame(animFrameId);
       if (minTimerId) clearTimeout(minTimerId);
       if (finishTimeout) clearTimeout(finishTimeout);
       if (safeguardTimer) clearTimeout(safeguardTimer);
@@ -179,6 +243,7 @@ export function ScrilloLoader({ isReady }: ScrilloLoaderProps) {
   // Handle external manual readiness override if provided
   useEffect(() => {
     if (isReady && state === 'ACTIVE') {
+      setProgress(100);
       setState('EXITING');
       const timer = setTimeout(() => setState('IDLE'), prefersReducedMotion ? 180 : 550);
       return () => clearTimeout(timer);
@@ -225,10 +290,14 @@ export function ScrilloLoader({ isReady }: ScrilloLoaderProps) {
         </div>
       </main>
 
-      {/* Bottom Metadata Bar */}
+      {/* Bottom Metadata Bar with Minimal Progress Indicator */}
       <footer className="flex items-center justify-between w-full font-mono text-xs tracking-[0.25em] text-white/40 uppercase">
         <span>DESIGN + CODE</span>
-        <span className="text-[#FF3E00]">PORTFOLIO</span>
+        
+        {/* Minimal Progress Bar + Percentage */}
+        <MinimalProgress progress={progress} />
+
+        <span className="text-[#FF3E00] hidden sm:inline-block">PORTFOLIO</span>
       </footer>
     </div>
   );

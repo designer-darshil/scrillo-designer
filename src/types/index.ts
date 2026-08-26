@@ -1,43 +1,76 @@
 export type ProjectCategory = 
   | 'all'
-  | 'product'
+  | 'ui-ux'
   | 'web-design'
-  | 'frontend';
+  | 'product'
+  | 'frontend'
+  | 'landing-pages'
+  | 'experiments';
+
+export interface ProjectMedia {
+  type: 'image' | 'video' | 'interactive';
+  url: string;
+  caption?: string;
+  aspectRatio?: '16/9' | '4/3' | '1/1' | '21/9' | '9/16';
+  alt: string;
+}
 
 export interface ProjectReceiptItem {
-  count: string;
+  count: number | string;
   label: string;
 }
 
 export interface DecisionLogItem {
   id: string;
-  title: string;
-  optionsConsidered: {
-    label: string;
-    description: string;
-  }[];
-  finalDecision: string;
-  rationale: string;
+  question: string;
+  decision: string;
+  tradeoff?: string;
   tag?: string;
 }
 
-export interface DesignToCodeComparison {
-  figmaNotes: string;
-  codeSnippet: {
-    filename: string;
-    language: string;
-    code: string;
+export interface BeforeAfterItem {
+  title: string;
+  before: {
+    label: string;
+    description: string;
+    image?: string;
+    flaws: string[];
   };
-  responsiveDetails: string;
+  after: {
+    label: string;
+    description: string;
+    image?: string;
+    improvements: string[];
+  };
 }
 
 export interface CaseStudySectionData {
   title: string;
   subtitle?: string;
+  tag?: string;
   description: string[];
   bulletPoints?: string[];
-  image?: string;
-  caption?: string;
+  visual?: {
+    type: 'browser' | 'mobile' | 'code' | 'tokens' | 'split' | 'grid' | 'wireframe';
+    image?: string;
+    secondaryImage?: string;
+    caption?: string;
+    codeSnippet?: {
+      language: string;
+      code: string;
+      filename?: string;
+    };
+    tokens?: Array<{
+      name: string;
+      value: string;
+      type: 'color' | 'typography' | 'spacing' | 'radius';
+    }>;
+    wireframePoints?: Array<{
+      step: string;
+      label: string;
+      detail: string;
+    }>;
+  };
 }
 
 export interface Project {
@@ -45,21 +78,76 @@ export interface Project {
   slug: string;
   number: string;
   title: string;
+  client: string;
+  subtitle: string;
+  tagline: string;
   category: ProjectCategory;
   categoryLabel: string;
   year: number;
-  role: string;
-  summary: string;
+  featured: boolean;
   heroImage: string;
-  overview: string;
-  problem: string;
-  approach: string;
+  mockupImage: string;
+  roles: string[];
+  services: string[];
+  technologies: string[];
+  timeline: string;
+  liveUrl?: string;
+  githubUrl?: string;
+  description: string;
+  challenge: string;
+  solution: string;
   receipt: ProjectReceiptItem[];
   decisionLogs: DecisionLogItem[];
-  designToCode: DesignToCodeComparison;
+  beforeAfter?: BeforeAfterItem;
+  impactStatements: string[];
+  layoutType: 'large-hero' | 'split-editorial' | 'horizontal-banner' | 'asymmetric-stack';
   sections: CaseStudySectionData[];
-  gallery: { url: string; caption: string }[];
-  nextProjectId: string;
+  gallery: ProjectMedia[];
+  nextProjectId?: string;
+}
+
+export interface ThinkingArticle {
+  id: string;
+  slug: string;
+  number: string;
+  title: string;
+  date: string;
+  category: 'UX Architecture' | 'Visual Craft' | 'Design-to-Code' | 'Philosophy' | 'Motion Design';
+  readTime: string;
+  introduction: string;
+  mainArgument: string[];
+  observation: string;
+  conclusion: string;
+  keyTakeaway: string;
+  relatedProjectSlug?: string;
+  relatedProjectName?: string;
+}
+
+export interface ServiceItem {
+  id: string;
+  number: string;
+  title: string;
+  tagline: string;
+  description: string;
+  whatYouGet: string[];
+  problemSolved: string;
+  technologies: string[];
+  deliverables: string[];
+  category: 'design' | 'engineering' | 'strategy';
+}
+
+export interface ExperienceItem {
+  id: string;
+  period: string;
+  year: number;
+  role: string;
+  companyOrContext: string;
+  type: 'Full-time' | 'Contract' | 'Independent Craft' | 'Open Source';
+  location: string;
+  description: string;
+  achievements: string[];
+  technologies: string[];
+  isCurrent?: boolean;
 }
 
 export interface ExperimentItem {
@@ -67,22 +155,20 @@ export interface ExperimentItem {
   number: string;
   title: string;
   category: string;
+  year: number;
+  tagline: string;
   description: string;
   tags: string[];
-  demoType: 'spring-physics' | 'variable-font' | 'css-3d-tilt' | 'palette-mixer';
+  demoType: 'spring-toggle' | 'variable-font' | 'matrix-grid' | 'color-mixer' | 'magnetic-button' | 'cursor-trail' | 'interactive-nav';
+  codeSnippet?: string;
 }
 
-export interface ServiceItem {
-  number: string;
-  title: string;
-  description: string;
-  deliverables: string[];
-}
-
-export interface ExperienceItem {
-  period: string;
+export interface TestimonialItem {
+  id: string;
+  quote: string;
+  author: string;
   role: string;
   context: string;
-  description: string;
-  focus: string[];
+  year: number;
+  avatar?: string;
 }

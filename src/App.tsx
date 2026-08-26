@@ -2,43 +2,59 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Navbar } from './components/layout/Navbar';
 import { Footer } from './components/layout/Footer';
+import { CustomCursor } from './components/layout/CustomCursor';
+import { ScrollProgress } from './components/layout/ScrollProgress';
+import { GrainOverlay } from './components/layout/GrainOverlay';
 import { ScrollToTopOnRoute } from './components/layout/ScrollToTopOnRoute';
 
 import { HomePage } from './pages/HomePage';
 import { WorkPage } from './pages/WorkPage';
 import { ProjectDetailPage } from './pages/ProjectDetailPage';
+import { LabPage } from './pages/LabPage';
+import { ThinkingPage } from './pages/ThinkingPage';
 import { AboutPage } from './pages/AboutPage';
-import { ExperimentsPage } from './pages/ExperimentsPage';
+import { ServicesPage } from './pages/ServicesPage';
+import { ExperiencePage } from './pages/ExperiencePage';
 import { ContactPage } from './pages/ContactPage';
 import { NotFoundPage } from './pages/NotFoundPage';
 
 export function App() {
   return (
     <Router>
-      <div className="min-h-screen bg-[#080808] text-[#F5F5F5] selection:bg-[#FF3E00] selection:text-white flex flex-col justify-between font-sans">
-        
+      <div className="relative min-h-screen bg-[#050505] text-[#F5F5F5] selection:bg-[#FF3E00] selection:text-white overflow-x-hidden font-sans">
+        {/* Ambient Film Grain Texture */}
+        <GrainOverlay />
+
+        {/* Top Scroll Progress Indicator */}
+        <ScrollProgress />
+
+        {/* Desktop Dynamic Contextual Cursor */}
+        <CustomCursor />
+
         {/* Auto Scroll to Top on Navigation */}
         <ScrollToTopOnRoute />
 
-        {/* Quiet Clean Navbar */}
+        {/* Global Floating Editorial Navbar */}
         <Navbar />
 
         {/* Main Application Routes */}
-        <main className="flex-grow">
+        <main>
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/work" element={<WorkPage />} />
             <Route path="/work/:slug" element={<ProjectDetailPage />} />
+            <Route path="/lab" element={<LabPage />} />
+            <Route path="/thinking" element={<ThinkingPage />} />
             <Route path="/about" element={<AboutPage />} />
-            <Route path="/experiments" element={<ExperimentsPage />} />
-            <Route path="/lab" element={<Navigate to="/experiments" replace />} />
+            <Route path="/services" element={<ServicesPage />} />
+            <Route path="/experience" element={<ExperiencePage />} />
             <Route path="/contact" element={<ContactPage />} />
             <Route path="/404" element={<NotFoundPage />} />
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </main>
 
-        {/* Direct Quiet Footer */}
+        {/* Large Editorial Footer */}
         <Footer />
       </div>
     </Router>

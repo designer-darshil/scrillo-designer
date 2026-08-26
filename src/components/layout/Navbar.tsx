@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { navLinks } from '../../data/navigation';
-import { Menu, X, ArrowRight } from 'lucide-react';
+import { MobileMenu } from './MobileMenu';
+import { Menu, ArrowRight } from 'lucide-react';
 
 export const Navbar: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -10,97 +12,93 @@ export const Navbar: React.FC = () => {
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
+      setIsScrolled(window.scrollY > 40);
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   return (
-    <header
-      className={`fixed top-0 left-0 right-0 z-40 transition-colors duration-200 ${
-        isScrolled
-          ? 'bg-[#080808]/90 backdrop-blur-md border-b border-white/10 py-3.5'
-          : 'bg-transparent border-b border-transparent py-5'
-      }`}
-    >
-      <div className="max-w-6xl mx-auto px-6 flex items-center justify-between">
-        
-        {/* Brand Name */}
-        <Link to="/" className="group flex items-baseline space-x-2">
-          <span className="font-extrabold text-sm tracking-tight text-white group-hover:text-[#FF3E00] transition-colors">
-            SCRILLO
-          </span>
-          <span className="hidden sm:inline text-xs text-neutral-500 font-mono">
-            / UI/UX + Code
-          </span>
-        </Link>
-
-        {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center space-x-8 text-xs font-medium text-neutral-400">
-          {navLinks.map((item) => {
-            const isActive = location.pathname === item.href || 
-              (item.href !== '/' && location.pathname.startsWith(item.href));
-
-            return (
-              <Link
-                key={item.href}
-                to={item.href}
-                className={`hover:text-white transition-colors ${
-                  isActive ? 'text-white font-semibold' : ''
-                }`}
-              >
-                {item.label}
-              </Link>
-            );
-          })}
-        </nav>
-
-        {/* Desktop Contact Action */}
-        <div className="hidden md:flex items-center">
-          <Link
-            to="/contact"
-            className="text-xs font-mono uppercase tracking-wider text-neutral-300 hover:text-white flex items-center space-x-1.5 px-3 py-1.5 rounded border border-white/10 hover:border-white/25 transition-colors"
-          >
-            <span>Let's Talk</span>
-            <ArrowRight size={12} className="text-[#FF3E00]" />
+    <>
+      <header
+        className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
+          isScrolled
+            ? 'py-3 bg-[#050505]/85 backdrop-blur-md border-b border-white/10'
+            : 'py-6 bg-transparent border-b border-transparent'
+        }`}
+      >
+        <div className="max-w-7xl mx-auto px-6 md:px-12 flex items-center justify-between">
+          {/* Logo / Brand Mark */}
+          <Link to="/" className="group flex items-center space-x-3">
+            <div className="w-8 h-8 rounded-sm bg-white text-black flex items-center justify-center font-bold text-xs tracking-tighter group-hover:bg-[#FF3E00] group-hover:text-white transition-colors">
+              SC
+            </div>
+            <div className="flex flex-col">
+              <span className="font-extrabold tracking-tight text-sm text-white flex items-center gap-1.5">
+                SCRILLO
+                <span className="w-1.5 h-1.5 rounded-full bg-[#FF3E00] inline-block animate-pulse" />
+              </span>
+              <span className="text-[10px] font-mono tracking-widest text-white/40 uppercase">
+                UI/UX + Code
+              </span>
+            </div>
           </Link>
-        </div>
 
-        {/* Mobile Hamburger Button */}
-        <button
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="md:hidden p-2 text-neutral-400 hover:text-white"
-          aria-label="Toggle navigation menu"
-        >
-          {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
-        </button>
-      </div>
+          {/* Desktop Navigation Links */}
+          <nav className="hidden lg:flex items-center space-x-1 border border-white/10 rounded-full px-4 py-1.5 bg-black/40 backdrop-blur-sm">
+            {navLinks.map((item) => {
+              const isActive = location.pathname === item.href || 
+                (item.href !== '/' && location.pathname.startsWith(item.href));
 
-      {/* Clean Mobile Dropdown Menu */}
-      {mobileMenuOpen && (
-        <div className="md:hidden border-b border-white/10 bg-[#080808] px-6 py-6 space-y-4">
-          {navLinks.map((item) => (
-            <Link
-              key={item.href}
-              to={item.href}
-              onClick={() => setMobileMenuOpen(false)}
-              className="block text-sm font-medium text-neutral-300 hover:text-white py-1"
-            >
-              {item.label}
-            </Link>
-          ))}
-          <div className="pt-4 border-t border-white/10">
+              return (
+                <Link
+                  key={item.href}
+                  to={item.href}
+                  className={`relative px-4 py-1.5 text-xs font-mono tracking-widest uppercase transition-colors rounded-full ${
+                    isActive ? 'text-white font-semibold' : 'text-white/60 hover:text-white'
+                  }`}
+                >
+                  {isActive && (
+                    <motion.span
+                      layoutId="activeNavIndicator"
+                      className="absolute inset-0 bg-white/10 rounded-full border border-white/20"
+                      transition={{ type: 'spring', stiffness: 350, damping: 30 }}
+                    />
+                  )}
+                  <span className="relative z-10">{item.label}</span>
+                </Link>
+              );
+            })}
+          </nav>
+
+          {/* Desktop CTA Button & Mobile Menu Trigger */}
+          <div className="flex items-center space-x-3">
             <Link
               to="/contact"
-              onClick={() => setMobileMenuOpen(false)}
-              className="inline-flex items-center space-x-2 text-xs font-mono text-[#FF3E00] uppercase"
+              data-cursor="cta"
+              className="hidden sm:inline-flex items-center space-x-2 text-xs font-mono uppercase tracking-widest px-4 py-2 rounded-full border border-white/20 bg-white/5 hover:bg-[#FF3E00] hover:border-[#FF3E00] hover:text-white text-white/90 transition-all duration-200"
             >
-              <span>Get in touch →</span>
+              <span>LET'S TALK</span>
+              <ArrowRight size={13} className="text-[#FF3E00] group-hover:text-white" />
             </Link>
+
+            {/* Mobile Hamburger Button */}
+            <button
+              onClick={() => setMobileMenuOpen(true)}
+              className="lg:hidden p-2.5 rounded-full border border-white/15 bg-white/5 text-white hover:bg-white/10 transition-colors"
+              aria-label="Open navigation menu"
+            >
+              <Menu size={18} />
+            </button>
           </div>
         </div>
-      )}
-    </header>
+      </header>
+
+      {/* Mobile Drawer */}
+      <MobileMenu
+        isOpen={mobileMenuOpen}
+        onClose={() => setMobileMenuOpen(false)}
+      />
+    </>
   );
 };

@@ -10,6 +10,7 @@ import { ProjectDetailPage } from './pages/ProjectDetailPage';
 import { AboutPage } from './pages/AboutPage';
 import { ExperimentsPage } from './pages/ExperimentsPage';
 import { ContactPage } from './pages/ContactPage';
+import { NotFoundPage } from './pages/NotFoundPage';
 
 export function App() {
   return (
@@ -32,7 +33,8 @@ export function App() {
             <Route path="/experiments" element={<ExperimentsPage />} />
             <Route path="/lab" element={<Navigate to="/experiments" replace />} />
             <Route path="/contact" element={<ContactPage />} />
-            <Route path="*" element={<Navigate to="/" replace />} />
+            <Route path="/404" element={<NotFoundPage />} />
+            <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </main>
 

@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef, memo } from 'react';
+import React, { useState, useEffect, memo } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 
-type LoaderState = 'INITIAL' | 'LOADING' | 'EXITING' | 'DONE';
+type LoaderState = 'LOADING' | 'EXITING' | 'DONE';
 
 interface ScrilloLoaderProps {
   /** Optional override to force show the loader regardless of sessionStorage */
@@ -31,7 +31,7 @@ const ProgressTracker = memo(function ProgressTracker({ progress }: { progress: 
           className="absolute inset-0 bg-[#FF3E00] rounded-full will-change-transform origin-left"
           style={{
             transform: `scaleX(${progress / 100})`,
-            transition: 'transform 80ms cubic-bezier(0.2, 0, 0, 1)',
+            transition: 'transform 60ms cubic-bezier(0.2, 0, 0, 1)',
           }}
         />
       </div>
@@ -47,9 +47,9 @@ const ProgressTracker = memo(function ProgressTracker({ progress }: { progress: 
 export function ScrilloLoader({ forceShow = false, onComplete }: ScrilloLoaderProps) {
   const prefersReducedMotion = useReducedMotion();
 
-  // Determine initial state synchronously to prevent any white/transparent flash
+  // Determine initial state synchronously from sessionStorage
   const [state, setState] = useState<LoaderState>(() => {
-    if (forceShow) return 'INITIAL';
+    if (forceShow) return 'LOADING';
     try {
       if (sessionStorage.getItem('scrillo-loader-seen') === 'true') {
         return 'DONE';
@@ -57,13 +57,12 @@ export function ScrilloLoader({ forceShow = false, onComplete }: ScrilloLoaderPr
     } catch {
       // Ignore storage errors
     }
-    return 'INITIAL';
+    return 'LOADING';
   });
 
   const [progress, setProgress] = useState(0);
-  const hasInitializedRef = useRef(false);
 
-  // Manage body scroll locking cleanly without layout shift
+  // Manage body scroll locking cleanly
   useEffect(() => {
     if (state !== 'DONE') {
       const prevOverflow = document.body.style.overflow;
@@ -74,80 +73,87 @@ export function ScrilloLoader({ forceShow = false, onComplete }: ScrilloLoaderPr
     }
   }, [state]);
 
-  // Loading sequence controller (Idempotent for React 18 StrictMode)
+  // Loading and exit sequence controller
   useEffect(() => {
     if (state === 'DONE') return;
-    if (hasInitializedRef.current && state !== 'INITIAL') return;
-    hasInitializedRef.current = true;
 
-    setState('LOADING');
+    let animId: number;
+    let exitTimeoutId: ReturnType<typeof setTimeout>;
+    let doneTimeoutId: ReturnType<typeof setTimeout>;
 
-    const duration = 1200; // 1.2s smooth presentation
+    const duration = 1200; // ~1.2s smooth presentation
     const startTime = performance.now();
-    let animationFrameId: number;
 
     const tick = (now: number) => {
       const elapsed = now - startTime;
       const t = Math.min(elapsed / duration, 1);
 
-      // Natural ease-out non-linear progress ramp
+      // Non-linear natural progress curve (quick start, steady climb, smooth snap)
       const currentProgress = Math.min(
         100,
         Math.floor(
-          t < 0.5
-            ? (t / 0.5) * 65
-            : 65 + ((t - 0.5) / 0.5) * 35
+          t < 0.55
+            ? (t / 0.55) * 68
+            : 68 + ((t - 0.55) / 0.45) * 32
         )
       );
 
       setProgress(currentProgress);
 
       if (t < 1) {
-        animationFrameId = requestAnimationFrame(tick);
+        animId = requestAnimationFrame(tick);
       } else {
         setProgress(100);
 
-        // Hold at 100% briefly, then trigger the single exit transition
-        const exitTimer = setTimeout(() => {
+        // Pause briefly at 100% then initiate split curtains
+        exitTimeoutId = setTimeout(() => {
           setState('EXITING');
-        }, 180);
 
-        return () => clearTimeout(exitTimer);
+          // Transition to DONE after curtain sweep animation completes (800ms duration)
+          doneTimeoutId = setTimeout(() => {
+            try {
+              sessionStorage.setItem('scrillo-loader-seen', 'true');
+            } catch {
+              // Ignore storage errors
+            }
+            setState('DONE');
+            if (onComplete) onComplete();
+          }, prefersReducedMotion ? 350 : 850);
+        }, 160);
       }
     };
 
-    animationFrameId = requestAnimationFrame(tick);
+    animId = requestAnimationFrame(tick);
 
-    // Hard safety timeout (2.0s max) - guarantees loader never gets permanently stuck
-    const safetyTimer = setTimeout(() => {
+    // Failsafe timer (2.5s maximum) to guarantee website is always accessible
+    const safetyTimeoutId = setTimeout(() => {
       setProgress(100);
       setState('EXITING');
-    }, 2000);
+      setTimeout(() => {
+        try {
+          sessionStorage.setItem('scrillo-loader-seen', 'true');
+        } catch {
+          // Ignore
+        }
+        setState('DONE');
+        if (onComplete) onComplete();
+      }, 400);
+    }, 2500);
 
     return () => {
-      cancelAnimationFrame(animationFrameId);
-      clearTimeout(safetyTimer);
+      if (animId) cancelAnimationFrame(animId);
+      clearTimeout(exitTimeoutId);
+      clearTimeout(doneTimeoutId);
+      clearTimeout(safetyTimeoutId);
     };
-  }, [state]);
+  }, []); // Run once on mount
 
-  // Clean transition to DONE upon exit animation completion
-  const handleExitComplete = () => {
-    try {
-      sessionStorage.setItem('scrillo-loader-seen', 'true');
-    } catch {
-      // Ignore storage errors
-    }
-    setState('DONE');
-    if (onComplete) onComplete();
-  };
-
-  // If already finished or session active, don't render anything
+  // If complete or seen in session, unmount from DOM
   if (state === 'DONE') {
     return null;
   }
 
-  // Animation constants
-  const curtainEase = [0.85, 0, 0.15, 1]; // Editorial high-craft bezier
+  const curtainEase = [0.85, 0, 0.15, 1]; // Premium editorial cubic bezier
   const isExiting = state === 'EXITING';
 
   return (
@@ -157,7 +163,6 @@ export function ScrilloLoader({ forceShow = false, onComplete }: ScrilloLoaderPr
       aria-busy={state !== 'EXITING'}
       className="fixed inset-0 w-screen h-[100dvh] z-[99999] pointer-events-auto select-none overflow-hidden bg-[#050505]"
       style={{
-        // Keep entire container fully opaque until exit
         opacity: isExiting && prefersReducedMotion ? 0 : 1,
         transition: prefersReducedMotion ? 'opacity 300ms ease-out' : undefined,
       }}
@@ -193,11 +198,6 @@ export function ScrilloLoader({ forceShow = false, onComplete }: ScrilloLoaderPr
             duration: 0.8,
             ease: curtainEase,
             delay: 0.05,
-          }}
-          onAnimationComplete={() => {
-            if (isExiting) {
-              handleExitComplete();
-            }
           }}
           className="w-1/2 h-full bg-[#050505] border-l border-white/[0.04] relative"
         >
@@ -235,7 +235,7 @@ export function ScrilloLoader({ forceShow = false, onComplete }: ScrilloLoaderPr
           </div>
         </header>
 
-        {/* Center Main Branded Typography - Stable, Rock-Solid without remounting */}
+        {/* Center Main Branded Typography - Completely stable without remounting */}
         <main className="flex flex-col items-center justify-center text-center my-auto px-4">
           <div className="overflow-hidden">
             <h1 className="text-6xl sm:text-8xl md:text-9xl lg:text-[10.5rem] font-extrabold tracking-tighter leading-none text-[#F5F5F5] select-none">
@@ -260,7 +260,7 @@ export function ScrilloLoader({ forceShow = false, onComplete }: ScrilloLoaderPr
             DESIGN + CODE
           </div>
 
-          {/* Isolated progress component: Only this sub-tree updates during progress ticks */}
+          {/* Isolated progress component */}
           <ProgressTracker progress={progress} />
         </footer>
       </motion.div>

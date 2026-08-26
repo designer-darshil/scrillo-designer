@@ -10,6 +10,8 @@ import { ScrollToTopOnRoute } from './components/layout/ScrollToTopOnRoute';
 import { HomePage } from './pages/HomePage';
 import { WorkPage } from './pages/WorkPage';
 import { ProjectDetailPage } from './pages/ProjectDetailPage';
+import { LabPage } from './pages/LabPage';
+import { ThinkingPage } from './pages/ThinkingPage';
 import { AboutPage } from './pages/AboutPage';
 import { ServicesPage } from './pages/ServicesPage';
 import { ExperiencePage } from './pages/ExperiencePage';
@@ -22,13 +24,13 @@ export function App() {
         {/* Ambient Film Grain Texture */}
         <GrainOverlay />
 
-        {/* Top Scroll Indicator */}
+        {/* Top Scroll Progress Indicator */}
         <ScrollProgress />
 
-        {/* Desktop Dynamic Cursor */}
+        {/* Desktop Dynamic Contextual Cursor */}
         <CustomCursor />
 
-        {/* Auto Scroll to Top on Page Navigation */}
+        {/* Auto Scroll to Top on Navigation */}
         <ScrollToTopOnRoute />
 
         {/* Global Floating Editorial Navbar */}
@@ -40,6 +42,8 @@ export function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/work" element={<WorkPage />} />
             <Route path="/work/:slug" element={<ProjectDetailPage />} />
+            <Route path="/lab" element={<LabPage />} />
+            <Route path="/thinking" element={<ThinkingPage />} />
             <Route path="/about" element={<AboutPage />} />
             <Route path="/services" element={<ServicesPage />} />
             <Route path="/experience" element={<ExperiencePage />} />

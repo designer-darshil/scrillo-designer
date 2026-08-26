@@ -15,6 +15,35 @@ export interface ProjectMedia {
   alt: string;
 }
 
+export interface ProjectReceiptItem {
+  count: number | string;
+  label: string;
+}
+
+export interface DecisionLogItem {
+  id: string;
+  question: string;
+  decision: string;
+  tradeoff?: string;
+  tag?: string;
+}
+
+export interface BeforeAfterItem {
+  title: string;
+  before: {
+    label: string;
+    description: string;
+    image?: string;
+    flaws: string[];
+  };
+  after: {
+    label: string;
+    description: string;
+    image?: string;
+    improvements: string[];
+  };
+}
+
 export interface CaseStudySectionData {
   title: string;
   subtitle?: string;
@@ -67,11 +96,31 @@ export interface Project {
   description: string;
   challenge: string;
   solution: string;
+  receipt: ProjectReceiptItem[];
+  decisionLogs: DecisionLogItem[];
+  beforeAfter?: BeforeAfterItem;
   impactStatements: string[];
   layoutType: 'large-hero' | 'split-editorial' | 'horizontal-banner' | 'asymmetric-stack';
   sections: CaseStudySectionData[];
   gallery: ProjectMedia[];
   nextProjectId?: string;
+}
+
+export interface ThinkingArticle {
+  id: string;
+  slug: string;
+  number: string;
+  title: string;
+  date: string;
+  category: 'UX Architecture' | 'Visual Craft' | 'Design-to-Code' | 'Philosophy' | 'Motion Design';
+  readTime: string;
+  introduction: string;
+  mainArgument: string[];
+  observation: string;
+  conclusion: string;
+  keyTakeaway: string;
+  relatedProjectSlug?: string;
+  relatedProjectName?: string;
 }
 
 export interface ServiceItem {
@@ -107,9 +156,10 @@ export interface ExperimentItem {
   title: string;
   category: string;
   year: number;
+  tagline: string;
   description: string;
   tags: string[];
-  demoType: 'spring-toggle' | 'variable-font' | 'matrix-grid' | 'color-mixer' | 'code-preview' | 'cursor-trail';
+  demoType: 'spring-toggle' | 'variable-font' | 'matrix-grid' | 'color-mixer' | 'magnetic-button' | 'cursor-trail' | 'interactive-nav';
   codeSnippet?: string;
 }
 

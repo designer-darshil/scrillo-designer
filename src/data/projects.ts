@@ -25,6 +25,51 @@ export const projects: Project[] = [
     description: 'Nova is a modern B2B analytics platform where data engineers and product teams observe distributed application pipelines in real-time. The interface was rebuilt from the ground up to reduce cognitive fatigue during critical incident monitoring.',
     challenge: 'The legacy interface suffered from severe information overload: 14 nested menus, inconsistent data tables, and latency-heavy data visualizers that caused operator confusion during production incidents.',
     solution: 'Designed a unified command-center layout featuring an omnipresent command palette (Cmd+K), high-density data tables with custom virtualized rendering, and an ergonomic dark palette with strict semantic contrast tokens.',
+    receipt: [
+      { count: '38', label: 'Unique Interface Screens' },
+      { count: '42', label: 'Tokenized UI Components' },
+      { count: '4', label: 'Responsive Breakpoints' },
+      { count: '3', label: 'Navigation Iterations Tested' },
+      { count: '100%', label: 'WCAG AAA Contrast Compliance' },
+      { count: '0ms', label: 'Cumulative Layout Shift' }
+    ],
+    decisionLogs: [
+      {
+        id: 'why-command-bar',
+        question: 'Why replace top-level nested dropdowns with a global Cmd+K palette?',
+        decision: 'Telemetry operators are power users whose hands stay on the keyboard during incident triaging. Moving secondary configuration out of sight into a keyboard-first index freed up 180px of vertical viewport real estate for live log streams.',
+        tradeoff: 'First-time users need brief visual tooltips to discover shortcuts, solved via persistent footer shortcut reminders.',
+        tag: 'INFORMATION ARCHITECTURE'
+      },
+      {
+        id: 'why-oklch-dark',
+        question: 'Why calibrate surface colors with OKLCH instead of pure black #000000?',
+        decision: 'Pure #000000 causes harsh contrast halation with pure white text on OLED screens. We used OKLCH lightness ramps (#080808, #121212, #181818) to preserve perceptible depth layers while preventing operator eye fatigue during 12-hour shifts.',
+        tradeoff: 'Requires modern CSS color function fallbacks for older browser targets.',
+        tag: 'COLOR SCIENCE'
+      }
+    ],
+    beforeAfter: {
+      title: 'Telemetry Dashboard Restructuring',
+      before: {
+        label: 'Legacy Dashboard (v1.8)',
+        description: 'Cluttered 14-tab navigation, inconsistent line-heights, and alerts scattered randomly across multiple sub-pages.',
+        flaws: [
+          'Critical incident alerts hidden behind 3 clicks',
+          'Heavy DOM overhead causing 450ms lag during streaming ticks',
+          'Poor contrast on status badges leading to operator ambiguity'
+        ]
+      },
+      after: {
+        label: 'Redesigned Command Canvas (v2.6)',
+        description: 'Single-pane virtualized stream, instant Cmd+K filter bar, and unified severity color coding.',
+        improvements: [
+          'One-click drilldown into cluster stack traces',
+          'Sub-16ms 60 FPS streaming data updates with canvas virtualization',
+          'Zero-latency filter bar supporting regex queries'
+        ]
+      }
+    },
     impactStatements: [
       'Reduced operator mean-time-to-diagnose by 38% through contextual hierarchy.',
       'Constructed a 42-component design system tokenized for React & Figma tokens.',
@@ -154,6 +199,42 @@ export const TelemetryStream: React.FC<TelemetryStreamProps> = ({
     description: 'Aura is a digital flagship store for an avant-garde architectural home goods manufacturer. The objective was to depart from standard modular e-commerce grids in favor of an immersive, magazine-style browsing journey.',
     challenge: 'Standard online storefronts felt transactional and cold. Aura required a tactile digital experience that conveyed the physical weight, raw texture, and artisanal craftsmanship of concrete, bronze, and stone objects.',
     solution: 'Designed an asymmetrical editorial grid with variable font scaling, cursor-linked perspective shifts, dynamic split-view lookbooks, and sub-100ms instant cart drawers.',
+    receipt: [
+      { count: '24', label: 'Editorial Pages Designed' },
+      { count: '18', label: 'Bespoke Lookbook Modules' },
+      { count: '5', label: 'Custom Motion Shaders' },
+      { count: '60fps', label: 'Continuous Parallax Performance' },
+      { count: 'sub-80ms', label: 'Instant Cart Drawer Latency' }
+    ],
+    decisionLogs: [
+      {
+        id: 'why-asymmetric-grid',
+        question: 'Why discard the traditional 4-column product card grid?',
+        decision: 'Aura sells artisanal objects ranging from $400 to $6,000. Uniform grid cards diminish perceived value by making sculptural pieces feel like commodity inventory. Staggered, magazine-scale compositions give each artifact gallery-level breathing room.',
+        tag: 'ART DIRECTION'
+      }
+    ],
+    beforeAfter: {
+      title: 'Storefront Experience Transition',
+      before: {
+        label: 'Generic E-Commerce Grid',
+        description: 'Standard square thumbnail boxes with generic price tags and standard modal popups.',
+        flaws: [
+          'No emotional resonance with architectural craftsmanship',
+          'Cramped product photography hiding surface textures',
+          'Clunky multi-step page reloads on variant selection'
+        ]
+      },
+      after: {
+        label: 'Editorial Spatial Flagship',
+        description: 'Full-bleed atmospheric photography with contextual material origin notes and instant sliding cart.',
+        improvements: [
+          'Elevated brand prestige and art direction',
+          'Seamless client-side transitions between chapters',
+          'Instant variant switching without page reload'
+        ]
+      }
+    },
     impactStatements: [
       'Elevated average time-on-site from 1m 12s to 3m 48s.',
       'Increased direct product detail page interaction rates by 44%.',
@@ -218,6 +299,20 @@ export const TelemetryStream: React.FC<TelemetryStreamProps> = ({
     description: 'Frame is a collaborative workspace where remote product designers and engineers mark up live web builds, leave pinned audio notes, and inspect CSS diffs directly on canvas.',
     challenge: 'Multiplayer canvases often suffer from visual chaos: overlapping cursor trails, cluttered toolbars, and unorganized commentary threads that obscure the actual design review.',
     solution: 'Engineered a "Focused Critique" spatial mode that dims secondary canvases, clusters commentary into thread ribbons, and provides an expandable bottom HUD with minimal visual footprint.',
+    receipt: [
+      { count: '46', label: 'Spatial Canvas Tools' },
+      { count: '12', label: 'Multiplayer Cursor States' },
+      { count: '6%', label: 'Total Screen HUD Footprint' },
+      { count: '120fps', label: 'Inertial Zoom Smoothness' }
+    ],
+    decisionLogs: [
+      {
+        id: 'why-bottom-hud',
+        question: 'Why move standard top/side toolbars to a collapsed bottom HUD dock?',
+        decision: 'Side toolbars create permanent lateral visual occlusion on widescreen monitors. Placing tool triggers in an auto-collapsing bottom dock gives designers 100% unobstructed horizontal panning room for side-by-side design comparisons.',
+        tag: 'SPATIAL UX'
+      }
+    ],
     impactStatements: [
       'Adopted by 180+ remote design squads during closed beta testing.',
       'Reduced design critique turnaround cycles from 4 days to 24 hours.',
@@ -268,6 +363,20 @@ export const TelemetryStream: React.FC<TelemetryStreamProps> = ({
     description: 'Mono is a digital specimen platform built for contemporary type foundries. It allows designers to test variable font axes (weight, slant, optical size), preview OpenType features, and export SVG outlines in real-time.',
     challenge: 'Traditional type foundry sites are static specimen PDFs or heavy flash-like apps that lag on mobile devices.',
     solution: 'Built a lightweight, canvas-accelerated text tester that renders 120 FPS font deformations and supports custom keyboard ligature testing with zero external libraries.',
+    receipt: [
+      { count: '14', label: 'Variable Axis Controllers' },
+      { count: '850+', label: 'Glyphs Rendered in Real-Time' },
+      { count: '48KB', label: 'Total Javascript Bundle Size' },
+      { count: '0', label: 'Third-Party Heavy Canvas Libraries' }
+    ],
+    decisionLogs: [
+      {
+        id: 'why-native-css-axes',
+        question: 'Why avoid WebGL for the glyph deformation tester?',
+        decision: 'Variable font variation settings can be applied directly to DOM typography with zero-copy hardware acceleration on the GPU. Using native CSS font-variation-settings keeps the bundle under 50KB and retains 100% copy-paste text accessibility.',
+        tag: 'FRONTEND PERFORMANCE'
+      }
+    ],
     impactStatements: [
       'Achieved a sub-50KB bundle size for the entire interactive specimen engine.',
       'Featured in multiple web design publications and design engineering newsletters.',
@@ -325,6 +434,19 @@ export const TelemetryStream: React.FC<TelemetryStreamProps> = ({
     description: 'Pulse delivers quantitative risk modeling and asset allocations to hedge funds and portfolio managers.',
     challenge: 'Traders had to synthesize dozens of volatile charts simultaneously across multiple monitor setups without losing situational awareness.',
     solution: 'Designed an ultra-dense, customizable modular grid system with custom candlestick rendering, heatmap matrices, and customizable audio cues for threshold breaches.',
+    receipt: [
+      { count: '28', label: 'Financial Chart Primitives' },
+      { count: '100%', label: 'Color-Blind Accessible Palettes' },
+      { count: '16ms', label: 'Streaming Tick Refresh Rate' }
+    ],
+    decisionLogs: [
+      {
+        id: 'why-duotone-status',
+        question: 'Why replace traditional red/green financial colors with dual-channel luminance and pattern fills?',
+        decision: 'Approximately 8% of male financial operators experience deuteranopia color blindness. Relying solely on red/green leads to catastrophic misinterpretation. We combined distinct luminance shifts with subtle geometric glyphs (▲ / ▼).',
+        tag: 'ACCESSIBILITY'
+      }
+    ],
     impactStatements: [
       'Eliminated UI redraw bottlenecks with specialized canvas data renderers.',
       'Achieved 100% WCAG 2.1 AA accessibility compliance across all financial charts.'
@@ -372,6 +494,19 @@ export const TelemetryStream: React.FC<TelemetryStreamProps> = ({
     description: 'Form Architecture required an online portfolio that mirrored their physical philosophy: raw concrete, honest materiality, and bold structural geometry.',
     challenge: 'Architectural imagery often gets lost in generic website layouts with distracting navigation and cramped photo carousels.',
     solution: 'Crafted full-bleed project spreads with crisp 1px structural gridlines, subtle scroll-driven parallax, and interactive building blueprints.',
+    receipt: [
+      { count: '16', label: 'Architectural Case Studies' },
+      { count: '1px', label: 'Structural Swiss Grid Lines' },
+      { count: '0', label: 'Unnecessary Visual Ornaments' }
+    ],
+    decisionLogs: [
+      {
+        id: 'why-exposed-grid',
+        question: 'Why expose 1px structural gridlines across the entire layout?',
+        decision: 'Architects think in grids, structural spans, and tectonic alignments. Showing the subtle 1px border scaffolding across every breakpoint creates an immediate subconscious kinship with architectural drawings.',
+        tag: 'VISUAL METAPHOR'
+      }
+    ],
     impactStatements: [
       'Won praise in multiple international design archives for spatial layout.',
       'Elevated client inquiry conversion for premium architectural commissions by 60%.'
@@ -419,6 +554,19 @@ export const TelemetryStream: React.FC<TelemetryStreamProps> = ({
     description: 'Shift helps remote software engineering teams communicate asynchronously without getting pulled into endless recurring video syncs.',
     challenge: 'Explaining a paradigm shift in team workflow required a landing page that immediately demonstrated the product value within 10 seconds of landing.',
     solution: 'Designed an interactive landing page featuring a live "Calendar Freedom Simulator" and seamless onboarding flow that got teams writing their first async standup in under 2 minutes.',
+    receipt: [
+      { count: '12', label: 'Landing Page Section Variations' },
+      { count: '1', label: 'Live Interactive Calendar Simulator' },
+      { count: '2 min', label: 'Time-to-First-Standup UX Onboarding' }
+    ],
+    decisionLogs: [
+      {
+        id: 'why-interactive-simulator',
+        question: 'Why include a live calendar simulator on the landing page hero?',
+        decision: 'Reading marketing copy about "saving hours" feels abstract. Letting visitors click and delete bloated calendar blocks to calculate their team\'s reclaimed focus time generated immediate emotional buy-in before signup.',
+        tag: 'CONVERSION UX'
+      }
+    ],
     impactStatements: [
       'Doubled landing page signup conversion rate from 3.2% to 6.8%.',
       'Engineered an interactive product walkthrough that converted 40% of visitors into trial users.'
@@ -466,6 +614,19 @@ export const TelemetryStream: React.FC<TelemetryStreamProps> = ({
     description: 'Orbit is an ongoing research lab exploring spatial user interfaces, magnetic physics cursors, and procedural typography without relying on heavy WebGL libraries like Three.js.',
     challenge: 'Achieving responsive, fluid 3D-like depth and motion interactions on the web without ballooning bundle sizes or causing battery drain on mobile devices.',
     solution: 'Built a lightweight CSS 3D matrix transform engine paired with Framer Motion spring physics, keeping the bundle size below 12KB.',
+    receipt: [
+      { count: '8', label: 'Interactive Physics Modules' },
+      { count: '12KB', label: 'Lightweight Math Engine' },
+      { count: '120fps', label: 'Frame Rate on M-Series / Modern Mobile' }
+    ],
+    decisionLogs: [
+      {
+        id: 'why-no-webgl',
+        question: 'Why avoid Three.js / WebGL for 3D interactions?',
+        decision: 'Three.js adds ~600KB uncompressed, spikes mobile battery temperature, and breaks standard DOM text accessibility. Native CSS matrix3d transforms provide 90% of the perceived depth at 2% of the weight.',
+        tag: 'ENGINEERING ARCHITECTURE'
+      }
+    ],
     impactStatements: [
       'Runs at steady 60–120 FPS on all modern mobile and desktop browsers.',
       '100% lightweight native CSS transforms and requestAnimationFrame loops.'

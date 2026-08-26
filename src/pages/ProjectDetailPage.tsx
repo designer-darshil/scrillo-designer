@@ -1,15 +1,17 @@
 import React, { useState } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { projects } from '../data/projects';
 import { PageTransition } from '../components/layout/PageTransition';
 import { BrowserMockup } from '../components/ui/BrowserMockup';
 import { DeviceMockup } from '../components/ui/DeviceMockup';
 import { Lightbox } from '../components/ui/Lightbox';
-import { ArrowLeft, ArrowUpRight, CheckCircle2, Code2, Figma, Layers, Sparkles, Terminal } from 'lucide-react';
+import { ProjectReceipt } from '../components/ui/ProjectReceipt';
+import { DecisionLog } from '../components/ui/DecisionLog';
+import { BeforeAfter } from '../components/ui/BeforeAfter';
+import { ArrowLeft, ArrowUpRight, CheckCircle2, Code2, Layers, Sparkles } from 'lucide-react';
 
 export const ProjectDetailPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
-  const navigate = useNavigate();
 
   const project = projects.find((p) => p.slug === slug) || projects[0];
   const nextProject = projects.find((p) => p.id === project.nextProjectId) || projects[0];
@@ -92,6 +94,13 @@ export const ProjectDetailPage: React.FC = () => {
           </div>
         </header>
 
+        {/* Project Receipt: Replaces fake stats with provable design evidence */}
+        {project.receipt && project.receipt.length > 0 && (
+          <section className="max-w-7xl mx-auto px-6 md:px-12 py-8">
+            <ProjectReceipt receipt={project.receipt} />
+          </section>
+        )}
+
         {/* Core Challenge & Solution Overview */}
         <section className="max-w-7xl mx-auto px-6 md:px-12 py-16 border-t border-white/10">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
@@ -121,6 +130,20 @@ export const ProjectDetailPage: React.FC = () => {
             </div>
           </div>
         </section>
+
+        {/* Before / After Comparison (If available) */}
+        {project.beforeAfter && (
+          <section className="max-w-7xl mx-auto px-6 md:px-12 py-12 border-t border-white/10">
+            <BeforeAfter data={project.beforeAfter} />
+          </section>
+        )}
+
+        {/* Design Decision Log: The "WHY?" section */}
+        {project.decisionLogs && project.decisionLogs.length > 0 && (
+          <section className="max-w-7xl mx-auto px-6 md:px-12 py-12 border-t border-white/10">
+            <DecisionLog logs={project.decisionLogs} />
+          </section>
+        )}
 
         {/* Case Study Detailed Storytelling Sections */}
         {project.sections.map((section, sIdx) => (

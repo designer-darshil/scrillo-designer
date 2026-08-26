@@ -2,14 +2,24 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PageTransition } from '../components/layout/PageTransition';
 import { siteConfig } from '../data/site';
-import { Mail, MapPin, Calendar, ArrowRight, CheckCircle2, Sparkles, Send, RefreshCw } from 'lucide-react';
+import { Mail, MapPin, Calendar, ArrowRight, CheckCircle2, Sparkles, Send, RefreshCw, Layers } from 'lucide-react';
 
 const projectTypes = [
-  'UI/UX Product Design',
-  'Creative Web Design',
-  'Frontend Web Development',
-  'Design System Architecture',
-  'End-to-End Design + Code'
+  'Website',
+  'Product UI',
+  'UX Redesign',
+  'Landing Page',
+  'Design System',
+  'Frontend Web',
+  'Other / Custom'
+];
+
+const projectStages = [
+  'Idea / Concept',
+  'Wireframes Ready',
+  'Redesign of Live App',
+  'Figma Ready for Code',
+  'Existing Production System'
 ];
 
 const budgetRanges = [
@@ -30,6 +40,7 @@ export const ContactPage: React.FC = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [selectedType, setSelectedType] = useState(projectTypes[0]);
+  const [selectedStage, setSelectedStage] = useState(projectStages[1]);
   const [selectedBudget, setSelectedBudget] = useState(budgetRanges[1]);
   const [selectedTimeline, setSelectedTimeline] = useState(timelineRanges[1]);
   const [message, setMessage] = useState('');
@@ -84,7 +95,7 @@ export const ContactPage: React.FC = () => {
             </div>
 
             <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-extrabold tracking-tighter text-white uppercase leading-[0.92] mb-8">
-              LET'S BUILD <br />
+              LET'S MAKE <br />
               <span className="font-editorial-serif italic font-normal text-[#FF3E00] lowercase text-[1.05em]">
                 something
               </span>{' '}
@@ -93,7 +104,7 @@ export const ContactPage: React.FC = () => {
             </h1>
 
             <p className="max-w-2xl text-lg sm:text-xl text-muted-primary leading-relaxed">
-              Have a challenging digital product to design, a design system to architect, or a website to code? Tell me about your goals and timeline.
+              Have a challenging digital product to design, a design system to architect, or a website to code? Complete this mini-brief to start the conversation.
             </p>
           </div>
 
@@ -170,7 +181,7 @@ export const ContactPage: React.FC = () => {
 
             </div>
 
-            {/* Right Column: Interactive Proposal Form */}
+            {/* Right Column: Mini-Brief Form */}
             <div className="lg:col-span-7">
               <div className="p-8 sm:p-12 rounded-3xl border border-white/10 bg-[#0A0A0A] shadow-2xl relative">
                 
@@ -226,7 +237,7 @@ export const ContactPage: React.FC = () => {
                       {/* Project Type Selector */}
                       <div className="space-y-3">
                         <label className="text-xs font-mono uppercase tracking-wider text-white/70 block">
-                          PROJECT FOCUS / DISCIPLINE
+                          PROJECT TYPE
                         </label>
                         <div className="flex flex-wrap gap-2">
                           {projectTypes.map((type) => (
@@ -241,6 +252,29 @@ export const ContactPage: React.FC = () => {
                               }`}
                             >
                               {type}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Project Stage Selector */}
+                      <div className="space-y-3">
+                        <label className="text-xs font-mono uppercase tracking-wider text-white/70 block">
+                          CURRENT STAGE
+                        </label>
+                        <div className="flex flex-wrap gap-2">
+                          {projectStages.map((stage) => (
+                            <button
+                              type="button"
+                              key={stage}
+                              onClick={() => setSelectedStage(stage)}
+                              className={`px-3.5 py-2 rounded-lg text-xs font-mono tracking-wider transition-all ${
+                                selectedStage === stage
+                                  ? 'bg-white text-black font-bold shadow-md shadow-white/10'
+                                  : 'bg-white/5 border border-white/10 text-white/60 hover:bg-white/10 hover:text-white'
+                              }`}
+                            >
+                              {stage}
                             </button>
                           ))}
                         </div>
@@ -362,7 +396,8 @@ export const ContactPage: React.FC = () => {
                       </div>
 
                       <div className="p-4 rounded-xl bg-white/5 border border-white/5 max-w-md mx-auto text-xs font-mono text-white/70 text-left space-y-1">
-                        <div><span className="text-white/40">Focus:</span> {selectedType}</div>
+                        <div><span className="text-white/40">Type:</span> {selectedType}</div>
+                        <div><span className="text-white/40">Stage:</span> {selectedStage}</div>
                         <div><span className="text-white/40">Budget:</span> {selectedBudget}</div>
                         <div><span className="text-white/40">Timeline:</span> {selectedTimeline}</div>
                       </div>

@@ -1,11 +1,12 @@
 import React from 'react';
 import { PageTransition } from '../components/layout/PageTransition';
 import { SectionHeading } from '../components/ui/SectionHeading';
+import { CurrentlySection } from '../components/ui/CurrentlySection';
+import { LikesDislikes } from '../components/ui/LikesDislikes';
 import { FinalCTA } from '../components/sections/FinalCTA';
 import { siteConfig } from '../data/site';
 import { media } from '../data/media';
-import { toolsData } from '../data/tools';
-import { Compass, Sparkles, Terminal, Code2, Layers, Heart, Coffee, BookOpen, Laptop } from 'lucide-react';
+import { Laptop, Terminal, Coffee } from 'lucide-react';
 
 export const AboutPage: React.FC = () => {
   return (
@@ -75,10 +76,38 @@ export const AboutPage: React.FC = () => {
             </div>
           </div>
 
-          {/* Design Philosophy & Core Principles */}
+          {/* Personality Section: I LIKE vs I DON'T LIKE */}
           <div className="py-20 border-t border-white/10">
             <SectionHeading
               number="01"
+              tag="PERSONAL TASTE & PERSPECTIVE"
+              title="DESIGN"
+              serifWord="predilections"
+              description="A direct look at the principles I champion and the superficial anti-patterns I reject."
+            />
+            <div className="mt-8">
+              <LikesDislikes />
+            </div>
+          </div>
+
+          {/* Currently & Exploring */}
+          <div className="py-20 border-t border-white/10">
+            <SectionHeading
+              number="02"
+              tag="REAL-TIME FOCUS"
+              title="CURRENTLY"
+              serifWord="active & exploring"
+              description="Ongoing design systems, micro-interaction research, and engineering experiments."
+            />
+            <div className="mt-8">
+              <CurrentlySection />
+            </div>
+          </div>
+
+          {/* Design Philosophy & Core Principles */}
+          <div className="py-20 border-t border-white/10">
+            <SectionHeading
+              number="03"
               tag="CORE VALUES"
               title="DESIGN"
               serifWord="philosophy"
@@ -108,7 +137,7 @@ export const AboutPage: React.FC = () => {
           {/* Studio Setup & Personal Notes */}
           <div className="py-20 border-t border-white/10">
             <SectionHeading
-              number="02"
+              number="04"
               tag="THE WORKSPACE"
               title="TOOLS &"
               serifWord="hardware setup"

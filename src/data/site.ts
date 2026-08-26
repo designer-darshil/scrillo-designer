@@ -20,6 +20,35 @@ export const siteConfig = {
     behance: 'https://behance.net/scrillo',
     instagram: 'https://instagram.com/scrillo.design'
   },
+  currently: [
+    'Designing telemetry & distributed system interfaces',
+    'Building lightweight CSS 3D & spring physics micro-interactions',
+    'Refining token sync engines between Figma variables and Tailwind CSS',
+    'Exploring kinetic variable typography in responsive viewports'
+  ],
+  exploring: [
+    'OKLCH Perceptual color models',
+    'Subgrid & CSS container queries',
+    'Keyboard-first spatial navigation patterns',
+    'Zero-runtime DOM performance profiling'
+  ],
+  likes: [
+    'Good typography & intentional whitespace',
+    'Fast websites with 0ms layout shift',
+    'Clear visual hierarchy',
+    'Unexpected tactile interactions',
+    'Simple, predictable interfaces',
+    'Ergonomic dark modes',
+    'Meticulous sub-pixel details'
+  ],
+  dislikes: [
+    'Pointless entrance animations that waste user time',
+    'Bloated UI kits with excessive dependencies',
+    'Generic AI-generated portfolio layouts',
+    'Design without architectural purpose',
+    'Interfaces that look good in static screenshots but feel terrible to use',
+    'Fake metric claims and manufactured awards'
+  ],
   principles: [
     {
       number: '01',

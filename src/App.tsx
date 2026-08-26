@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { ScrilloLoader } from './components/layout/ScrilloLoader';
 import { Navbar } from './components/layout/Navbar';
 import { Footer } from './components/layout/Footer';
 import { CustomCursor } from './components/layout/CustomCursor';
@@ -22,6 +23,9 @@ export function App() {
   return (
     <Router>
       <div className="relative min-h-screen bg-[#050505] text-[#F5F5F5] selection:bg-[#FF3E00] selection:text-white overflow-x-hidden font-sans">
+        {/* Full-Screen Signature Entry Loader */}
+        <ScrilloLoader />
+
         {/* Ambient Film Grain Texture */}
         <GrainOverlay />
 

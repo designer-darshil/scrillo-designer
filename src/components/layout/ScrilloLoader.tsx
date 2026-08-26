@@ -1,18 +1,17 @@
-import React, { useState, useEffect, memo } from 'react';
+import React, { useState, useEffect, useRef, memo, useCallback } from 'react';
+import { useLocation } from 'react-router-dom';
 import { motion, useReducedMotion } from 'framer-motion';
 
-type LoaderState = 'LOADING' | 'EXITING' | 'DONE';
+type LoaderState = 'IDLE' | 'LOADING' | 'WAITING_FOR_PAGE' | 'READY' | 'EXITING' | 'COMPLETE';
 
 interface ScrilloLoaderProps {
-  /** Optional override to force show the loader regardless of sessionStorage */
-  forceShow?: boolean;
-  /** Callback fired when the loader finishes transitioning out */
-  onComplete?: () => void;
+  /** Optional manual readiness override */
+  isReady?: boolean;
 }
 
 /**
  * Isolated Progress Sub-Component
- * Prevents full re-render of the parent loader and wordmark during progress ticks.
+ * Renders the hairline track and numerical percentage without causing full layout re-renders.
  */
 const ProgressTracker = memo(function ProgressTracker({ progress }: { progress: number }) {
   return (
@@ -30,41 +29,96 @@ const ProgressTracker = memo(function ProgressTracker({ progress }: { progress: 
         <div
           className="absolute inset-0 bg-[#FF3E00] rounded-full will-change-transform origin-left"
           style={{
-            transform: `scaleX(${progress / 100})`,
-            transition: 'transform 60ms cubic-bezier(0.2, 0, 0, 1)',
+            transform: `scaleX(${Math.max(0, Math.min(progress, 100)) / 100})`,
+            transition: 'transform 80ms cubic-bezier(0.2, 0, 0, 1)',
           }}
         />
       </div>
 
       {/* Numeric Counter with fixed width to prevent layout shift */}
       <span className="text-white font-medium tabular-nums w-[3.5ch] text-right">
-        {progress}%
+        {Math.round(progress)}%
       </span>
     </div>
   );
 });
 
-export function ScrilloLoader({ forceShow = false, onComplete }: ScrilloLoaderProps) {
-  const prefersReducedMotion = useReducedMotion();
-
-  // Determine initial state synchronously from sessionStorage
-  const [state, setState] = useState<LoaderState>(() => {
-    if (forceShow) return 'LOADING';
+/**
+ * Utility: Wait for critical above-the-fold images to load or error out
+ */
+function waitForCriticalImages(): Promise<void> {
+  return new Promise((resolve) => {
     try {
-      if (sessionStorage.getItem('scrillo-loader-seen') === 'true') {
-        return 'DONE';
+      const main = document.querySelector('main');
+      if (!main) {
+        resolve();
+        return;
+      }
+
+      // Find visible/critical images within main content
+      const images = Array.from(main.querySelectorAll('img')).slice(0, 6);
+      const pendingImages = images.filter((img) => !img.complete && img.src);
+
+      if (pendingImages.length === 0) {
+        resolve();
+        return;
+      }
+
+      let remaining = pendingImages.length;
+      const onImageFinish = () => {
+        remaining -= 1;
+        if (remaining <= 0) resolve();
+      };
+
+      pendingImages.forEach((img) => {
+        if (img.complete) {
+          onImageFinish();
+        } else {
+          img.addEventListener('load', onImageFinish, { once: true });
+          img.addEventListener('error', onImageFinish, { once: true });
+        }
+      });
+
+      // Max image wait safeguard (600ms)
+      setTimeout(resolve, 600);
+    } catch {
+      resolve();
+    }
+  });
+}
+
+/**
+ * Utility: Wait for critical fonts to load
+ */
+function waitForFonts(): Promise<void> {
+  return new Promise((resolve) => {
+    try {
+      if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(() => resolve()).catch(() => resolve());
+        // Max font wait safeguard (300ms)
+        setTimeout(resolve, 300);
+      } else {
+        resolve();
       }
     } catch {
-      // Ignore storage errors
+      resolve();
     }
-    return 'LOADING';
   });
+}
 
+export function ScrilloLoader({ isReady }: ScrilloLoaderProps) {
+  const location = useLocation();
+  const prefersReducedMotion = useReducedMotion();
+
+  const [state, setState] = useState<LoaderState>('LOADING');
   const [progress, setProgress] = useState(0);
 
-  // Manage body scroll locking cleanly
+  const navIdRef = useRef(0);
+  const isFirstMountRef = useRef(true);
+
+  // Manage body scroll locking during active loader states
   useEffect(() => {
-    if (state !== 'DONE') {
+    if (state !== 'IDLE' && state !== 'COMPLETE') {
       const prevOverflow = document.body.style.overflow;
       document.body.style.overflow = 'hidden';
       return () => {
@@ -73,98 +127,125 @@ export function ScrilloLoader({ forceShow = false, onComplete }: ScrilloLoaderPr
     }
   }, [state]);
 
-  // Loading and exit sequence controller
-  useEffect(() => {
-    if (state === 'DONE') return;
+  // Main navigation & refresh lifecycle coordinator
+  const runNavigationSequence = useCallback((targetNavId: number) => {
+    setState('LOADING');
+    setProgress(0);
 
-    let animId: number;
-    let exitTimeoutId: ReturnType<typeof setTimeout>;
-    let doneTimeoutId: ReturnType<typeof setTimeout>;
-
-    const duration = 1200; // ~1.2s smooth presentation
     const startTime = performance.now();
+    const targetPreloadTime = 650; // Smooth initial ramp to ~90%
+    let animFrameId: number;
+    let isDestinationReady = false;
 
+    // Track readiness resolution
+    const checkReadiness = async () => {
+      // 1. Double requestAnimationFrame to ensure React has mounted the new route DOM
+      await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+
+      if (navIdRef.current !== targetNavId) return;
+
+      // 2. Parallel check for fonts and critical route images
+      await Promise.all([waitForFonts(), waitForCriticalImages()]);
+
+      if (navIdRef.current !== targetNavId) return;
+
+      // Destination is now genuinely ready
+      isDestinationReady = true;
+    };
+
+    checkReadiness();
+
+    // Progress animation tick
     const tick = (now: number) => {
+      if (navIdRef.current !== targetNavId) return;
+
       const elapsed = now - startTime;
-      const t = Math.min(elapsed / duration, 1);
 
-      // Non-linear natural progress curve (quick start, steady climb, smooth snap)
-      const currentProgress = Math.min(
-        100,
-        Math.floor(
-          t < 0.55
-            ? (t / 0.55) * 68
-            : 68 + ((t - 0.55) / 0.45) * 32
-        )
-      );
-
-      setProgress(currentProgress);
-
-      if (t < 1) {
-        animId = requestAnimationFrame(tick);
+      if (!isDestinationReady) {
+        // Smoothly approach 92% while waiting for the page to be ready
+        const ratio = Math.min(elapsed / targetPreloadTime, 1);
+        const currentProg = Math.floor(ratio * 92);
+        setProgress(currentProg);
+        setState('WAITING_FOR_PAGE');
+        animFrameId = requestAnimationFrame(tick);
       } else {
+        // Page is ready! Leap smoothly to 100%
+        setState('READY');
         setProgress(100);
 
-        // Pause briefly at 100% then initiate split curtains
-        exitTimeoutId = setTimeout(() => {
+        // Brief hold at 100% so the user perceives completion
+        const exitTimer = setTimeout(() => {
+          if (navIdRef.current !== targetNavId) return;
           setState('EXITING');
 
-          // Transition to DONE after curtain sweep animation completes (800ms duration)
-          doneTimeoutId = setTimeout(() => {
-            try {
-              sessionStorage.setItem('scrillo-loader-seen', 'true');
-            } catch {
-              // Ignore storage errors
-            }
-            setState('DONE');
-            if (onComplete) onComplete();
-          }, prefersReducedMotion ? 350 : 850);
-        }, 160);
+          // Transition to COMPLETE/IDLE after curtain panels part
+          const completeTimer = setTimeout(() => {
+            if (navIdRef.current !== targetNavId) return;
+            setState('COMPLETE');
+          }, prefersReducedMotion ? 250 : 800);
+
+          return () => clearTimeout(completeTimer);
+        }, 120);
+
+        return () => clearTimeout(exitTimer);
       }
     };
 
-    animId = requestAnimationFrame(tick);
+    animFrameId = requestAnimationFrame(tick);
 
-    // Failsafe timer (2.5s maximum) to guarantee website is always accessible
-    const safetyTimeoutId = setTimeout(() => {
-      setProgress(100);
-      setState('EXITING');
-      setTimeout(() => {
-        try {
-          sessionStorage.setItem('scrillo-loader-seen', 'true');
-        } catch {
-          // Ignore
-        }
-        setState('DONE');
-        if (onComplete) onComplete();
-      }, 400);
+    // Safety fallback (2.5s maximum) to guarantee user is never blocked
+    const fallbackTimer = setTimeout(() => {
+      if (navIdRef.current === targetNavId && !isDestinationReady) {
+        isDestinationReady = true;
+      }
     }, 2500);
 
     return () => {
-      if (animId) cancelAnimationFrame(animId);
-      clearTimeout(exitTimeoutId);
-      clearTimeout(doneTimeoutId);
-      clearTimeout(safetyTimeoutId);
+      cancelAnimationFrame(animFrameId);
+      clearTimeout(fallbackTimer);
     };
-  }, []); // Run once on mount
+  }, [prefersReducedMotion]);
 
-  // If complete or seen in session, unmount from DOM
-  if (state === 'DONE') {
+  // Trigger loader on full refresh (mount) AND on every route navigation
+  useEffect(() => {
+    navIdRef.current += 1;
+    const currentNavId = navIdRef.current;
+
+    // Scroll to top immediately when route changes under the cover of the loader
+    if (!isFirstMountRef.current) {
+      window.scrollTo(0, 0);
+    }
+    isFirstMountRef.current = false;
+
+    const cleanup = runNavigationSequence(currentNavId);
+    return cleanup;
+  }, [location.pathname, location.search, runNavigationSequence]);
+
+  // Handle external manual isReady override if provided
+  useEffect(() => {
+    if (isReady && state === 'WAITING_FOR_PAGE') {
+      setProgress(100);
+      setState('READY');
+    }
+  }, [isReady, state]);
+
+  // If complete, hide loader
+  if (state === 'COMPLETE' || state === 'IDLE') {
     return null;
   }
 
-  const curtainEase = [0.85, 0, 0.15, 1]; // Premium editorial cubic bezier
+  const curtainEase = [0.85, 0, 0.15, 1]; // Premium editorial bezier
   const isExiting = state === 'EXITING';
 
   return (
     <div
-      id="scrillo-experience-loader"
+      id="scrillo-global-loader"
       aria-live="polite"
       aria-busy={state !== 'EXITING'}
       className="fixed inset-0 w-screen h-[100dvh] z-[99999] pointer-events-auto select-none overflow-hidden bg-[#050505]"
       style={{
         opacity: isExiting && prefersReducedMotion ? 0 : 1,
-        transition: prefersReducedMotion ? 'opacity 300ms ease-out' : undefined,
+        transition: prefersReducedMotion ? 'opacity 250ms ease-out' : undefined,
       }}
     >
       {/* 
@@ -179,9 +260,9 @@ export function ScrilloLoader({ forceShow = false, onComplete }: ScrilloLoaderPr
             x: isExiting && !prefersReducedMotion ? '-100%' : '0%',
           }}
           transition={{
-            duration: 0.8,
+            duration: 0.75,
             ease: curtainEase,
-            delay: 0.05,
+            delay: 0.04,
           }}
           className="w-1/2 h-full bg-[#050505] border-r border-white/[0.04] relative"
         >
@@ -195,9 +276,9 @@ export function ScrilloLoader({ forceShow = false, onComplete }: ScrilloLoaderPr
             x: isExiting && !prefersReducedMotion ? '100%' : '0%',
           }}
           transition={{
-            duration: 0.8,
+            duration: 0.75,
             ease: curtainEase,
-            delay: 0.05,
+            delay: 0.04,
           }}
           className="w-1/2 h-full bg-[#050505] border-l border-white/[0.04] relative"
         >
@@ -216,7 +297,7 @@ export function ScrilloLoader({ forceShow = false, onComplete }: ScrilloLoaderPr
           scale: isExiting && !prefersReducedMotion ? 0.98 : 1,
         }}
         transition={{
-          duration: prefersReducedMotion ? 0.25 : 0.4,
+          duration: prefersReducedMotion ? 0.2 : 0.35,
           ease: 'easeInOut',
         }}
         className="relative z-10 w-full h-full flex flex-col justify-between p-6 sm:p-10 md:p-14 lg:p-16 text-[#F5F5F5] pointer-events-none"
@@ -235,7 +316,7 @@ export function ScrilloLoader({ forceShow = false, onComplete }: ScrilloLoaderPr
           </div>
         </header>
 
-        {/* Center Main Branded Typography - Completely stable without remounting */}
+        {/* Center Main Branded Typography - Stable, Rock-Solid without remounting */}
         <main className="flex flex-col items-center justify-center text-center my-auto px-4">
           <div className="overflow-hidden">
             <h1 className="text-6xl sm:text-8xl md:text-9xl lg:text-[10.5rem] font-extrabold tracking-tighter leading-none text-[#F5F5F5] select-none">

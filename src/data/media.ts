@@ -1,7 +1,7 @@
 export const media = {
   // Hero & Backgrounds
   heroWorkspace: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1400&auto=format&fit=crop',
-  designerPortrait: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=1200&auto=format&fit=crop',
+  designerPortrait: '/images/designer-portrait.jpg',
   studioDesk: 'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?q=80&w=1200&auto=format&fit=crop',
 
   // Project 01 - NOVA (SaaS Product Interface)

@@ -63,6 +63,22 @@
   font-family: 'JetBrains Mono', monospace;
 }
 
+/* Subtle Wordmark Character Reveal */
+@keyframes charReveal {
+  0% {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-char-reveal {
+  animation-name: charReveal;
+}
+
 /* Subtle Film Grain Texture Overlay */
 .grain-overlay {
   position: fixed;

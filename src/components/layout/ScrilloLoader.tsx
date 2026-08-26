@@ -14,6 +14,46 @@ interface ScrilloLoaderProps {
   isReady?: boolean;
 }
 
+const WORDMARK_LETTERS = ['S', 'C', 'R', 'I', 'L', 'L', 'O'];
+
+/**
+ * Isolated Animated Wordmark Sub-Component
+ * Character-by-character reveal (staggered 70ms) that plays once per navigation.
+ */
+const AnimatedWordmark = memo(function AnimatedWordmark({ navId }: { navId: number }) {
+  const prefersReducedMotion = useReducedMotion();
+
+  if (prefersReducedMotion) {
+    return (
+      <h1 className="text-7xl sm:text-9xl md:text-[11rem] lg:text-[13rem] font-bold tracking-tight leading-none text-[#F5F5F5] select-none">
+        SCRILLO
+      </h1>
+    );
+  }
+
+  return (
+    <h1
+      key={`wordmark-${navId}`}
+      className="text-7xl sm:text-9xl md:text-[11rem] lg:text-[13rem] font-bold tracking-tight leading-none text-[#F5F5F5] select-none inline-flex items-center justify-center overflow-hidden"
+    >
+      {WORDMARK_LETTERS.map((char, index) => (
+        <span
+          key={`${char}-${index}`}
+          className="inline-block animate-char-reveal will-change-transform"
+          style={{
+            animationDelay: `${index * 70}ms`,
+            animationDuration: '320ms',
+            animationFillMode: 'both',
+            animationTimingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)',
+          }}
+        >
+          {char}
+        </span>
+      ))}
+    </h1>
+  );
+});
+
 /**
  * Minimal Progress Sub-Component
  * Clean horizontal line + small percentage with GPU-accelerated scaleX
@@ -174,7 +214,6 @@ export function ScrilloLoader({ isReady }: ScrilloLoaderProps) {
       if (!isDestinationReady || !isMinTimeElapsed) {
         // Smoothly ramp towards 98% during the loading window, then hold
         const ratio = Math.min(elapsed / (MIN_LOADER_DURATION * 0.9), 1);
-        // Easing curve for smooth progression
         const eased = 1 - Math.pow(1 - ratio, 3);
         const currentProg = Math.min(98, Math.floor(eased * 98));
 
@@ -282,9 +321,9 @@ export function ScrilloLoader({ isReady }: ScrilloLoaderProps) {
 
       {/* Main Center Brand Showcase */}
       <main className="flex flex-col items-center justify-center text-center my-auto px-4">
-        <h1 className="text-7xl sm:text-9xl md:text-[11rem] lg:text-[13rem] font-bold tracking-tight leading-none text-[#F5F5F5] select-none">
-          SCRILLO
-        </h1>
+        {/* Subtle character-by-character staggered wordmark reveal */}
+        <AnimatedWordmark navId={navIdRef.current} />
+
         <div className="mt-4 sm:mt-6 font-mono text-xs sm:text-sm tracking-[0.35em] text-white/40 uppercase font-medium">
           UI / UX / WEB
         </div>

@@ -1,6 +1,12 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { useReducedMotion } from 'framer-motion';
+
+/**
+ * Configurable Minimum Loader Display Duration (ms)
+ * Allows developers/reviewers to adjust the presentation window easily.
+ */
+export const MIN_LOADER_DURATION = 2500;
 
 type LoaderState = 'IDLE' | 'ACTIVE' | 'EXITING';
 
@@ -44,8 +50,8 @@ function waitForCriticalImages(): Promise<void> {
         }
       });
 
-      // Max image wait safeguard (350ms)
-      setTimeout(resolve, 350);
+      // Max image wait safeguard (600ms)
+      setTimeout(resolve, 600);
     } catch {
       resolve();
     }
@@ -60,7 +66,7 @@ function waitForFonts(): Promise<void> {
     try {
       if (document.fonts && document.fonts.ready) {
         document.fonts.ready.then(() => resolve()).catch(() => resolve());
-        setTimeout(resolve, 200);
+        setTimeout(resolve, 300);
       } else {
         resolve();
       }
@@ -94,33 +100,38 @@ export function ScrilloLoader({ isReady }: ScrilloLoaderProps) {
     setState('ACTIVE');
 
     const startTime = performance.now();
-    const minDisplayDuration = 450; // Clean, brief presentation so the brand entrance is perceived
+    let isDestinationReady = false;
+    let isMinTimeElapsed = false;
+    let hasExited = false;
 
-    let isDone = false;
-    let exitTimeout: ReturnType<typeof setTimeout>;
-    let finishTimeout: ReturnType<typeof setTimeout>;
+    let minTimerId: ReturnType<typeof setTimeout> | undefined;
+    let finishTimeout: ReturnType<typeof setTimeout> | undefined;
+    let safeguardTimer: ReturnType<typeof setTimeout> | undefined;
 
-    const completeLoader = () => {
-      if (isDone || navIdRef.current !== targetNavId) return;
-      isDone = true;
+    // Attempt exit only when BOTH conditions are satisfied
+    const attemptExit = () => {
+      if (hasExited || navIdRef.current !== targetNavId) return;
+      if (!isDestinationReady || !isMinTimeElapsed) return;
 
-      const elapsed = performance.now() - startTime;
-      const remainingTime = Math.max(0, minDisplayDuration - elapsed);
+      hasExited = true;
+      setState('EXITING');
 
-      exitTimeout = setTimeout(() => {
+      finishTimeout = setTimeout(() => {
         if (navIdRef.current !== targetNavId) return;
-        setState('EXITING');
-
-        finishTimeout = setTimeout(() => {
-          if (navIdRef.current !== targetNavId) return;
-          setState('IDLE');
-        }, prefersReducedMotion ? 180 : 550);
-      }, remainingTime);
+        setState('IDLE');
+      }, prefersReducedMotion ? 180 : 550);
     };
 
-    // Parallel check for destination DOM, fonts, and critical images
+    // 1. Minimum duration timer
+    minTimerId = setTimeout(() => {
+      if (navIdRef.current !== targetNavId) return;
+      isMinTimeElapsed = true;
+      attemptExit();
+    }, MIN_LOADER_DURATION);
+
+    // 2. Parallel destination readiness checker (DOM commit, fonts, images)
     const checkReadiness = async () => {
-      // Allow React to commit the new route DOM
+      // Double requestAnimationFrame ensures React has committed destination route DOM
       await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
 
       if (navIdRef.current !== targetNavId) return;
@@ -129,22 +140,25 @@ export function ScrilloLoader({ isReady }: ScrilloLoaderProps) {
 
       if (navIdRef.current !== targetNavId) return;
 
-      completeLoader();
+      isDestinationReady = true;
+      attemptExit();
     };
 
     checkReadiness();
 
-    // Catastrophic safeguard (1.8s maximum)
-    const safeguardTimer = setTimeout(() => {
-      if (navIdRef.current === targetNavId && !isDone) {
-        completeLoader();
+    // 3. Catastrophic fallback safeguard (MIN_LOADER_DURATION + 2500ms max)
+    safeguardTimer = setTimeout(() => {
+      if (navIdRef.current === targetNavId && !hasExited) {
+        isDestinationReady = true;
+        isMinTimeElapsed = true;
+        attemptExit();
       }
-    }, 1800);
+    }, Math.max(MIN_LOADER_DURATION + 2500, 5000));
 
     return () => {
-      clearTimeout(exitTimeout);
-      clearTimeout(finishTimeout);
-      clearTimeout(safeguardTimer);
+      if (minTimerId) clearTimeout(minTimerId);
+      if (finishTimeout) clearTimeout(finishTimeout);
+      if (safeguardTimer) clearTimeout(safeguardTimer);
     };
   }, [prefersReducedMotion]);
 
@@ -175,8 +189,6 @@ export function ScrilloLoader({ isReady }: ScrilloLoaderProps) {
     return null;
   }
 
-  // Smooth, controlled luxury easing curve
-  const transitionEase = [0.76, 0, 0.24, 1];
   const isExiting = state === 'EXITING';
 
   return (

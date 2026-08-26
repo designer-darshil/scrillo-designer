@@ -8,7 +8,6 @@ import { HomePage } from './pages/HomePage';
 import { WorkPage } from './pages/WorkPage';
 import { ProjectDetailPage } from './pages/ProjectDetailPage';
 import { AboutPage } from './pages/AboutPage';
-import { ServicesPage } from './pages/ServicesPage';
 import { ExperimentsPage } from './pages/ExperimentsPage';
 import { ContactPage } from './pages/ContactPage';
 import { NotFoundPage } from './pages/NotFoundPage';
@@ -31,7 +30,6 @@ export function App() {
             <Route path="/work" element={<WorkPage />} />
             <Route path="/work/:slug" element={<ProjectDetailPage />} />
             <Route path="/about" element={<AboutPage />} />
-            <Route path="/services" element={<ServicesPage />} />
             <Route path="/experiments" element={<ExperimentsPage />} />
             <Route path="/lab" element={<Navigate to="/experiments" replace />} />
             <Route path="/contact" element={<ContactPage />} />

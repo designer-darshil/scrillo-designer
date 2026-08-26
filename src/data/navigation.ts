@@ -6,7 +6,7 @@ export interface NavLink {
 export const navLinks: NavLink[] = [
   { label: 'Work', href: '/work' },
   { label: 'About', href: '/about' },
-  { label: 'Services', href: '/services' },
+  { label: 'Experiments', href: '/experiments' },
   { label: 'Contact', href: '/contact' }
 ];
 
@@ -14,7 +14,7 @@ export const siteMetadata = {
   name: 'SCRILLO',
   role: 'UI/UX Designer · Frontend Web Designer',
   intro: 'I design digital products and websites with a focus on clarity, interaction and detail.',
-  location: 'India · Available for Select Projects',
+  location: 'Bangalore, India · Available for Select Projects',
   email: 'hello@scrillo.design',
   socials: [
     { label: 'GitHub', href: 'https://github.com/scrillo-design' },

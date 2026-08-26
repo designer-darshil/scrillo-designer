@@ -1,0 +1,511 @@
+import { Project } from '../types';
+import { media } from './media';
+
+export const projects: Project[] = [
+  {
+    id: 'nova',
+    slug: 'nova',
+    number: '01',
+    title: 'NOVA',
+    client: 'Nova Systems Inc.',
+    subtitle: 'SaaS product interface redesigned for cognitive clarity and speed',
+    tagline: 'Modern enterprise analytics platform simplifying complex data pipelines into intuitive visual models.',
+    category: 'product',
+    categoryLabel: 'Product Design & Frontend',
+    year: 2026,
+    featured: true,
+    heroImage: media.novaHero,
+    mockupImage: media.novaMockup,
+    roles: ['Lead Product Designer', 'Design Systems Architect', 'Frontend Engineer'],
+    services: ['UX Strategy', 'Information Architecture', 'Design System', 'React / TypeScript Frontend'],
+    technologies: ['Figma', 'React 18', 'TypeScript', 'Tailwind CSS', 'Framer Motion', 'Radix UI'],
+    timeline: '4 Months (Q1 2026)',
+    liveUrl: 'https://demo.nova-systems.craft',
+    githubUrl: 'https://github.com/scrillo-design/nova-ui-core',
+    description: 'Nova is a modern B2B analytics platform where data engineers and product teams observe distributed application pipelines in real-time. The interface was rebuilt from the ground up to reduce cognitive fatigue during critical incident monitoring.',
+    challenge: 'The legacy interface suffered from severe information overload: 14 nested menus, inconsistent data tables, and latency-heavy data visualizers that caused operator confusion during production incidents.',
+    solution: 'Designed a unified command-center layout featuring an omnipresent command palette (Cmd+K), high-density data tables with custom virtualized rendering, and an ergonomic dark palette with strict semantic contrast tokens.',
+    impactStatements: [
+      'Reduced operator mean-time-to-diagnose by 38% through contextual hierarchy.',
+      'Constructed a 42-component design system tokenized for React & Figma tokens.',
+      'Achieved a 99.4/100 Lighthouse performance score with zero layout shift.'
+    ],
+    layoutType: 'large-hero',
+    sections: [
+      {
+        title: '01. Problem & Context',
+        subtitle: 'The Challenge of Complex Data Density',
+        tag: 'RESEARCH & DISCOVERY',
+        description: [
+          'Enterprise telemetry operators monitor hundreds of simultaneous microservice metrics. The previous dashboard scattered alert states across four distinct tabs, forcing operators to context-switch during high-stress incidents.',
+          'Our mission was clear: construct a calm, confident interface where critical alerts surface instantly without visual noise.'
+        ],
+        bulletPoints: [
+          'Multi-layered information architecture with too many clicks to actionable insights.',
+          'Inconsistent visual styling created by disparate engineering teams over 3 years.',
+          'High memory overhead and slow table rendering with 10,000+ data points.'
+        ],
+        visual: {
+          type: 'browser',
+          image: media.novaAnalytics,
+          caption: 'High-density telemetry dashboard featuring custom SVG stream charts and prioritized alert badges.'
+        }
+      },
+      {
+        title: '02. Information Architecture & UX Flow',
+        subtitle: 'Restructuring the Workspace Hierarchy',
+        tag: 'UX STRATEGY',
+        description: [
+          'We simplified the top-level navigation from 14 items down to 4 primary workspaces: Telemetry Stream, Service Mesh, Incident Drilldown, and Team Settings.',
+          'A universal search index lets operators jump directly to service nodes, filter by error codes, and trigger remediation runbooks in under two keypresses.'
+        ],
+        visual: {
+          type: 'wireframe',
+          wireframePoints: [
+            { step: '01', label: 'Global Telemetry Bar', detail: 'Real-time throughput indicator, active cluster status, and instant command trigger.' },
+            { step: '02', label: 'Virtualized Stream View', detail: 'Zero-lag tabular stream with instant column reordering and regex query filters.' },
+            { step: '03', label: 'Contextual Inspector Drawer', detail: 'Slide-over inspector displaying stack traces, log diffs, and deploy diffs side-by-side.' }
+          ]
+        }
+      },
+      {
+        title: '03. Visual Direction & Design Tokens',
+        subtitle: 'Ergonomic Contrast in a Dark Atmosphere',
+        tag: 'DESIGN SYSTEM',
+        description: [
+          'Built a mathematically scaled color system using OKLCH color space for absolute perceptual uniformity. Backgrounds sit on deep charcoal tones (#080808, #121212) preventing eye strain during 12-hour shifts.',
+          'Status colors (Success, Warning, Critical, Muted) strictly adhere to WCAG AAA contrast ratios against all layered surface depths.'
+        ],
+        visual: {
+          type: 'tokens',
+          tokens: [
+            { name: '--surface-base', value: '#080808', type: 'color' },
+            { name: '--surface-card', value: '#121212', type: 'color' },
+            { name: '--status-alert', value: '#FF3E00', type: 'color' },
+            { name: '--status-ok', value: '#10B981', type: 'color' },
+            { name: '--font-mono', value: 'JetBrains Mono', type: 'typography' },
+            { name: '--radius-base', value: '6px', type: 'radius' }
+          ]
+        }
+      },
+      {
+        title: '04. Design-to-Code Implementation',
+        subtitle: 'Zero-Friction React Architecture',
+        tag: 'FRONTEND ARCHITECTURE',
+        description: [
+          'Translated Figma variables directly into Tailwind CSS custom properties and typed React component props. Built reusable composite widgets including virtualized tables, sparkline cards, and keyboard-driven menus.'
+        ],
+        visual: {
+          type: 'code',
+          codeSnippet: {
+            filename: 'components/TelemetryTable.tsx',
+            language: 'typescript',
+            code: `interface TelemetryStreamProps {
+  clusterId: string;
+  refreshIntervalMs?: number;
+  onAlertTrigger?: (event: IncidentAlert) => void;
+}
+
+export const TelemetryStream: React.FC<TelemetryStreamProps> = ({
+  clusterId,
+  refreshIntervalMs = 1000,
+  onAlertTrigger
+}) => {
+  const { nodes, isStale } = useClusterTelemetry(clusterId, { pollMs: refreshIntervalMs });
+  
+  return (
+    <div className="rounded-md border border-white/10 bg-[#0A0A0A] p-4">
+      <TelemetryHeader clusterId={clusterId} status={isStale ? 'syncing' : 'live'} />
+      <VirtualizedNodeGrid nodes={nodes} onSelectAlert={onAlertTrigger} />
+    </div>
+  );
+};`
+          }
+        }
+      }
+    ],
+    gallery: [
+      { type: 'image', url: media.novaMockup, alt: 'Nova Multi-device Interface', caption: 'Full-width dashboard overview' },
+      { type: 'image', url: media.novaAnalytics, alt: 'Nova Analytics Graph', caption: 'Custom sparkline visualization' },
+      { type: 'image', url: media.novaMobile, alt: 'Nova Mobile Emergency View', caption: 'Incident response on iOS mobile viewport' },
+      { type: 'image', url: media.novaDesignSystem, alt: 'Nova Design System Grid', caption: 'Atomic component library in Figma & React' }
+    ],
+    nextProjectId: 'aura'
+  },
+  {
+    id: 'aura',
+    slug: 'aura',
+    number: '02',
+    title: 'AURA',
+    client: 'Aura Atelier Living',
+    subtitle: 'High-craft editorial e-commerce platform for architectural lifestyle objects',
+    tagline: 'Merging high-fashion editorial typography with smooth micro-interactions and instant headless checkout.',
+    category: 'web-design',
+    categoryLabel: 'Creative Web Design',
+    year: 2026,
+    featured: true,
+    heroImage: media.auraHero,
+    mockupImage: media.auraEditorial,
+    roles: ['Art Director', 'Web Designer', 'Creative Developer'],
+    services: ['Brand Identity', 'Art Direction', 'Custom E-Commerce Design', 'Interactive Motion'],
+    technologies: ['Figma', 'Next.js', 'TypeScript', 'Tailwind CSS', 'Framer Motion', 'Shopify Storefront API'],
+    timeline: '3 Months (Late 2025)',
+    liveUrl: 'https://aura.atelier.craft',
+    description: 'Aura is a digital flagship store for an avant-garde architectural home goods manufacturer. The objective was to depart from standard modular e-commerce grids in favor of an immersive, magazine-style browsing journey.',
+    challenge: 'Standard online storefronts felt transactional and cold. Aura required a tactile digital experience that conveyed the physical weight, raw texture, and artisanal craftsmanship of concrete, bronze, and stone objects.',
+    solution: 'Designed an asymmetrical editorial grid with variable font scaling, cursor-linked perspective shifts, dynamic split-view lookbooks, and sub-100ms instant cart drawers.',
+    impactStatements: [
+      'Elevated average time-on-site from 1m 12s to 3m 48s.',
+      'Increased direct product detail page interaction rates by 44%.',
+      'Engineered smooth client-side page transitions without layout jank.'
+    ],
+    layoutType: 'split-editorial',
+    sections: [
+      {
+        title: '01. Editorial Vision',
+        subtitle: 'Digital Space as a Modern Art Gallery',
+        tag: 'ART DIRECTION',
+        description: [
+          'We treated each collection as an editorial chapter. Large serif titles combine with raw architectural photography, generous negative space, and numbered inventory tags.',
+          'Instead of uniform product grids, products appear in curated living scenes with contextual annotations revealing material origins and artisanal techniques.'
+        ],
+        visual: {
+          type: 'browser',
+          image: media.auraEditorial,
+          caption: 'Editorial chapter view with asymmetrical image pairing and tactile material tags.'
+        }
+      },
+      {
+        title: '02. Interactive Micro-Moments',
+        subtitle: 'Subtle Motion Reflecting Physical Craft',
+        tag: 'MOTION & INTERACTION',
+        description: [
+          'Images feature custom cursor magnification and subtle 3D parallax on desktop. Micro-animations guide the eye toward material specifications without interrupting the purchasing flow.'
+        ],
+        visual: {
+          type: 'mobile',
+          image: media.auraMobile,
+          caption: 'Mobile responsive lookbook adapted for fluid vertical touch swipes.'
+        }
+      }
+    ],
+    gallery: [
+      { type: 'image', url: media.auraHero, alt: 'Aura Homepage Hero', caption: 'Editorial typographic hero composition' },
+      { type: 'image', url: media.auraEditorial, alt: 'Aura Product Lookbook', caption: 'Interactive spatial product gallery' },
+      { type: 'image', url: media.auraMobile, alt: 'Aura Mobile Experience', caption: 'Editorial lookbook on mobile screens' }
+    ],
+    nextProjectId: 'frame'
+  },
+  {
+    id: 'frame',
+    slug: 'frame',
+    number: '03',
+    title: 'FRAME',
+    client: 'Frame Collaborative',
+    subtitle: 'Next-generation canvas workspace for distributed design critique and spatial feedback',
+    tagline: 'Real-time multiplayer canvas interface balancing boundless spatial freedom with strict structured critique workflows.',
+    category: 'product',
+    categoryLabel: 'Product Design & UX',
+    year: 2026,
+    featured: true,
+    heroImage: media.frameHero,
+    mockupImage: media.frameCanvas,
+    roles: ['Principal UX Designer', 'Product Architect'],
+    services: ['Multiplayer Canvas UX', 'Design System', 'Design-to-Code Specification'],
+    technologies: ['Figma', 'React', 'TypeScript', 'WebSockets', 'Tailwind CSS'],
+    timeline: '5 Months (2025–2026)',
+    liveUrl: 'https://frame.canvas.craft',
+    description: 'Frame is a collaborative workspace where remote product designers and engineers mark up live web builds, leave pinned audio notes, and inspect CSS diffs directly on canvas.',
+    challenge: 'Multiplayer canvases often suffer from visual chaos: overlapping cursor trails, cluttered toolbars, and unorganized commentary threads that obscure the actual design review.',
+    solution: 'Engineered a "Focused Critique" spatial mode that dims secondary canvases, clusters commentary into thread ribbons, and provides an expandable bottom HUD with minimal visual footprint.',
+    impactStatements: [
+      'Adopted by 180+ remote design squads during closed beta testing.',
+      'Reduced design critique turnaround cycles from 4 days to 24 hours.',
+      'Built a spatial HUD interface that occupies less than 6% of screen real estate.'
+    ],
+    layoutType: 'large-hero',
+    sections: [
+      {
+        title: '01. Spatial Canvas Architecture',
+        subtitle: 'Designing for Zero-Clutter Collaboration',
+        tag: 'SPATIAL UX',
+        description: [
+          'The primary canvas uses an infinite coordinate system with smooth mouse-wheel zooming and inertial panning. Toolbars dynamically collapse into an ergonomic bottom dock when the user begins canvas manipulation.'
+        ],
+        visual: {
+          type: 'browser',
+          image: media.frameCanvas,
+          caption: 'Frame infinite canvas with contextual feedback markers and collapsed bottom toolbar.'
+        }
+      }
+    ],
+    gallery: [
+      { type: 'image', url: media.frameHero, alt: 'Frame Workspace Hero', caption: 'Infinite canvas workspace in dark mode' },
+      { type: 'image', url: media.frameCanvas, alt: 'Frame Multi-cursor Canvas', caption: 'Live multi-user critique mode' },
+      { type: 'image', url: media.frameLayers, alt: 'Frame Layer Inspector', caption: 'Live DOM inspector integration' }
+    ],
+    nextProjectId: 'mono'
+  },
+  {
+    id: 'mono',
+    slug: 'mono',
+    number: '04',
+    title: 'MONO',
+    client: 'Mono Type Foundry',
+    subtitle: 'Typographic specimen archive & interactive glyph tester for independent type designers',
+    tagline: 'A minimalist digital archive celebrating font geometry, kerning pairs, and variable font axis control.',
+    category: 'frontend',
+    categoryLabel: 'Frontend & Web Design',
+    year: 2025,
+    featured: true,
+    heroImage: media.monoHero,
+    mockupImage: media.monoPrint,
+    roles: ['Creative Developer', 'Typographic Designer'],
+    services: ['Interactive Web Experience', 'Variable Font Engine', 'Responsive Specimen Sheets'],
+    technologies: ['Vite', 'React', 'TypeScript', 'CSS Canvas API', 'Opentype.js'],
+    timeline: '2 Months (2025)',
+    liveUrl: 'https://mono.foundry.craft',
+    description: 'Mono is a digital specimen platform built for contemporary type foundries. It allows designers to test variable font axes (weight, slant, optical size), preview OpenType features, and export SVG outlines in real-time.',
+    challenge: 'Traditional type foundry sites are static specimen PDFs or heavy flash-like apps that lag on mobile devices.',
+    solution: 'Built a lightweight, canvas-accelerated text tester that renders 120 FPS font deformations and supports custom keyboard ligature testing with zero external libraries.',
+    impactStatements: [
+      'Achieved a sub-50KB bundle size for the entire interactive specimen engine.',
+      'Featured in multiple web design publications and design engineering newsletters.',
+      'Over 85,000 unique font tests conducted in the first 90 days.'
+    ],
+    layoutType: 'horizontal-banner',
+    sections: [
+      {
+        title: '01. Kinetic Typography',
+        subtitle: 'Pushing the Limits of Browser Font Rendering',
+        tag: 'CREATIVE DEVELOPMENT',
+        description: [
+          'Variable font axes are bound to custom interactive sliders with live SVG path rendering. The layout adapts automatically from desktop ultra-wide displays down to mobile touch viewports.'
+        ],
+        visual: {
+          type: 'code',
+          codeSnippet: {
+            filename: 'engine/VariableFontController.ts',
+            language: 'typescript',
+            code: `export const applyVariableAxes = (
+  element: HTMLElement,
+  axes: { wght: number; slnt: number; opsz: number }
+) => {
+  element.style.fontVariationSettings = 
+    \`'wght' \${axes.wght}, 'slnt' \${axes.slnt}, 'opsz' \${axes.opsz}\`;
+};`
+          }
+        }
+      }
+    ],
+    gallery: [
+      { type: 'image', url: media.monoHero, alt: 'Mono Specimen Hero', caption: 'High-contrast typography tester' },
+      { type: 'image', url: media.monoPrint, alt: 'Mono Print Specimen', caption: 'Exportable vector glyph specimen' }
+    ],
+    nextProjectId: 'pulse'
+  },
+  {
+    id: 'pulse',
+    slug: 'pulse',
+    number: '05',
+    title: 'PULSE',
+    client: 'Pulse Financial Analytics',
+    subtitle: 'Institutional-grade quantitative analytics and portfolio health dashboard',
+    tagline: 'High-frequency algorithmic trading interface engineered for microsecond clarity and risk visualization.',
+    category: 'ui-ux',
+    categoryLabel: 'UI/UX Design',
+    year: 2025,
+    featured: false,
+    heroImage: media.pulseHero,
+    mockupImage: media.pulseCharts,
+    roles: ['Senior UI/UX Designer', 'Information Architect'],
+    services: ['Complex Data Visualization', 'Design System', 'Accessibility Audits'],
+    technologies: ['Figma', 'React', 'D3.js', 'Tailwind CSS'],
+    timeline: '4 Months (2025)',
+    description: 'Pulse delivers quantitative risk modeling and asset allocations to hedge funds and portfolio managers.',
+    challenge: 'Traders had to synthesize dozens of volatile charts simultaneously across multiple monitor setups without losing situational awareness.',
+    solution: 'Designed an ultra-dense, customizable modular grid system with custom candlestick rendering, heatmap matrices, and customizable audio cues for threshold breaches.',
+    impactStatements: [
+      'Eliminated UI redraw bottlenecks with specialized canvas data renderers.',
+      'Achieved 100% WCAG 2.1 AA accessibility compliance across all financial charts.'
+    ],
+    layoutType: 'asymmetric-stack',
+    sections: [
+      {
+        title: '01. Quantitative Data Layout',
+        subtitle: 'High-Density Spatial Hierarchy',
+        tag: 'DATA VISUALIZATION',
+        description: [
+          'Constructed custom D3 visualization modules that handle continuous streaming WebSocket ticks without repainting the entire document tree.'
+        ],
+        visual: {
+          type: 'browser',
+          image: media.pulseCharts,
+          caption: 'Real-time financial charts with custom volatility bands and risk indicators.'
+        }
+      }
+    ],
+    gallery: [
+      { type: 'image', url: media.pulseHero, alt: 'Pulse Dark Mode Dashboard', caption: 'Institutional multi-chart interface' },
+      { type: 'image', url: media.pulseCharts, alt: 'Pulse Financial Matrix', caption: 'Heatmap correlation matrix view' }
+    ],
+    nextProjectId: 'form'
+  },
+  {
+    id: 'form',
+    slug: 'form',
+    number: '06',
+    title: 'FORM',
+    client: 'Form Spatial Studio',
+    subtitle: 'Branded digital showcase for a contemporary Scandinavian architecture practice',
+    tagline: 'Architectural storytelling through brutalist typography, monochrome elevations, and seamless project transitions.',
+    category: 'web-design',
+    categoryLabel: 'Web Design & Art Direction',
+    year: 2025,
+    featured: false,
+    heroImage: media.formHero,
+    mockupImage: media.formGrid,
+    roles: ['Art Director', 'Frontend Developer'],
+    services: ['Web Design', 'Content Strategy', 'Responsive Frontend'],
+    technologies: ['Vite', 'React', 'Tailwind CSS', 'Framer Motion'],
+    timeline: '2 Months (2025)',
+    description: 'Form Architecture required an online portfolio that mirrored their physical philosophy: raw concrete, honest materiality, and bold structural geometry.',
+    challenge: 'Architectural imagery often gets lost in generic website layouts with distracting navigation and cramped photo carousels.',
+    solution: 'Crafted full-bleed project spreads with crisp 1px structural gridlines, subtle scroll-driven parallax, and interactive building blueprints.',
+    impactStatements: [
+      'Won praise in multiple international design archives for spatial layout.',
+      'Elevated client inquiry conversion for premium architectural commissions by 60%.'
+    ],
+    layoutType: 'large-hero',
+    sections: [
+      {
+        title: '01. Spatial Grids in the Browser',
+        subtitle: 'Translating Physical Blueprint Systems',
+        tag: 'BRAND DIRECTION',
+        description: [
+          'Using a 12-column Swiss grid system with visible structural guides, the website communicates architectural rigor before a single word is read.'
+        ],
+        visual: {
+          type: 'browser',
+          image: media.formGrid,
+          caption: 'Visible grid lines framing high-resolution architectural photography.'
+        }
+      }
+    ],
+    gallery: [
+      { type: 'image', url: media.formHero, alt: 'Form Architecture Hero', caption: 'Monochrome concrete elevation study' },
+      { type: 'image', url: media.formGrid, alt: 'Form Grid Layout', caption: 'Structural 12-column architectural index' }
+    ],
+    nextProjectId: 'shift'
+  },
+  {
+    id: 'shift',
+    slug: 'shift',
+    number: '07',
+    title: 'SHIFT',
+    client: 'Shift Async Software',
+    subtitle: 'Async-first team collaboration & standup tool designed to end calendar fatigue',
+    tagline: 'Focus-centric productivity app combining rich markdown memos with contextual video micro-updates.',
+    category: 'landing-pages',
+    categoryLabel: 'Landing Page & Product Design',
+    year: 2025,
+    featured: false,
+    heroImage: media.shiftHero,
+    mockupImage: media.shiftApp,
+    roles: ['Product Designer', 'Frontend Lead'],
+    services: ['Landing Page Design', 'Product Onboarding Flow', 'Design System'],
+    technologies: ['Figma', 'React', 'TypeScript', 'Tailwind CSS'],
+    timeline: '3 Months (2025)',
+    description: 'Shift helps remote software engineering teams communicate asynchronously without getting pulled into endless recurring video syncs.',
+    challenge: 'Explaining a paradigm shift in team workflow required a landing page that immediately demonstrated the product value within 10 seconds of landing.',
+    solution: 'Designed an interactive landing page featuring a live "Calendar Freedom Simulator" and seamless onboarding flow that got teams writing their first async standup in under 2 minutes.',
+    impactStatements: [
+      'Doubled landing page signup conversion rate from 3.2% to 6.8%.',
+      'Engineered an interactive product walkthrough that converted 40% of visitors into trial users.'
+    ],
+    layoutType: 'split-editorial',
+    sections: [
+      {
+        title: '01. The Narrative Landing Page',
+        subtitle: 'Communicating the Value of Async Work',
+        tag: 'LANDING PAGE DESIGN',
+        description: [
+          'Combined high-contrast typography, interactive micro-previews, and real product snippets to prove why async standups preserve deep work blocks.'
+        ],
+        visual: {
+          type: 'browser',
+          image: media.shiftApp,
+          caption: 'Interactive product demo on the marketing homepage.'
+        }
+      }
+    ],
+    gallery: [
+      { type: 'image', url: media.shiftHero, alt: 'Shift Team Collaboration', caption: 'Team communication dashboard' },
+      { type: 'image', url: media.shiftApp, alt: 'Shift Standup Editor', caption: 'Markdown async update composer' }
+    ],
+    nextProjectId: 'orbit'
+  },
+  {
+    id: 'orbit',
+    slug: 'orbit',
+    number: '08',
+    title: 'ORBIT',
+    client: 'Orbit Labs (Experimental)',
+    subtitle: 'Experimental creative coding sandbox exploring procedural UI geometry and interaction physics',
+    tagline: 'Pure CSS/JS interactive playground pushing browser performance without heavy 3D engine overhead.',
+    category: 'experiments',
+    categoryLabel: 'Creative Development & Experiments',
+    year: 2026,
+    featured: true,
+    heroImage: media.orbitHero,
+    mockupImage: media.orbitWebGL,
+    roles: ['Creative Technologist', 'Motion Designer'],
+    services: ['CSS Physics', 'Interaction Engineering', 'Procedural Audio'],
+    technologies: ['TypeScript', 'CSS Matrix3D', 'Web Audio API', 'Framer Motion'],
+    timeline: 'Continuous Exploration',
+    description: 'Orbit is an ongoing research lab exploring spatial user interfaces, magnetic physics cursors, and procedural typography without relying on heavy WebGL libraries like Three.js.',
+    challenge: 'Achieving responsive, fluid 3D-like depth and motion interactions on the web without ballooning bundle sizes or causing battery drain on mobile devices.',
+    solution: 'Built a lightweight CSS 3D matrix transform engine paired with Framer Motion spring physics, keeping the bundle size below 12KB.',
+    impactStatements: [
+      'Runs at steady 60–120 FPS on all modern mobile and desktop browsers.',
+      '100% lightweight native CSS transforms and requestAnimationFrame loops.'
+    ],
+    layoutType: 'large-hero',
+    sections: [
+      {
+        title: '01. Lightweight 3D Depth Engine',
+        subtitle: 'Math-Driven CSS Transforms',
+        tag: 'LAB EXPLORATION',
+        description: [
+          'Calculates cursor distance from element centers using normalized Euclidean vectors, applying subtle translate3d and rotateX/rotateY transforms without triggering layout reflows.'
+        ],
+        visual: {
+          type: 'code',
+          codeSnippet: {
+            filename: 'physics/perspectiveTransform.ts',
+            language: 'typescript',
+            code: `export function computePerspectiveOffset(
+  clientX: number,
+  clientY: number,
+  rect: DOMRect,
+  intensity = 15
+) {
+  const x = (clientX - rect.left) / rect.width - 0.5;
+  const y = (clientY - rect.top) / rect.height - 0.5;
+  return {
+    rotateX: -y * intensity,
+    rotateY: x * intensity,
+    transform: \`perspective(1000px) rotateX(\${-y * intensity}deg) rotateY(\${x * intensity}deg)\`
+  };
+}`
+          }
+        }
+      }
+    ],
+    gallery: [
+      { type: 'image', url: media.orbitHero, alt: 'Orbit Interactive Playground', caption: 'Interactive procedural geometry canvas' },
+      { type: 'image', url: media.orbitWebGL, alt: 'Orbit Physics Demonstration', caption: 'CSS 3D perspective coordinate demo' }
+    ],
+    nextProjectId: 'nova'
+  }
+];

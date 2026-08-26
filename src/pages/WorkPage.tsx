@@ -1,201 +1,104 @@
-import React, { useState, useEffect } from 'react';
-import { useSearchParams, Link } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { projects } from '../data/projects';
 import { ProjectCategory } from '../types';
-import { PageTransition } from '../components/layout/PageTransition';
-import { SectionHeading } from '../components/ui/SectionHeading';
-import { PerspectiveCard } from '../components/ui/PerspectiveCard';
-import { FinalCTA } from '../components/sections/FinalCTA';
-import { ArrowUpRight, Filter, Sparkles } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 
-const filterCategories: Array<{ id: ProjectCategory; label: string; count: number }> = [
-  { id: 'all', label: 'ALL WORK', count: 8 },
-  { id: 'ui-ux', label: 'UI/UX', count: 1 },
-  { id: 'web-design', label: 'WEB DESIGN', count: 2 },
-  { id: 'product', label: 'PRODUCT', count: 2 },
-  { id: 'frontend', label: 'FRONTEND', count: 1 },
-  { id: 'landing-pages', label: 'LANDING PAGES', count: 1 },
-  { id: 'experiments', label: 'EXPERIMENTS', count: 1 },
+const filterCategories: Array<{ id: ProjectCategory; label: string }> = [
+  { id: 'all', label: 'All Projects' },
+  { id: 'product', label: 'Product Design' },
+  { id: 'web-design', label: 'Web Design' },
+  { id: 'frontend', label: 'Frontend' }
 ];
 
 export const WorkPage: React.FC = () => {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const initialCategory = (searchParams.get('category') as ProjectCategory) || 'all';
-  const [activeCategory, setActiveCategory] = useState<ProjectCategory>(initialCategory);
-
-  useEffect(() => {
-    const cat = searchParams.get('category') as ProjectCategory;
-    if (cat && filterCategories.some((c) => c.id === cat)) {
-      setActiveCategory(cat);
-    }
-  }, [searchParams]);
-
-  const handleFilterChange = (category: ProjectCategory) => {
-    setActiveCategory(category);
-    if (category === 'all') {
-      searchParams.delete('category');
-      setSearchParams(searchParams);
-    } else {
-      setSearchParams({ category });
-    }
-  };
+  const [activeCategory, setActiveCategory] = useState<ProjectCategory>('all');
 
   const filteredProjects = activeCategory === 'all'
     ? projects
     : projects.filter((p) => p.category === activeCategory);
 
   return (
-    <PageTransition>
-      <div className="pt-32 pb-20 md:pt-40 md:pb-28">
-        <div className="max-w-7xl mx-auto px-6 md:px-12">
-          
-          {/* Header Section */}
-          <div className="mb-16">
-            <div className="flex items-center space-x-3 text-xs font-mono tracking-widest text-[#FF3E00] uppercase mb-4">
-              <span className="px-2 py-0.5 rounded border border-[#FF3E00]/30 bg-[#FF3E00]/10 font-bold">
-                PORTFOLIO ARCHIVE
-              </span>
-              <span className="text-white/30">/</span>
-              <span className="text-white/60">2024 — 2026</span>
-            </div>
-
-            <h1 className="text-5xl sm:text-7xl md:text-8xl font-extrabold tracking-tighter text-white uppercase leading-none mb-6">
-              PROVE BY <br />
-              <span className="font-editorial-serif italic font-normal text-[#FF3E00] lowercase text-[1.05em]">
-                built
-              </span>{' '}
-              WORK.
-            </h1>
-
-            <p className="max-w-2xl text-muted-primary text-base md:text-lg leading-relaxed">
-              Every project represents a deep dive into user experience architecture, bespoke art direction, and production frontend engineering.
-            </p>
-          </div>
-
-          {/* Interactive Filter Pills */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-16 border-b border-white/10 no-scrollbar">
-            <div className="flex items-center space-x-1 pr-2 text-xs font-mono text-white/40">
-              <Filter size={13} />
-              <span>FILTER:</span>
-            </div>
-
-            {filterCategories.map((cat) => {
-              const isActive = activeCategory === cat.id;
-              return (
-                <button
-                  key={cat.id}
-                  onClick={() => handleFilterChange(cat.id)}
-                  className={`px-4 py-2 rounded-full text-xs font-mono uppercase tracking-wider transition-all whitespace-nowrap flex items-center space-x-2 ${
-                    isActive
-                      ? 'bg-white text-black font-bold shadow-lg shadow-white/10'
-                      : 'bg-white/5 border border-white/10 text-white/70 hover:bg-white/10 hover:text-white'
-                  }`}
-                >
-                  <span>{cat.label}</span>
-                  <span
-                    className={`text-[10px] px-1.5 py-0.2 rounded-full ${
-                      isActive ? 'bg-black text-white' : 'bg-white/10 text-white/60'
-                    }`}
-                  >
-                    {cat.count}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Projects Grid */}
-          <motion.div
-            layout
-            className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12"
-          >
-            <AnimatePresence>
-              {filteredProjects.map((project) => (
-                <motion.article
-                  key={project.id}
-                  layout
-                  initial={{ opacity: 0, scale: 0.96 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.96 }}
-                  transition={{ duration: 0.35 }}
-                  className="group flex flex-col justify-between border border-white/10 rounded-2xl bg-[#0A0A0A] p-6 hover:border-white/25 transition-all duration-300"
-                >
-                  <div>
-                    {/* Top Metadata */}
-                    <div className="flex items-center justify-between text-xs font-mono text-white/50 mb-4 pb-4 border-b border-white/5">
-                      <div className="flex items-center space-x-2">
-                        <span className="text-[#FF3E00] font-bold">{project.number}</span>
-                        <span>/</span>
-                        <span className="text-white uppercase">{project.categoryLabel}</span>
-                      </div>
-                      <span>{project.year}</span>
-                    </div>
-
-                    {/* Image Preview */}
-                    <Link to={`/work/${project.slug}`} data-cursor="project" className="block mb-6">
-                      <PerspectiveCard intensity={6}>
-                        <div className="relative rounded-xl overflow-hidden aspect-[16/10] bg-[#141414] border border-white/5">
-                          <img
-                            src={project.heroImage}
-                            alt={project.title}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                            loading="lazy"
-                          />
-                          <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors" />
-                        </div>
-                      </PerspectiveCard>
-                    </Link>
-
-                    {/* Title & Tagline */}
-                    <div className="space-y-2 mb-4">
-                      <h2 className="text-2xl sm:text-3xl font-extrabold text-white group-hover:text-[#FF3E00] transition-colors flex items-center justify-between">
-                        <span>{project.title}</span>
-                        <ArrowUpRight size={20} className="opacity-0 group-hover:opacity-100 group-hover:translate-x-1 group-hover:-translate-y-1 transition-all text-[#FF3E00]" />
-                      </h2>
-                      <p className="text-sm font-editorial-serif italic text-white/80">
-                        "{project.subtitle}"
-                      </p>
-                    </div>
-
-                    <p className="text-xs sm:text-sm text-muted-primary leading-relaxed mb-6">
-                      {project.description}
-                    </p>
-                  </div>
-
-                  {/* Bottom Tech Tags & Action */}
-                  <div className="pt-4 border-t border-white/5 flex flex-wrap items-center justify-between gap-3">
-                    <div className="flex flex-wrap gap-1.5">
-                      {project.technologies.slice(0, 3).map((tech) => (
-                        <span
-                          key={tech}
-                          className="px-2 py-0.5 rounded bg-white/5 border border-white/10 text-[10px] font-mono text-white/60"
-                        >
-                          {tech}
-                        </span>
-                      ))}
-                    </div>
-
-                    <Link
-                      to={`/work/${project.slug}`}
-                      data-cursor="project"
-                      className="text-xs font-mono uppercase tracking-wider text-white font-bold hover:text-[#FF3E00] transition-colors"
-                    >
-                      READ CASE STUDY →
-                    </Link>
-                  </div>
-                </motion.article>
-              ))}
-            </AnimatePresence>
-          </motion.div>
-
-        </div>
-
-        {/* Bottom CTA */}
-        <div className="mt-28">
-          <FinalCTA />
-        </div>
+    <div className="pt-32 pb-24 max-w-6xl mx-auto px-6 space-y-16">
+      
+      {/* Header */}
+      <div className="space-y-4">
+        <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+          Work
+        </h1>
+        <p className="text-sm text-neutral-400 max-w-xl leading-relaxed">
+          A selection of digital products, web designs, and frontend systems built with attention to hierarchy, interaction, and performance.
+        </p>
       </div>
-    </PageTransition>
+
+      {/* Filter Tabs */}
+      <div className="flex items-center space-x-2 border-b border-white/10 pb-4">
+        {filterCategories.map((cat) => {
+          const isActive = activeCategory === cat.id;
+          return (
+            <button
+              key={cat.id}
+              onClick={() => setActiveCategory(cat.id)}
+              className={`px-3 py-1.5 rounded text-xs font-mono transition-colors ${
+                isActive
+                  ? 'bg-white text-black font-semibold'
+                  : 'text-neutral-400 hover:text-white hover:bg-white/5'
+              }`}
+            >
+              {cat.label}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Projects List */}
+      <div className="space-y-24">
+        {filteredProjects.map((project) => (
+          <article key={project.id} className="group space-y-6">
+            
+            <Link to={`/work/${project.slug}`} className="block overflow-hidden rounded border border-white/10 bg-[#0E0E0E]">
+              <img
+                src={project.heroImage}
+                alt={project.title}
+                className="w-full aspect-[16/9] sm:aspect-[21/10] object-cover transition-transform duration-500 group-hover:scale-[1.01]"
+                loading="lazy"
+              />
+            </Link>
+
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-start pt-2">
+              <div className="md:col-span-4 space-y-1">
+                <div className="flex items-center space-x-2 text-xs font-mono text-neutral-400">
+                  <span className="text-[#FF3E00] font-bold">{project.number}</span>
+                  <span>/</span>
+                  <span className="uppercase">{project.categoryLabel}</span>
+                  <span>·</span>
+                  <span>{project.year}</span>
+                </div>
+                <h2 className="text-2xl font-bold text-white tracking-tight">
+                  <Link to={`/work/${project.slug}`} className="hover:text-[#FF3E00] transition-colors">
+                    {project.title}
+                  </Link>
+                </h2>
+              </div>
+
+              <div className="md:col-span-8 flex flex-col sm:flex-row items-start sm:items-baseline justify-between gap-4">
+                <p className="text-sm text-neutral-400 leading-relaxed max-w-lg">
+                  {project.summary}
+                </p>
+                <Link
+                  to={`/work/${project.slug}`}
+                  className="text-xs font-mono uppercase tracking-wider text-white hover:text-[#FF3E00] transition-colors whitespace-nowrap flex items-center space-x-1 shrink-0"
+                >
+                  <span>View Case Study</span>
+                  <ArrowRight size={12} className="group-hover:translate-x-1 transition-transform" />
+                </Link>
+              </div>
+            </div>
+
+          </article>
+        ))}
+      </div>
+
+    </div>
   );
 };

@@ -1,184 +1,144 @@
 import React from 'react';
-import { PageTransition } from '../components/layout/PageTransition';
-import { SectionHeading } from '../components/ui/SectionHeading';
-import { CurrentlySection } from '../components/ui/CurrentlySection';
-import { LikesDislikes } from '../components/ui/LikesDislikes';
-import { FinalCTA } from '../components/sections/FinalCTA';
-import { siteConfig } from '../data/site';
+import { experienceData, toolsList } from '../data/experience';
+import { siteMetadata } from '../data/navigation';
 import { media } from '../data/media';
-import { Laptop, Terminal, Coffee } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { ArrowUpRight } from 'lucide-react';
 
 export const AboutPage: React.FC = () => {
   return (
-    <PageTransition>
-      <div className="pt-32 pb-20 md:pt-40 md:pb-28">
-        <div className="max-w-7xl mx-auto px-6 md:px-12">
-          
-          {/* Hero Header */}
-          <div className="mb-20">
-            <div className="flex items-center space-x-3 text-xs font-mono tracking-widest text-[#FF3E00] uppercase mb-4">
-              <span className="px-2 py-0.5 rounded border border-[#FF3E00]/30 bg-[#FF3E00]/10 font-bold">
-                ABOUT SCRILLO
-              </span>
-              <span className="text-white/30">/</span>
-              <span className="text-white/60">CRAFT, CODE & INTENTION</span>
-            </div>
+    <div className="pt-32 pb-24 max-w-4xl mx-auto px-6 space-y-20">
+      
+      {/* Intro Header */}
+      <section className="space-y-6">
+        <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+          About Scrillo
+        </h1>
+        <p className="text-xl sm:text-2xl text-neutral-200 leading-relaxed font-normal">
+          I'm a UI/UX and frontend web designer focused on creating clear interfaces, thoughtful interactions and websites that feel good to use.
+        </p>
+      </section>
 
-            <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-extrabold tracking-tighter text-white uppercase leading-[0.92] mb-8">
-              DESIGNER. <br />
-              <span className="font-editorial-serif italic font-normal text-[#FF3E00] lowercase text-[1.05em]">
-                builder.
-              </span>{' '}
-              <br />
-              PROBLEM SOLVER.
-            </h1>
+      {/* Portrait & Context */}
+      <section className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start py-8 border-y border-white/10">
+        <div className="md:col-span-4">
+          <div className="rounded overflow-hidden border border-white/10 bg-[#0E0E0E] aspect-[4/5]">
+            <img
+              src={media.designerPortrait}
+              alt="Scrillo Portrait"
+              className="w-full h-full object-cover grayscale"
+            />
+          </div>
+          <div className="pt-2 text-xs font-mono text-neutral-400">
+            {siteMetadata.location}
+          </div>
+        </div>
 
-            <p className="max-w-3xl text-lg sm:text-xl text-muted-primary leading-relaxed">
-              I am an independent UI/UX and frontend web designer based in Bangalore, working with ambitious product teams worldwide. I believe the best digital experiences happen when visual craft and technical execution are conceived by the same mind.
+        <div className="md:col-span-8 space-y-4 text-sm sm:text-base text-neutral-300 leading-relaxed">
+          <p>
+            I began my journey exploring typography, spatial layout, and frontend programming. Over the last 7 years, I've worked directly with founders, product managers, and engineering teams to turn ambiguous product ideas into structured, production-ready interfaces.
+          </p>
+          <p>
+            I believe that great product design is the resolution of complexity, not the concealment of it. When designing an interface, I work with the DOM in mind—understanding layout shifts, responsive breakpoints, and rendering efficiency from the very first wireframe.
+          </p>
+        </div>
+      </section>
+
+      {/* How I Work */}
+      <section className="space-y-6">
+        <h2 className="text-xs font-mono uppercase tracking-wider text-neutral-400">
+          How I Work
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 text-sm text-neutral-300 leading-relaxed">
+          <div className="space-y-2">
+            <h3 className="font-bold text-white">1. Understand the Information Architecture</h3>
+            <p className="text-xs sm:text-sm text-neutral-400">
+              Before touching visual styling, I define user journeys, task priorities, and keyboard navigation flows to ensure the foundation is sound.
             </p>
           </div>
-
-          {/* Portrait & Manifesto Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center py-16 border-t border-white/10">
-            <div className="lg:col-span-5">
-              <div className="relative rounded-2xl overflow-hidden border border-white/10 aspect-[4/5] bg-[#0A0A0A] group shadow-2xl">
-                <img
-                  src={media.designerPortrait}
-                  alt="Scrillo Portrait"
-                  className="w-full h-full object-cover grayscale contrast-125 group-hover:grayscale-0 transition-all duration-700"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-6">
-                  <span className="text-xs font-mono uppercase tracking-widest text-[#FF3E00] font-bold">
-                    BANGALORE, INDIA
-                  </span>
-                  <p className="text-sm font-bold text-white mt-1">
-                    Independent Digital Craft & Engineering
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="lg:col-span-7 space-y-6 text-muted-primary text-base sm:text-lg leading-relaxed">
-              <h2 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight">
-                Closing the Chasm Between Canvas and Code
-              </h2>
-              <p>
-                In the conventional product cycle, a designer creates static mockups in Figma, hands them to an engineering team, and hopes the nuances don't get lost in translation. Inevitably, padding shifts, font line-heights break, animations lose their spring tension, and edge cases get ignored.
-              </p>
-              <p>
-                I eliminate that friction by designing directly with the DOM in mind. When I craft a layout in Figma, I already know how the CSS Grid will collapse, how the TypeScript interface will model the state, and how the spring curve will feel under the user's thumb.
-              </p>
-              <div className="p-6 rounded-2xl bg-white/5 border border-white/5 space-y-2">
-                <p className="font-handwritten text-2xl text-[#FF3E00]">
-                  "Great design is invisible until you notice that you haven't felt frustrated once."
-                </p>
-              </div>
-            </div>
+          <div className="space-y-2">
+            <h3 className="font-bold text-white">2. Tokenized Design Systems</h3>
+            <p className="text-xs sm:text-sm text-neutral-400">
+              I build component systems with strict variable scales (spacing, typography, semantic colors) that translate directly into React and Tailwind code.
+            </p>
           </div>
-
-          {/* Personality Section: I LIKE vs I DON'T LIKE */}
-          <div className="py-20 border-t border-white/10">
-            <SectionHeading
-              number="01"
-              tag="PERSONAL TASTE & PERSPECTIVE"
-              title="DESIGN"
-              serifWord="predilections"
-              description="A direct look at the principles I champion and the superficial anti-patterns I reject."
-            />
-            <div className="mt-8">
-              <LikesDislikes />
-            </div>
+          <div className="space-y-2">
+            <h3 className="font-bold text-white">3. Design-to-Code Execution</h3>
+            <p className="text-xs sm:text-sm text-neutral-400">
+              I write clean, typed React and TypeScript frontends with 100% fidelity to the approved Figma designs, with zero layout shifts.
+            </p>
           </div>
-
-          {/* Currently & Exploring */}
-          <div className="py-20 border-t border-white/10">
-            <SectionHeading
-              number="02"
-              tag="REAL-TIME FOCUS"
-              title="CURRENTLY"
-              serifWord="active & exploring"
-              description="Ongoing design systems, micro-interaction research, and engineering experiments."
-            />
-            <div className="mt-8">
-              <CurrentlySection />
-            </div>
+          <div className="space-y-2">
+            <h3 className="font-bold text-white">4. Honest Collaboration</h3>
+            <p className="text-xs sm:text-sm text-neutral-400">
+              Direct, asynchronous communication via Figma and Loom with weekly checkpoints. No endless corporate bureaucracy.
+            </p>
           </div>
-
-          {/* Design Philosophy & Core Principles */}
-          <div className="py-20 border-t border-white/10">
-            <SectionHeading
-              number="03"
-              tag="CORE VALUES"
-              title="DESIGN"
-              serifWord="philosophy"
-              description="The foundational tenets that govern every wireframe, token scale, and code commit."
-            />
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-12">
-              {siteConfig.principles.map((p) => (
-                <div
-                  key={p.number}
-                  className="p-8 rounded-2xl border border-white/10 bg-[#0C0C0C] space-y-4 hover:border-white/20 transition-colors"
-                >
-                  <span className="font-mono text-xs text-[#FF3E00] font-bold">
-                    PRINCIPLE {p.number}
-                  </span>
-                  <h3 className="text-2xl font-bold text-white tracking-tight">
-                    {p.title}
-                  </h3>
-                  <p className="text-sm text-muted-primary leading-relaxed">
-                    {p.description}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Studio Setup & Personal Notes */}
-          <div className="py-20 border-t border-white/10">
-            <SectionHeading
-              number="04"
-              tag="THE WORKSPACE"
-              title="TOOLS &"
-              serifWord="hardware setup"
-              description="The hardware and software environment powering daily design and code execution."
-              align="split"
-            />
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
-              <div className="p-6 rounded-2xl border border-white/10 bg-[#0A0A0A] space-y-3">
-                <Laptop className="text-[#FF3E00]" size={20} />
-                <h3 className="text-lg font-bold text-white">Hardware & Displays</h3>
-                <p className="text-xs text-muted-primary leading-relaxed">
-                  Apple MacBook Pro M3 Max, Apple Studio Display (5K), CalDigit TS4 Dock, Keychron Q1 Custom Mechanical Keyboard (Gateron Oil Kings).
-                </p>
-              </div>
-
-              <div className="p-6 rounded-2xl border border-white/10 bg-[#0A0A0A] space-y-3">
-                <Terminal className="text-blue-400" size={20} />
-                <h3 className="text-lg font-bold text-white">Software & Editor</h3>
-                <p className="text-xs text-muted-primary leading-relaxed">
-                  Figma for interface & token exploration, VS Code with tailored minimal dark theme, Warp Terminal, Raycast, Linear, and Notion.
-                </p>
-              </div>
-
-              <div className="p-6 rounded-2xl border border-white/10 bg-[#0A0A0A] space-y-3">
-                <Coffee className="text-amber-400" size={20} />
-                <h3 className="text-lg font-bold text-white">Outside the Screen</h3>
-                <p className="text-xs text-muted-primary leading-relaxed">
-                  Collecting Swiss typography books, exploring Brutalist architecture photography, pour-over specialty coffee, and analog film cameras.
-                </p>
-              </div>
-            </div>
-          </div>
-
         </div>
+      </section>
 
-        {/* Bottom CTA */}
-        <div className="mt-12">
-          <FinalCTA />
+      {/* Experience Timeline */}
+      <section className="space-y-8 pt-8 border-t border-white/10">
+        <h2 className="text-xs font-mono uppercase tracking-wider text-neutral-400">
+          Career Timeline
+        </h2>
+
+        <div className="space-y-8">
+          {experienceData.map((item, idx) => (
+            <div key={idx} className="grid grid-cols-1 md:grid-cols-12 gap-4 items-start">
+              <div className="md:col-span-4 text-xs font-mono text-neutral-400">
+                <span className="text-white font-bold block">{item.period}</span>
+                <span>{item.context}</span>
+              </div>
+              <div className="md:col-span-8 space-y-1">
+                <h3 className="text-sm font-bold text-white">
+                  {item.role}
+                </h3>
+                <p className="text-xs sm:text-sm text-neutral-400 leading-relaxed">
+                  {item.description}
+                </p>
+              </div>
+            </div>
+          ))}
         </div>
-      </div>
-    </PageTransition>
+      </section>
+
+      {/* Tools List */}
+      <section className="space-y-6 pt-8 border-t border-white/10">
+        <h2 className="text-xs font-mono uppercase tracking-wider text-neutral-400">
+          Tools & Technologies
+        </h2>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+          {toolsList.map((t) => (
+            <div key={t.category} className="space-y-2">
+              <div className="text-xs font-mono text-white font-semibold">
+                {t.category}
+              </div>
+              <ul className="space-y-1 text-xs font-mono text-neutral-400">
+                {t.items.map((item) => (
+                  <li key={item}>• {item}</li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Contact Link */}
+      <section className="pt-8 border-t border-white/10 flex items-center justify-between">
+        <div>
+          <h2 className="text-lg font-bold text-white">Let's discuss a project</h2>
+          <p className="text-xs text-neutral-400">Open to design and frontend collaborations.</p>
+        </div>
+        <Link
+          to="/contact"
+          className="px-4 py-2 rounded bg-white text-black text-xs font-mono uppercase font-semibold hover:bg-[#FF3E00] hover:text-white transition-colors"
+        >
+          Contact →
+        </Link>
+      </section>
+
+    </div>
   );
 };

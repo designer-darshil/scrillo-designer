@@ -105,89 +105,101 @@ export const WorkPage: React.FC = () => {
             })}
           </div>
 
-          {/* Projects Grid */}
-          <motion.div
-            layout
-            className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12"
-          >
-            <AnimatePresence>
-              {filteredProjects.map((project) => (
-                <motion.article
-                  key={project.id}
-                  layout
-                  initial={{ opacity: 0, scale: 0.96 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.96 }}
-                  transition={{ duration: 0.35 }}
-                  className="group flex flex-col justify-between border border-white/10 rounded-2xl bg-[#0A0A0A] p-6 hover:border-white/25 transition-all duration-300"
-                >
-                  <div>
-                    {/* Top Metadata */}
-                    <div className="flex items-center justify-between text-xs font-mono text-white/50 mb-4 pb-4 border-b border-white/5">
-                      <div className="flex items-center space-x-2">
-                        <span className="text-[#FF3E00] font-bold">{project.number}</span>
-                        <span>/</span>
-                        <span className="text-white uppercase">{project.categoryLabel}</span>
-                      </div>
-                      <span>{project.year}</span>
-                    </div>
-
-                    {/* Image Preview */}
-                    <Link to={`/work/${project.slug}`} data-cursor="project" className="block mb-6">
-                      <PerspectiveCard intensity={6}>
-                        <div className="relative rounded-xl overflow-hidden aspect-[16/10] bg-[#141414] border border-white/5">
-                          <img
-                            src={project.heroImage}
-                            alt={project.title}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                            loading="lazy"
-                          />
-                          <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors" />
+          {/* Projects Grid or Empty State */}
+          {filteredProjects.length > 0 ? (
+            <motion.div
+              layout
+              className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12"
+            >
+              <AnimatePresence>
+                {filteredProjects.map((project) => (
+                  <motion.article
+                    key={project.id}
+                    layout
+                    initial={{ opacity: 0, scale: 0.96 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.96 }}
+                    transition={{ duration: 0.35 }}
+                    className="group flex flex-col justify-between border border-white/10 rounded-2xl bg-[#0A0A0A] p-6 hover:border-white/25 transition-all duration-300"
+                  >
+                    <div>
+                      {/* Top Metadata */}
+                      <div className="flex items-center justify-between text-xs font-mono text-white/50 mb-4 pb-4 border-b border-white/5">
+                        <div className="flex items-center space-x-2">
+                          <span className="text-[#FF3E00] font-bold">{project.number}</span>
+                          <span>/</span>
+                          <span className="text-white uppercase">{project.categoryLabel}</span>
                         </div>
-                      </PerspectiveCard>
-                    </Link>
+                        <span>{project.year}</span>
+                      </div>
 
-                    {/* Title & Tagline */}
-                    <div className="space-y-2 mb-4">
-                      <h2 className="text-2xl sm:text-3xl font-extrabold text-white group-hover:text-[#FF3E00] transition-colors flex items-center justify-between">
-                        <span>{project.title}</span>
-                        <ArrowUpRight size={20} className="opacity-0 group-hover:opacity-100 group-hover:translate-x-1 group-hover:-translate-y-1 transition-all text-[#FF3E00]" />
-                      </h2>
-                      <p className="text-sm font-editorial-serif italic text-white/80">
-                        "{project.subtitle}"
+                      {/* Image Preview */}
+                      <Link to={`/work/${project.slug}`} data-cursor="project" className="block mb-6">
+                        <PerspectiveCard intensity={6}>
+                          <div className="relative rounded-xl overflow-hidden aspect-[16/10] bg-[#141414] border border-white/5">
+                            <img
+                              src={project.heroImage}
+                              alt={project.title}
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                              loading="lazy"
+                            />
+                            <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors" />
+                          </div>
+                        </PerspectiveCard>
+                      </Link>
+
+                      {/* Title & Tagline */}
+                      <div className="space-y-2 mb-4">
+                        <h2 className="text-2xl sm:text-3xl font-extrabold text-white group-hover:text-[#FF3E00] transition-colors flex items-center justify-between">
+                          <span>{project.title}</span>
+                          <ArrowUpRight size={20} className="opacity-0 group-hover:opacity-100 group-hover:translate-x-1 group-hover:-translate-y-1 transition-all text-[#FF3E00]" />
+                        </h2>
+                        <p className="text-sm font-editorial-serif italic text-white/80">
+                          "{project.subtitle}"
+                        </p>
+                      </div>
+
+                      <p className="text-xs sm:text-sm text-muted-primary leading-relaxed mb-6">
+                        {project.description}
                       </p>
                     </div>
 
-                    <p className="text-xs sm:text-sm text-muted-primary leading-relaxed mb-6">
-                      {project.description}
-                    </p>
-                  </div>
+                    {/* Bottom Tech Tags & Action */}
+                    <div className="pt-4 border-t border-white/5 flex flex-wrap items-center justify-between gap-3">
+                      <div className="flex flex-wrap gap-1.5">
+                        {project.technologies.slice(0, 3).map((tech) => (
+                          <span
+                            key={tech}
+                            className="px-2 py-0.5 rounded bg-white/5 border border-white/10 text-[10px] font-mono text-white/60"
+                          >
+                            {tech}
+                          </span>
+                        ))}
+                      </div>
 
-                  {/* Bottom Tech Tags & Action */}
-                  <div className="pt-4 border-t border-white/5 flex flex-wrap items-center justify-between gap-3">
-                    <div className="flex flex-wrap gap-1.5">
-                      {project.technologies.slice(0, 3).map((tech) => (
-                        <span
-                          key={tech}
-                          className="px-2 py-0.5 rounded bg-white/5 border border-white/10 text-[10px] font-mono text-white/60"
-                        >
-                          {tech}
-                        </span>
-                      ))}
+                      <Link
+                        to={`/work/${project.slug}`}
+                        data-cursor="project"
+                        className="text-xs font-mono uppercase tracking-wider text-white font-bold hover:text-[#FF3E00] transition-colors"
+                      >
+                        READ CASE STUDY →
+                      </Link>
                     </div>
-
-                    <Link
-                      to={`/work/${project.slug}`}
-                      data-cursor="project"
-                      className="text-xs font-mono uppercase tracking-wider text-white font-bold hover:text-[#FF3E00] transition-colors"
-                    >
-                      READ CASE STUDY →
-                    </Link>
-                  </div>
-                </motion.article>
-              ))}
-            </AnimatePresence>
-          </motion.div>
+                  </motion.article>
+                ))}
+              </AnimatePresence>
+            </motion.div>
+          ) : (
+            <div className="p-12 rounded-2xl border border-white/10 bg-[#0A0A0A] text-center space-y-4">
+              <p className="text-muted-primary text-sm font-mono">No projects found for the selected category filter.</p>
+              <button
+                onClick={() => handleFilterChange('all')}
+                className="px-6 py-2.5 rounded-full bg-[#FF3E00] text-white font-mono text-xs uppercase tracking-widest font-bold hover:bg-white hover:text-black transition-colors"
+              >
+                VIEW ALL PROJECTS
+              </button>
+            </div>
+          )}
 
         </div>
 

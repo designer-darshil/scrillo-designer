@@ -182,6 +182,7 @@ export function ScrilloLoader({ isReady }: ScrilloLoaderProps) {
     let animFrameId: number;
 
     let minTimerId: ReturnType<typeof setTimeout> | undefined;
+    let exitSlideTimeout: ReturnType<typeof setTimeout> | undefined;
     let finishTimeout: ReturnType<typeof setTimeout> | undefined;
     let safeguardTimer: ReturnType<typeof setTimeout> | undefined;
 
@@ -194,7 +195,7 @@ export function ScrilloLoader({ isReady }: ScrilloLoaderProps) {
       setProgress(100);
 
       // Brief hold at 100% before running upward exit slide
-      setTimeout(() => {
+      exitSlideTimeout = setTimeout(() => {
         if (navIdRef.current !== targetNavId) return;
         setState('EXITING');
 
@@ -260,6 +261,7 @@ export function ScrilloLoader({ isReady }: ScrilloLoaderProps) {
     return () => {
       if (animFrameId) cancelAnimationFrame(animFrameId);
       if (minTimerId) clearTimeout(minTimerId);
+      if (exitSlideTimeout) clearTimeout(exitSlideTimeout);
       if (finishTimeout) clearTimeout(finishTimeout);
       if (safeguardTimer) clearTimeout(safeguardTimer);
     };

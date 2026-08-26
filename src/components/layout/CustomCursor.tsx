@@ -35,7 +35,7 @@ export const CustomCursor: React.FC = () => {
 
     const handleElementHover = (e: MouseEvent) => {
       const target = e.target as HTMLElement | null;
-      if (!target) return;
+      if (!target || typeof target.closest !== 'function') return;
 
       const projectTarget = target.closest('[data-cursor="project"]');
       const exploreTarget = target.closest('[data-cursor="explore"]');

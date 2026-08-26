@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ScrilloLoader } from './components/layout/ScrilloLoader';
 import { Navbar } from './components/layout/Navbar';
 import { Footer } from './components/layout/Footer';
@@ -7,6 +7,7 @@ import { CustomCursor } from './components/layout/CustomCursor';
 import { ScrollProgress } from './components/layout/ScrollProgress';
 import { GrainOverlay } from './components/layout/GrainOverlay';
 import { ScrollToTopOnRoute } from './components/layout/ScrollToTopOnRoute';
+import { ErrorBoundary } from './components/layout/ErrorBoundary';
 
 import { HomePage } from './pages/HomePage';
 import { WorkPage } from './pages/WorkPage';
@@ -41,21 +42,23 @@ export function App() {
         {/* Global Floating Editorial Navbar */}
         <Navbar />
 
-        {/* Main Application Routes */}
+        {/* Main Application Routes with Error Boundary Guard */}
         <main>
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/work" element={<WorkPage />} />
-            <Route path="/work/:slug" element={<ProjectDetailPage />} />
-            <Route path="/lab" element={<LabPage />} />
-            <Route path="/thinking" element={<ThinkingPage />} />
-            <Route path="/about" element={<AboutPage />} />
-            <Route path="/services" element={<ServicesPage />} />
-            <Route path="/experience" element={<ExperiencePage />} />
-            <Route path="/contact" element={<ContactPage />} />
-            <Route path="/404" element={<NotFoundPage />} />
-            <Route path="*" element={<NotFoundPage />} />
-          </Routes>
+          <ErrorBoundary>
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/work" element={<WorkPage />} />
+              <Route path="/work/:slug" element={<ProjectDetailPage />} />
+              <Route path="/lab" element={<LabPage />} />
+              <Route path="/thinking" element={<ThinkingPage />} />
+              <Route path="/about" element={<AboutPage />} />
+              <Route path="/services" element={<ServicesPage />} />
+              <Route path="/experience" element={<ExperiencePage />} />
+              <Route path="/contact" element={<ContactPage />} />
+              <Route path="/404" element={<NotFoundPage />} />
+              <Route path="*" element={<NotFoundPage />} />
+            </Routes>
+          </ErrorBoundary>
         </main>
 
         {/* Large Editorial Footer */}

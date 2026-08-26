@@ -10,10 +10,17 @@ import { DecisionLog } from '../components/ui/DecisionLog';
 import { BeforeAfter } from '../components/ui/BeforeAfter';
 import { ArrowLeft, ArrowUpRight, CheckCircle2, Code2, Layers, Sparkles } from 'lucide-react';
 
+import { NotFoundPage } from './NotFoundPage';
+
 export const ProjectDetailPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
 
-  const project = projects.find((p) => p.slug === slug) || projects[0];
+  const project = projects.find((p) => p.slug === slug);
+
+  if (!project) {
+    return <NotFoundPage />;
+  }
+
   const nextProject = projects.find((p) => p.id === project.nextProjectId) || projects[0];
 
   const [lightboxOpen, setLightboxOpen] = useState(false);

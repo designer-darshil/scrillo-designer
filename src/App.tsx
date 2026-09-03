@@ -15,7 +15,7 @@ import { ProjectDetailPage } from './pages/ProjectDetailPage';
 // import { ThinkingPage } from './pages/ThinkingPage';
 import { AboutPage } from './pages/AboutPage';
 // import { ServicesPage } from './pages/ServicesPage';
-import { ExperiencePage } from './pages/ExperiencePage';
+// import { ExperiencePage } from './pages/ExperiencePage';
 import { ContactPage } from './pages/ContactPage';
 import { NotFoundPage } from './pages/NotFoundPage';
 
@@ -51,7 +51,7 @@ export function App() {
               {/* <Route path="/thinking" element={<ThinkingPage />} /> */}
               <Route path="/about" element={<AboutPage />} />
               {/* <Route path="/services" element={<ServicesPage />} /> */}
-              <Route path="/experience" element={<ExperiencePage />} />
+              {/* <Route path="/experience" element={<ExperiencePage />} /> */}
               <Route path="/contact" element={<ContactPage />} />
               <Route path="/404" element={<NotFoundPage />} />
               <Route path="*" element={<NotFoundPage />} />

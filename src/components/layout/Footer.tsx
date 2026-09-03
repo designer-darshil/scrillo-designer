@@ -79,17 +79,22 @@ export const Footer: React.FC = () => {
 
         {/* Links Navigation Grid */}
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 py-16 border-b border-white/10">
-          {/* Brand Info */}
+          {/* Personal Brand Info */}
           <div className="col-span-2 space-y-4">
-            <span className="font-extrabold text-2xl tracking-tight text-white flex items-center gap-1.5">
-              SCRILLO
-              <span className="w-1.5 h-1.5 rounded-full bg-[#FF3E00]" />
-            </span>
+            <div className="flex items-center space-x-3">
+              <div className="w-8 h-8 rounded-sm bg-white text-black flex items-center justify-center font-bold text-xs tracking-wider select-none">
+                {siteConfig.initials}
+              </div>
+              <span className="font-extrabold text-2xl tracking-tight text-white flex items-center gap-1.5">
+                {siteConfig.name}
+                <span className="w-1.5 h-1.5 rounded-full bg-[#FF3E00]" />
+              </span>
+            </div>
             <p className="text-xs font-mono text-white/50 tracking-wider uppercase max-w-xs">
-              UI/UX DESIGNER & FRONTEND WEB DESIGNER
+              {siteConfig.role}
             </p>
             <p className="font-handwritten text-lg text-white/70">
-              "bridging high craft and production code"
+              "{siteConfig.tagline}"
             </p>
             <div className="pt-2">
               <a
@@ -166,7 +171,7 @@ export const Footer: React.FC = () => {
         {/* Bottom Colophon & Scroll to Top */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono text-white/40">
           <div>
-            © 2026 SCRILLO. DESIGNED & BUILT WITH INTENTION.
+            © 2026 {siteConfig.name}. ALL RIGHTS RESERVED.
           </div>
           
           <div className="flex items-center space-x-6">

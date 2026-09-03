@@ -122,12 +122,8 @@ export const WorkPage: React.FC = () => {
                   >
                     <div>
                       {/* Top Metadata */}
-                      <div className="flex items-center justify-between text-xs font-mono text-white/50 mb-4 pb-4 border-b border-white/5">
-                        <div className="flex items-center space-x-2">
-                          <span className="text-[#FF3E00] font-bold">{project.number}</span>
-                          <span>/</span>
-                          <span className="text-white uppercase">{project.categoryLabel}</span>
-                        </div>
+                      <div className="flex items-center justify-between text-xs font-mono text-white/50 mb-4 pb-3 border-b border-white/5">
+                        <span className="text-white/70 uppercase tracking-wider">{project.roles.join(' • ')}</span>
                         <span>{project.year}</span>
                       </div>
 
@@ -152,35 +148,21 @@ export const WorkPage: React.FC = () => {
                           <span>{project.title}</span>
                           <ArrowUpRight size={20} className="opacity-0 group-hover:opacity-100 group-hover:translate-x-1 group-hover:-translate-y-1 transition-all text-[#FF3E00]" />
                         </h2>
-                        <p className="text-sm font-editorial-serif italic text-white/80">
-                          "{project.subtitle}"
+                        <p className="text-sm text-white/70 font-normal leading-relaxed">
+                          {project.subtitle}
                         </p>
                       </div>
-
-                      <p className="text-xs sm:text-sm text-muted-primary leading-relaxed mb-6">
-                        {project.description}
-                      </p>
                     </div>
 
-                    {/* Bottom Tech Tags & Action */}
-                    <div className="pt-4 border-t border-white/5 flex flex-wrap items-center justify-between gap-3">
-                      <div className="flex flex-wrap gap-1.5">
-                        {project.technologies.slice(0, 3).map((tech) => (
-                          <span
-                            key={tech}
-                            className="px-2 py-0.5 rounded bg-white/5 border border-white/10 text-[10px] font-mono text-white/60"
-                          >
-                            {tech}
-                          </span>
-                        ))}
-                      </div>
-
+                    {/* Bottom Action */}
+                    <div className="pt-4 border-t border-white/5 flex items-center justify-end">
                       <Link
                         to={`/work/${project.slug}`}
                         data-cursor="project"
-                        className="text-xs font-mono uppercase tracking-wider text-white font-bold hover:text-[#FF3E00] transition-colors"
+                        className="text-xs font-mono uppercase tracking-wider text-white font-bold hover:text-[#FF3E00] transition-colors inline-flex items-center gap-1.5"
                       >
-                        READ CASE STUDY →
+                        <span>VIEW PROJECT</span>
+                        <ArrowUpRight size={13} />
                       </Link>
                     </div>
                   </motion.article>

@@ -1,23 +1,26 @@
 export const siteConfig = {
-  name: 'SCRILLO',
-  title: 'SCRILLO — Senior UI/UX Designer & Frontend Web Designer',
-  role: 'Senior UI/UX Designer & Frontend Web Designer',
-  tagline: 'Designing digital products and interfaces, then building them for the web.',
-  heroHeadline: 'UI/UX DESIGN + FRONTEND ENGINEERING.',
+  name: '[YOUR NAME]',
+  initials: 'DS',
+  title: '[YOUR NAME] — UI/UX Designer & Frontend Web Designer',
+  role: 'UI/UX Designer & Frontend Web Designer',
+  tagline: 'I design digital products and interfaces, then build them for the web.',
+  heroHeadline: 'UI/UX DESIGNER + WEB DESIGNER / FRONTEND',
   heroSubheadline: '8+ years designing digital products and 4+ years building production web systems.',
   annotation: '8+ YRS UI/UX • 4+ YRS FRONTEND',
   location: 'Bangalore, India — Available Worldwide',
-  availability: 'Available for Select Client Projects & Design-to-Code Engagements (Q3/Q4 2026)',
-  email: 'hello@scrillo.design',
-  phone: '+91 (0) 98765 43210',
-  yearsOfCraft: '8+',
-  designStatement: `I design digital products and interfaces, then build them for the web. Combining 8+ years of UI/UX design leadership with 4+ years of production frontend engineering in React and TypeScript.`,
+  availability: 'Available for Select Product Design & Frontend Engagements (2026)',
+  email: 'darshilbhuva4322@gmail.com',
+  yearsOfExperience: {
+    uiux: '8+',
+    frontend: '4+'
+  },
+  designStatement: `I design digital products and interfaces, then build them for the web. Combining 8+ years of UI/UX design with 4+ years of production frontend implementation in React and TypeScript.`,
   socials: {
-    github: 'https://github.com/scrillo-design',
-    twitter: 'https://twitter.com/scrillocraft',
-    linkedin: 'https://linkedin.com/in/scrillo-design',
-    dribbble: 'https://dribbble.com/scrillo',
-    behance: 'https://behance.net/scrillo'
+    github: 'https://github.com/designer-darshil',
+    twitter: 'https://twitter.com/darshildesign',
+    linkedin: 'https://linkedin.com/in/darshil-design',
+    dribbble: 'https://dribbble.com/darshil',
+    behance: 'https://behance.net/darshil'
   },
   currently: [
     'Leading end-to-end product design for enterprise telemetry & SaaS platforms',

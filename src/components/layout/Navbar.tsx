@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { navLinks } from '../../data/navigation';
+import { siteConfig } from '../../data/site';
 import { MobileMenu } from './MobileMenu';
 import { Menu, ArrowRight } from 'lucide-react';
 
@@ -33,18 +34,18 @@ export const Navbar: React.FC = () => {
         }`}
       >
         <div className="max-w-7xl mx-auto px-6 md:px-12 flex items-center justify-between">
-          {/* Logo / Brand Mark */}
-          <Link to="/" className="group flex items-center space-x-3">
-            <div className="w-8 h-8 rounded-sm bg-white text-black flex items-center justify-center font-bold text-xs tracking-tighter group-hover:bg-[#FF3E00] group-hover:text-white transition-colors">
-              SC
+          {/* Logo / Personal Identity */}
+          <Link to="/" className="group flex items-center space-x-3" aria-label="Home">
+            <div className="w-8 h-8 rounded-sm bg-white text-black flex items-center justify-center font-bold text-xs tracking-wider group-hover:bg-[#FF3E00] group-hover:text-white transition-colors select-none">
+              {siteConfig.initials}
             </div>
             <div className="flex flex-col">
               <span className="font-extrabold tracking-tight text-sm text-white flex items-center gap-1.5">
-                SCRILLO
+                {siteConfig.name}
                 <span className="w-1.5 h-1.5 rounded-full bg-[#FF3E00] inline-block animate-pulse" />
               </span>
               <span className="text-[10px] font-mono tracking-widest text-white/40 uppercase">
-                UI/UX + Code
+                UI/UX & Frontend
               </span>
             </div>
           </Link>

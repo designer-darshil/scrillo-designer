@@ -25,9 +25,11 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose }) => {
         >
           {/* Top Bar */}
           <div className="flex items-center justify-between border-b border-white/10 pb-6">
-            <Link to="/" onClick={onClose} className="flex items-center space-x-2">
-              <span className="font-mono text-xs tracking-widest text-[#FF3E00] font-bold">00</span>
-              <span className="font-bold tracking-tight text-lg text-white">SCRILLO</span>
+            <Link to="/" onClick={onClose} className="flex items-center space-x-3">
+              <div className="w-7 h-7 rounded-sm bg-white text-black flex items-center justify-center font-bold text-xs tracking-wider select-none">
+                {siteConfig.initials}
+              </div>
+              <span className="font-bold tracking-tight text-base text-white">{siteConfig.name}</span>
             </Link>
             <button
               onClick={onClose}

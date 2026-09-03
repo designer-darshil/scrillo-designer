@@ -19,7 +19,7 @@ export const NotFoundPage: React.FC = () => {
               <span className="text-white/60">PAGE NOT FOUND</span>
             </div>
 
-            {/* Headline matching SCRILLO editorial style */}
+            {/* Headline matching personal portfolio editorial style */}
             <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-extrabold tracking-tighter text-white uppercase leading-[0.92] mb-8">
               PAGE <br />
               <span className="font-editorial-serif italic font-normal text-[#FF3E00] lowercase text-[1.05em]">

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback, memo } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useReducedMotion } from 'framer-motion';
+import { siteConfig } from '../../data/site';
 
 /**
  * Configurable Minimum Loader Display Duration (ms)
@@ -14,7 +15,7 @@ interface ScrilloLoaderProps {
   isReady?: boolean;
 }
 
-const WORDMARK_LETTERS = ['S', 'C', 'R', 'I', 'L', 'L', 'O'];
+const WORDMARK_LETTERS = ['D', 'S'];
 
 /**
  * Isolated Animated Wordmark Sub-Component
@@ -26,7 +27,7 @@ const AnimatedWordmark = memo(function AnimatedWordmark({ navId }: { navId: numb
   if (prefersReducedMotion) {
     return (
       <h1 className="text-7xl sm:text-9xl md:text-[11rem] lg:text-[13rem] font-bold tracking-tight leading-none text-[#F5F5F5] select-none">
-        SCRILLO
+        DS
       </h1>
     );
   }
@@ -299,7 +300,7 @@ export function ScrilloLoader({ isReady }: ScrilloLoaderProps) {
 
   return (
     <div
-      id="scrillo-brand-loader"
+      id="personal-brand-loader"
       aria-live="polite"
       aria-busy={state === 'ACTIVE'}
       className="fixed inset-0 w-screen h-[100dvh] z-[99999] pointer-events-auto select-none overflow-hidden bg-[#050505] flex flex-col justify-between p-8 sm:p-12 md:p-16 text-[#F5F5F5]"
@@ -314,7 +315,7 @@ export function ScrilloLoader({ isReady }: ScrilloLoaderProps) {
       {/* Top Brand Bar */}
       <header className="flex items-center justify-between w-full">
         <span className="font-mono text-xs tracking-[0.25em] uppercase text-white/50 font-medium">
-          SCRILLO
+          {siteConfig.name}
         </span>
         <span className="font-mono text-xs tracking-[0.25em] text-white/40">
           2026
@@ -327,7 +328,7 @@ export function ScrilloLoader({ isReady }: ScrilloLoaderProps) {
         <AnimatedWordmark navId={navIdRef.current} />
 
         <div className="mt-4 sm:mt-6 font-mono text-xs sm:text-sm tracking-[0.35em] text-white/40 uppercase font-medium">
-          UI / UX / WEB
+          UI / UX · FRONTEND
         </div>
       </main>
 

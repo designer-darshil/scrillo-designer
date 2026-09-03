@@ -104,7 +104,7 @@ export const ContactPage: React.FC = () => {
             </h1>
 
             <p className="max-w-2xl text-lg sm:text-xl text-muted-primary leading-relaxed">
-              Have a challenging digital product to design, a design system to architect, or a website to code? Complete this mini-brief to start the conversation.
+              Have a digital product to design, a design system to architect, or a website to build? Send me a note below to start the conversation.
             </p>
           </div>
 

@@ -1,12 +1,10 @@
 import React from 'react';
 import { PageTransition } from '../components/layout/PageTransition';
-import { SectionHeading } from '../components/ui/SectionHeading';
-import { CurrentlySection } from '../components/ui/CurrentlySection';
-import { LikesDislikes } from '../components/ui/LikesDislikes';
 import { FinalCTA } from '../components/sections/FinalCTA';
-import { siteConfig } from '../data/site';
 import { media } from '../data/media';
-import { Laptop, Terminal, Coffee } from 'lucide-react';
+import { siteConfig } from '../data/site';
+import { experienceData } from '../data/experience';
+import { Calendar } from 'lucide-react';
 
 export const AboutPage: React.FC = () => {
   return (
@@ -15,36 +13,40 @@ export const AboutPage: React.FC = () => {
         <div className="max-w-7xl mx-auto px-6 md:px-12">
           
           {/* Hero Header */}
-          <div className="mb-20">
+          <div className="mb-16">
             <div className="flex items-center space-x-3 text-xs font-mono tracking-widest text-[#FF3E00] uppercase mb-4">
               <span className="px-2 py-0.5 rounded border border-[#FF3E00]/30 bg-[#FF3E00]/10 font-bold">
-                ABOUT SCRILLO
+                ABOUT
               </span>
               <span className="text-white/30">/</span>
-              <span className="text-white/60">SENIOR DESIGN & FRONTEND CRAFT</span>
+              <span className="text-white/60">{siteConfig.name}</span>
+            </div>
+
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/10 bg-white/5 text-xs font-mono tracking-widest text-[#FF3E00] uppercase mb-6 font-bold">
+              <span>{siteConfig.initials}</span>
+              <span className="text-white/30">/</span>
+              <span className="text-white">{siteConfig.name}</span>
             </div>
 
             <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-extrabold tracking-tighter text-white uppercase leading-[0.92] mb-8">
-              8+ YRS UI/UX. <br />
-              <span className="font-editorial-serif italic font-normal text-[#FF3E00] lowercase text-[1.05em]">
-                4+ yrs web
-              </span>{' '}
-              <br />
-              ENGINEERING.
+              UI/UX DESIGNER <br />
+              <span className="font-editorial-serif italic font-normal text-[#FF3E00] lowercase text-[0.85em] sm:text-[0.92em] block my-1 sm:my-2">
+                + web designer / frontend
+              </span>
             </h1>
 
-            <p className="max-w-3xl text-lg sm:text-xl text-muted-primary leading-relaxed">
-              I am an independent UI/UX and frontend web designer based in Bangalore, working with venture-backed product teams worldwide. I design digital products from user journeys and token systems to production-grade React and TypeScript code.
+            <p className="max-w-3xl text-lg sm:text-xl text-white/80 leading-relaxed font-normal">
+              8+ years of UI/UX design experience and 4+ years of web design and frontend implementation. I solve product challenges end-to-end—from system architecture to production web code.
             </p>
           </div>
 
-          {/* Portrait & Manifesto Grid */}
+          {/* Portrait & Narrative Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center py-16 border-t border-white/10">
             <div className="lg:col-span-5">
               <div className="relative rounded-2xl overflow-hidden border border-white/10 aspect-[4/5] bg-[#0A0A0A] group shadow-2xl">
                 <img
                   src={media.designerPortrait}
-                  alt="Scrillo Portrait"
+                  alt={`${siteConfig.name} Portrait`}
                   className="w-full h-full object-cover grayscale contrast-125 group-hover:grayscale-0 transition-all duration-500"
                   decoding="async"
                 />
@@ -64,152 +66,85 @@ export const AboutPage: React.FC = () => {
                 Closing the Chasm Between Canvas and Code
               </h2>
               <p>
-                In the conventional product cycle, a designer creates static mockups in Figma, hands them to an engineering team, and hopes the nuances don't get lost in translation. Inevitably, padding shifts, line-heights break, animations lose their spring tension, and state edge cases get overlooked.
+                In the conventional product cycle, a designer creates static mockups in Figma, hands them off to engineering, and hopes the nuances don't get lost in translation. Inevitably, padding shifts, line-heights break, animations lose their spring tension, and state edge cases get overlooked.
               </p>
               <p>
-                I eliminate that friction by designing directly with DOM architecture in mind. When I craft a layout in Figma, I already know how the CSS Grid will collapse, how the TypeScript interface will model the state, and how the spring curve will feel under the user's thumb.
+                I eliminate that friction by designing directly with DOM architecture in mind. When I craft a layout, I already know how the responsive layout collapses, how the TypeScript interface models state, and how the interaction feels under real user input.
               </p>
               <div className="p-6 rounded-2xl bg-white/5 border border-white/5 space-y-2">
                 <p className="font-handwritten text-2xl text-[#FF3E00]">
-                  "Great design is invisible until you notice that you haven't felt frustrated once."
+                  "The work is the hero. The interface frames the work."
                 </p>
               </div>
             </div>
           </div>
 
-          {/* Proven Disciplines Breakdown */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 py-16 border-t border-white/10">
+          {/* Two Core Disciplines */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 py-16 border-t border-white/10">
             <div className="p-8 rounded-2xl border border-white/10 bg-[#0C0C0C] space-y-3">
               <span className="text-xs font-mono uppercase tracking-widest text-[#FF3E00] font-bold block">
-                01. PRODUCT UI/UX (8+ YRS)
+                01. UI/UX DESIGN (8+ YRS)
               </span>
-              <h3 className="text-xl font-bold text-white">Information Architecture & Systems</h3>
-              <p className="text-xs text-muted-primary leading-relaxed">
-                Specialized in multi-tenant SaaS dashboards, complex data density, command canvas navigation (Cmd+K), and ergonomic dark interfaces with WCAG AAA contrast.
+              <h3 className="text-2xl font-bold text-white tracking-tight">Product Architecture & Design Systems</h3>
+              <p className="text-sm text-muted-primary leading-relaxed">
+                Specialized in multi-tenant SaaS dashboards, complex data density, command-driven workflows (Cmd+K), and ergonomic dark interfaces with WCAG AAA contrast.
               </p>
             </div>
 
             <div className="p-8 rounded-2xl border border-white/10 bg-[#0C0C0C] space-y-3">
               <span className="text-xs font-mono uppercase tracking-widest text-[#FF3E00] font-bold block">
-                02. FRONTEND CODE (4+ YRS)
+                02. FRONTEND WEB (4+ YRS)
               </span>
-              <h3 className="text-xl font-bold text-white">Production React & TypeScript</h3>
-              <p className="text-xs text-muted-primary leading-relaxed">
-                Translating Figma tokens into modular, zero-dependency React components, Tailwind CSS utility hierarchies, and 60fps spring animations with 0ms layout shift.
-              </p>
-            </div>
-
-            <div className="p-8 rounded-2xl border border-white/10 bg-[#0C0C0C] space-y-3">
-              <span className="text-xs font-mono uppercase tracking-widest text-[#FF3E00] font-bold block">
-                03. DESIGN SYSTEMS
-              </span>
-              <h3 className="text-xl font-bold text-white">1:1 Token Sync & Governance</h3>
-              <p className="text-xs text-muted-primary leading-relaxed">
-                Building scalable token pipelines linking Figma variables directly to JSON schema, Tailwind configs, and strongly typed component props.
+              <h3 className="text-2xl font-bold text-white tracking-tight">Production React & Web Engineering</h3>
+              <p className="text-sm text-muted-primary leading-relaxed">
+                Translating Figma tokens into modular, clean React components, Tailwind CSS utility hierarchies, and 60fps spring animations with zero layout shift.
               </p>
             </div>
           </div>
 
-          {/* Personality Section: I LIKE vs I DON'T LIKE */}
-          <div className="py-20 border-t border-white/10">
-            <SectionHeading
-              number="01"
-              tag="TASTE & CRAFT VALUES"
-              title="DESIGN"
-              serifWord="predilections"
-              description="A direct look at the principles I champion and the superficial anti-patterns I reject."
-            />
-            <div className="mt-8">
-              <LikesDislikes />
+          {/* Concise Experience Timeline */}
+          <div className="py-16 border-t border-white/10">
+            <div className="mb-10">
+              <span className="text-xs font-mono uppercase tracking-widest text-[#FF3E00] font-bold">
+                EXPERIENCE
+              </span>
+              <h3 className="text-3xl font-extrabold text-white tracking-tight mt-2">
+                Career Background
+              </h3>
             </div>
-          </div>
 
-          {/* Currently & Exploring */}
-          <div className="py-20 border-t border-white/10">
-            <SectionHeading
-              number="02"
-              tag="REAL-TIME FOCUS"
-              title="CURRENTLY"
-              serifWord="active & exploring"
-              description="Active client product work, design system token architecture, and technical research."
-            />
-            <div className="mt-8">
-              <CurrentlySection />
-            </div>
-          </div>
-
-          {/* Design Philosophy & Core Principles */}
-          <div className="py-20 border-t border-white/10">
-            <SectionHeading
-              number="03"
-              tag="CORE PRINCIPLES"
-              title="DESIGN"
-              serifWord="philosophy"
-              description="The foundational tenets that govern every wireframe, token scale, and code commit."
-            />
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-12">
-              {siteConfig.principles.map((p) => (
+            <div className="space-y-4">
+              {experienceData.slice(0, 3).map((item) => (
                 <div
-                  key={p.number}
-                  className="p-8 rounded-2xl border border-white/10 bg-[#0C0C0C] space-y-4 hover:border-white/20 transition-colors"
+                  key={item.id}
+                  className="p-6 md:p-8 rounded-2xl border border-white/10 bg-[#0A0A0A] flex flex-col md:flex-row md:items-center justify-between gap-4"
                 >
-                  <span className="font-mono text-xs text-[#FF3E00] font-bold">
-                    PRINCIPLE {p.number}
-                  </span>
-                  <h3 className="text-2xl font-bold text-white tracking-tight">
-                    {p.title}
-                  </h3>
-                  <p className="text-sm text-muted-primary leading-relaxed">
-                    {p.description}
+                  <div className="space-y-1">
+                    <div className="flex items-center space-x-2 text-xs font-mono text-[#FF3E00]">
+                      <Calendar size={13} />
+                      <span>{item.period}</span>
+                      {item.isCurrent && (
+                        <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px]">
+                          CURRENT
+                        </span>
+                      )}
+                    </div>
+                    <h4 className="text-xl font-bold text-white">{item.role}</h4>
+                    <p className="text-xs font-mono text-white/50">{item.companyOrContext}</p>
+                  </div>
+
+                  <p className="text-sm text-muted-primary max-w-xl">
+                    {item.description}
                   </p>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Studio Setup & Hardware Notes */}
-          <div className="py-20 border-t border-white/10">
-            <SectionHeading
-              number="04"
-              tag="THE WORKSPACE"
-              title="TOOLS &"
-              serifWord="hardware setup"
-              description="The hardware and software environment powering daily design and code execution."
-              align="split"
-            />
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
-              <div className="p-6 rounded-2xl border border-white/10 bg-[#0A0A0A] space-y-3">
-                <Laptop className="text-[#FF3E00]" size={20} />
-                <h3 className="text-lg font-bold text-white">Hardware & Displays</h3>
-                <p className="text-xs text-muted-primary leading-relaxed">
-                  Apple MacBook Pro M3 Max, Apple Studio Display (5K), CalDigit TS4 Dock, Keychron Q1 Custom Mechanical Keyboard (Gateron Oil Kings).
-                </p>
-              </div>
-
-              <div className="p-6 rounded-2xl border border-white/10 bg-[#0A0A0A] space-y-3">
-                <Terminal className="text-blue-400" size={20} />
-                <h3 className="text-lg font-bold text-white">Software & Editor</h3>
-                <p className="text-xs text-muted-primary leading-relaxed">
-                  Figma for interface & token exploration, VS Code with tailored minimal dark theme, Warp Terminal, Raycast, Linear, and Notion.
-                </p>
-              </div>
-
-              <div className="p-6 rounded-2xl border border-white/10 bg-[#0A0A0A] space-y-3">
-                <Coffee className="text-amber-400" size={20} />
-                <h3 className="text-lg font-bold text-white">Outside the Screen</h3>
-                <p className="text-xs text-muted-primary leading-relaxed">
-                  Collecting Swiss typography books, exploring Brutalist architecture photography, pour-over specialty coffee, and analog film cameras.
-                </p>
-              </div>
-            </div>
-          </div>
-
         </div>
 
         {/* Bottom CTA */}
-        <div className="mt-12">
+        <div className="mt-8">
           <FinalCTA />
         </div>
       </div>

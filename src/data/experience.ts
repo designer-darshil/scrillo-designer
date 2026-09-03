@@ -6,7 +6,7 @@ export const experienceData: ExperienceItem[] = [
     period: '2024 — PRESENT',
     year: 2026,
     role: 'Lead UI/UX & Frontend Web Designer',
-    companyOrContext: 'Scrillo Design (Independent Craft & Engineering)',
+    companyOrContext: 'Independent Practice (Product Design & Frontend)',
     type: 'Independent Craft',
     location: 'Remote / Global',
     isCurrent: true,

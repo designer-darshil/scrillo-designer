@@ -21,7 +21,7 @@ export const projects: Project[] = [
     technologies: ['Figma', 'React 18', 'TypeScript', 'Tailwind CSS', 'Framer Motion', 'Radix UI'],
     timeline: '4 Months (Q1 2026)',
     liveUrl: 'https://demo.nova-systems.craft',
-    githubUrl: 'https://github.com/scrillo-design/nova-ui-core',
+    githubUrl: 'https://github.com/designer-darshil/nova-ui-core',
     description: 'Nova is a modern B2B analytics platform where data engineers and product teams observe distributed application pipelines in real-time. The interface was rebuilt from the ground up to reduce cognitive fatigue during critical incident monitoring.',
     challenge: 'The legacy interface suffered from severe information overload: 14 nested menus, inconsistent data tables, and latency-heavy data visualizers that caused operator confusion during production incidents.',
     solution: 'Designed a unified command-center layout featuring an omnipresent command palette (Cmd+K), high-density data tables with custom virtualized rendering, and an ergonomic dark palette with strict semantic contrast tokens.',

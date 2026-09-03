@@ -11,7 +11,7 @@ interface BrowserMockupProps {
 }
 
 export const BrowserMockup: React.FC<BrowserMockupProps> = ({
-  url = 'https://scrillo.craft/preview',
+  url = 'https://portfolio.design/preview',
   title = 'Interactive Preview',
   children,
   className = '',

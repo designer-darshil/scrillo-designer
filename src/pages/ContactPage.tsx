@@ -5,12 +5,13 @@ import { siteConfig } from '../data/site';
 import { Mail, MapPin, ArrowRight, CheckCircle2, Send, RefreshCw, AlertCircle } from 'lucide-react';
 
 const RECIPIENT_EMAIL = 'darshilbhuva4322@gmail.com';
-const SUBMISSION_ENDPOINT = `https://formsubmit.co/ajax/${RECIPIENT_EMAIL}`;
+const API_ENDPOINT = '/api/contact';
 
 export const ContactPage: React.FC = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
+  const [honeypot, setHoneypot] = useState('');
 
   const [errors, setErrors] = useState<{ name?: string; email?: string; message?: string }>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -22,16 +23,24 @@ export const ContactPage: React.FC = () => {
     const newErrors: { name?: string; email?: string; message?: string } = {};
 
     if (!name.trim()) {
-      newErrors.name = 'Please enter your name.';
+      newErrors.name = 'Name is required.';
+    } else if (name.trim().length < 2) {
+      newErrors.name = 'Please enter at least 2 characters.';
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!email.trim() || !emailRegex.test(email.trim())) {
+    if (!email.trim()) {
+      newErrors.email = 'Email is required.';
+    } else if (!emailRegex.test(email.trim())) {
       newErrors.email = 'Please enter a valid email address.';
     }
 
-    if (!message.trim() || message.trim().length < 10) {
-      newErrors.message = 'Please enter a message (at least 10 characters).';
+    if (!message.trim()) {
+      newErrors.message = 'Message is required.';
+    } else if (message.trim().length < 10) {
+      newErrors.message = 'Please enter a message of at least 10 characters.';
+    } else if (message.trim().length > 5000) {
+      newErrors.message = 'Message cannot exceed 5,000 characters.';
     }
 
     setErrors(newErrors);
@@ -41,6 +50,7 @@ export const ContactPage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Prevent duplicate/multiple submissions while pending
     if (isSubmitting) return;
 
     setSubmitError(null);
@@ -52,7 +62,7 @@ export const ContactPage: React.FC = () => {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch(SUBMISSION_ENDPOINT, {
+      const response = await fetch(API_ENDPOINT, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -62,28 +72,28 @@ export const ContactPage: React.FC = () => {
           name: name.trim(),
           email: email.trim(),
           message: message.trim(),
-          _subject: `New Portfolio Inquiry from ${name.trim()}`,
-          _template: 'table'
+          _gotcha: honeypot
         })
       });
 
       const data = await response.json();
 
-      if (response.ok && data.success !== 'false') {
+      if (response.ok && data.success) {
         setSubmittedName(name.trim());
         setIsSubmitted(true);
-        // Reset form inputs only after successful submission
+        // Reset form inputs only after successful delivery
         setName('');
         setEmail('');
         setMessage('');
+        setHoneypot('');
         setErrors({});
+        setSubmitError(null);
       } else {
-        throw new Error(data.message || 'Delivery request was not accepted.');
+        throw new Error(data.error || data.message || 'Email delivery failed.');
       }
-    } catch (err) {
-      setSubmitError(
-        `Unable to deliver message right now. Please try again or email me directly at ${RECIPIENT_EMAIL}.`
-      );
+    } catch (err: any) {
+      const fallbackMsg = err?.message || 'Unable to send your message right now. Please try again or email me directly.';
+      setSubmitError(fallbackMsg);
     } finally {
       setIsSubmitting(false);
     }
@@ -123,14 +133,14 @@ export const ContactPage: React.FC = () => {
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 pt-8 border-t border-white/10 items-start">
             
-            {/* Left Column: Direct Channels & Information */}
+            {/* Left Column: Context & Contact Metadata */}
             <div className="lg:col-span-5 space-y-8">
               
-              {/* Availability Status */}
-              <div className="p-6 rounded-2xl border border-emerald-500/20 bg-emerald-950/10 space-y-2">
-                <div className="flex items-center space-x-2 text-xs font-mono text-emerald-400 font-bold">
+              {/* Availability Notice */}
+              <div className="p-6 rounded-2xl border border-white/10 bg-[#0C0C0C] space-y-3">
+                <div className="flex items-center space-x-2 text-xs font-mono text-emerald-400">
                   <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                  <span>CURRENT AVAILABILITY</span>
+                  <span>ACCEPTING NEW WORK</span>
                 </div>
                 <p className="text-xs sm:text-sm text-white/80 leading-relaxed font-mono">
                   {siteConfig.availability}
@@ -209,17 +219,29 @@ export const ContactPage: React.FC = () => {
                       className="space-y-6"
                       noValidate
                     >
-                      {/* Optional Server/Network Error Notification */}
+                      {/* Honeypot anti-spam field (hidden from genuine users) */}
+                      <input
+                        type="text"
+                        name="_gotcha"
+                        value={honeypot}
+                        onChange={(e) => setHoneypot(e.target.value)}
+                        tabIndex={-1}
+                        autoComplete="off"
+                        className="sr-only"
+                        aria-hidden="true"
+                      />
+
+                      {/* Error Banner */}
                       {submitError && (
                         <div className="p-4 rounded-xl border border-red-500/30 bg-red-950/20 flex items-start space-x-3 text-red-300 text-xs font-mono leading-relaxed">
                           <AlertCircle size={16} className="text-red-400 shrink-0 mt-0.5" />
-                          <div>
+                          <div className="space-y-1.5">
                             <p>{submitError}</p>
                             <a
                               href={`mailto:${RECIPIENT_EMAIL}`}
-                              className="underline text-white hover:text-[#FF3E00] mt-1 inline-block"
+                              className="underline text-white hover:text-[#FF3E00] inline-block font-semibold"
                             >
-                              Click here to open email client →
+                              Email me directly at {RECIPIENT_EMAIL} →
                             </a>
                           </div>
                         </div>
@@ -307,7 +329,7 @@ export const ContactPage: React.FC = () => {
                         {isSubmitting ? (
                           <>
                             <RefreshCw size={14} className="animate-spin" />
-                            <span>SENDING MESSAGE...</span>
+                            <span>SENDING…</span>
                           </>
                         ) : (
                           <>
@@ -336,7 +358,7 @@ export const ContactPage: React.FC = () => {
 
                       <div className="space-y-2">
                         <span className="text-xs font-mono uppercase tracking-widest text-[#FF3E00] font-bold">
-                          MESSAGE DELIVERED
+                          MESSAGE SENT
                         </span>
                         <h3 className="text-3xl font-extrabold text-white tracking-tight">
                           THANK YOU.

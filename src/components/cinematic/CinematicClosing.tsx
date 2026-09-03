@@ -134,10 +134,10 @@ export const CinematicClosing: React.FC = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-12 relative z-10">
         
-        {/* Act 04 Scene Marker */}
-        <div className="flex items-center space-x-3 text-xs font-mono tracking-widest text-[#FF3E00] uppercase mb-8 sm:mb-12">
+        {/* Act 05 Scene Marker */}
+        <div className="flex items-center space-x-3 text-xs font-mono tracking-[0.25em] text-[#FF3E00] uppercase mb-8 sm:mb-12">
           <span className="px-2 py-0.5 rounded border border-[#FF3E00]/30 bg-[#FF3E00]/10 font-bold">
-            ACT 04
+            ACT 05
           </span>
           <span className="text-white/30">/</span>
           <span className="text-white/60">EPILOGUE</span>
@@ -152,7 +152,7 @@ export const CinematicClosing: React.FC = () => {
               <span className="italic font-light text-[#FF3E00] lowercase">together.</span>
             </h2>
 
-            <p className="text-sm sm:text-base text-muted-primary leading-relaxed max-w-md">
+            <p className="text-sm sm:text-base text-muted-primary leading-relaxed max-w-md font-normal">
               Available for select UI/UX design, web design, and frontend implementation engagements. Let's discuss your product.
             </p>
 
@@ -177,6 +177,26 @@ export const CinematicClosing: React.FC = () => {
               <div className="flex items-center space-x-3 p-3.5 rounded-xl border border-white/10 bg-[#0C0C0C] text-white/70">
                 <MapPin size={15} className="text-white/50 shrink-0" />
                 <span>{siteConfig.location}</span>
+              </div>
+            </div>
+
+            {/* Minimal Social Links */}
+            <div className="pt-2">
+              <span className="text-[11px] font-mono tracking-[0.2em] text-white/40 uppercase block mb-2">
+                NETWORKS
+              </span>
+              <div className="grid grid-cols-2 gap-2 font-mono text-xs">
+                {Object.entries(siteConfig.socials).map(([key, url]) => (
+                  <a
+                    key={key}
+                    href={url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-3 rounded-lg border border-white/10 bg-[#0C0C0C] hover:border-[#FF3E00] text-white/80 hover:text-[#FF3E00] transition-colors capitalize text-center"
+                  >
+                    {key}
+                  </a>
+                ))}
               </div>
             </div>
           </div>

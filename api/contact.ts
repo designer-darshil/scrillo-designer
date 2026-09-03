@@ -6,12 +6,18 @@ interface ContactPayload {
   email: string;
   message: string;
   _gotcha?: string; // Honeypot spam trap
+  _simulateFailure?: boolean; // Optional simulation flag for testing fallback flow
 }
 
 const RECIPIENT_EMAIL = 'darshilbhuva4322@gmail.com';
 
 export async function processContactSubmission(payload: ContactPayload): Promise<{ success: boolean; message?: string; error?: string }> {
-  const { name, email, message, _gotcha } = payload;
+  const { name, email, message, _gotcha, _simulateFailure } = payload;
+
+  // 0. Failure simulation for automated testing
+  if (_simulateFailure) {
+    return { success: false, error: 'Simulated email service failure for testing fallback path.' };
+  }
 
   // 1. Honeypot check for bots
   if (_gotcha) {

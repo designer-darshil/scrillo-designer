@@ -31,13 +31,13 @@ export const ContactPage: React.FC = () => {
     const trimmedMsg = message.trim();
 
     const subject = trimmedName
-      ? `Portfolio Inquiry from ${trimmedName}`
-      : 'Portfolio Inquiry — Darshil S. Bhuva';
+      ? `New portfolio inquiry from ${trimmedName}`
+      : 'New portfolio inquiry';
 
     const bodyParts: string[] = [];
-    if (trimmedName) bodyParts.push(`Name: ${trimmedName}`);
-    if (trimmedEmail) bodyParts.push(`Email: ${trimmedEmail}`);
-    if (trimmedMsg) bodyParts.push(`\nMessage:\n${trimmedMsg}`);
+    bodyParts.push(`Name: ${trimmedName || 'Visitor'}`);
+    bodyParts.push(`Email: ${trimmedEmail || 'Not provided'}`);
+    bodyParts.push(`\nMessage:\n${trimmedMsg || ''}`);
 
     const body = bodyParts.join('\n');
     return `mailto:${RECIPIENT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
@@ -80,6 +80,9 @@ export const ContactPage: React.FC = () => {
     setIsSubmitting(true);
     setSubmitError(null);
 
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
+
     try {
       const res = await fetch(API_ENDPOINT, {
         method: 'POST',
@@ -92,8 +95,11 @@ export const ContactPage: React.FC = () => {
           email: email.trim(),
           message: message.trim(),
           _gotcha: honeypot
-        })
+        }),
+        signal: controller.signal
       });
+
+      clearTimeout(timeoutId);
 
       let data: any = {};
       try {
@@ -103,7 +109,7 @@ export const ContactPage: React.FC = () => {
       }
 
       if (!res.ok || !data.success) {
-        throw new Error(data.error || "Couldn't deliver message through the server right now.");
+        throw new Error(data.error || "Couldn't send the message.");
       }
 
       // Success flow: record name, mark submitted, reset form fields
@@ -115,9 +121,15 @@ export const ContactPage: React.FC = () => {
       setHoneypot('');
       setSubmitError(null);
     } catch (err: any) {
-      // Failure flow: preserve form data, display compact error with 1-click mailto fallback
-      setSubmitError(err?.message || "Couldn't send the message.");
+      clearTimeout(timeoutId);
+      // Failure flow: form data (name, email, message) is strictly preserved!
+      if (err?.name === 'AbortError') {
+        setSubmitError("Request timed out. Please try again, or open your email client to contact me directly.");
+      } else {
+        setSubmitError(err?.message || "Couldn't send the message.");
+      }
     } finally {
+      clearTimeout(timeoutId);
       setIsSubmitting(false);
     }
   };
@@ -277,8 +289,8 @@ export const ContactPage: React.FC = () => {
                           <div className="flex items-center space-x-2 text-white/80">
                             <AlertCircle size={15} className="text-[#FF3E00] shrink-0" />
                             <div>
-                              <span className="text-white font-bold mr-1">Couldn't send the message.</span>
-                              <span className="text-white/60">Please try again or send via your email client.</span>
+                              <span className="text-white font-bold mr-1">Couldn't send the message</span>
+                              <span className="text-white/60 block sm:inline">Please try again, or open your email client to contact me directly.</span>
                             </div>
                           </div>
                           <a

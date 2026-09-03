@@ -1,25 +1,29 @@
 import React from 'react';
 import { PageTransition } from '../components/layout/PageTransition';
-import { CinematicHero } from '../components/sections/CinematicHero';
-import { SelectedWork } from '../components/sections/SelectedWork';
-import { HomeAboutPreview } from '../components/sections/HomeAboutPreview';
-import { FinalCTA } from '../components/sections/FinalCTA';
+import { CinematicIntro } from '../components/cinematic/CinematicIntro';
+import { CinematicFilmHero } from '../components/cinematic/CinematicFilmHero';
+import { CinematicSelectedWork } from '../components/cinematic/CinematicSelectedWork';
+import { CinematicNarrative } from '../components/cinematic/CinematicNarrative';
+import { CinematicClosing } from '../components/cinematic/CinematicClosing';
 
 export const HomePage: React.FC = () => {
   return (
     <PageTransition>
       <div className="relative">
-        {/* 01: Hero - UI/UX Designer + Web Designer / Frontend */}
-        <CinematicHero />
+        {/* Prologue: 1.4s Fast Filmic Entrance Sequence */}
+        <CinematicIntro />
 
-        {/* 02: Selected Work - Focused Project Cards */}
-        <SelectedWork />
+        {/* Act 01: Title Sequence Hero */}
+        <CinematicFilmHero />
 
-        {/* 03: Short About / Experience */}
-        <HomeAboutPreview />
+        {/* Act 02: Full-Width Scene-Based Projects */}
+        <CinematicSelectedWork />
 
-        {/* 04: Contact Conversion */}
-        <FinalCTA />
+        {/* Act 03: Narrative Chronicle & Career Credits */}
+        <CinematicNarrative />
+
+        {/* Act 04: Typographic Closing & Fallback-Guarded Contact */}
+        <CinematicClosing />
       </div>
     </PageTransition>
   );

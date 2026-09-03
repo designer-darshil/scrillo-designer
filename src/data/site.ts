@@ -1,7 +1,7 @@
 export const siteConfig = {
-  name: '[YOUR NAME]',
+  name: 'Darshil Bhuva',
   initials: 'DS',
-  title: '[YOUR NAME] — UI/UX Designer & Frontend Web Designer',
+  title: 'Darshil Bhuva — UI/UX Designer & Frontend Web Designer',
   role: 'UI/UX Designer & Frontend Web Designer',
   tagline: 'I design digital products and interfaces, then build them for the web.',
   heroHeadline: 'UI/UX DESIGNER + WEB DESIGNER / FRONTEND',

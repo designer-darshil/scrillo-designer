@@ -34,9 +34,7 @@ export default {
       },
       fontFamily: {
         sans: ['"Plus Jakarta Sans"', 'Inter', '-apple-system', 'sans-serif'],
-        serif: ['"Instrument Serif"', '"Playfair Display"', 'Georgia', 'serif'],
         mono: ['"JetBrains Mono"', 'monospace'],
-        hand: ['"Caveat"', 'cursive']
       },
       letterSpacing: {
         tighter: '-0.04em',

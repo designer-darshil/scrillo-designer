@@ -30,7 +30,7 @@ export const AboutPage: React.FC = () => {
 
             <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-extrabold tracking-tight sm:tracking-tighter text-white uppercase leading-[0.95] sm:leading-[0.92] mb-8 break-words">
               UI/UX DESIGNER <br />
-              <span className="font-editorial-serif italic font-normal text-[#FF3E00] lowercase text-[0.88em] sm:text-[0.92em] block my-1 sm:my-2">
+              <span className="italic font-light text-[#FF3E00] tracking-tight lowercase text-[0.88em] sm:text-[0.92em] block my-1 sm:my-2">
                 + web designer / frontend
               </span>
             </h1>
@@ -72,7 +72,7 @@ export const AboutPage: React.FC = () => {
                 I eliminate that friction by designing directly with DOM architecture in mind. When I craft a layout, I already know how the responsive layout collapses, how the TypeScript interface models state, and how the interaction feels under real user input.
               </p>
               <div className="p-6 rounded-2xl bg-white/5 border border-white/5 space-y-2">
-                <p className="font-handwritten text-2xl text-[#FF3E00]">
+                <p className="font-sans italic font-normal text-lg sm:text-xl text-[#FF3E00] leading-relaxed">
                   "The work is the hero. The interface frames the work."
                 </p>
               </div>

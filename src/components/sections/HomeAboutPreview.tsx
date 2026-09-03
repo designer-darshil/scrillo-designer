@@ -23,7 +23,7 @@ export const HomeAboutPreview: React.FC = () => {
           <div className="lg:col-span-7 space-y-6 sm:space-y-8">
             <h2 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight sm:tracking-tighter text-white leading-[1.05] uppercase">
               BRIDGING SYSTEMIC PRODUCT DESIGN AND{' '}
-              <span className="font-editorial-serif italic font-normal text-[#FF3E00] lowercase text-[1.1em]">
+              <span className="italic font-light text-[#FF3E00] tracking-tight lowercase">
                 production
               </span>{' '}
               FRONTEND.

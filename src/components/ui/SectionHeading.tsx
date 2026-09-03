@@ -40,7 +40,7 @@ export const SectionHeading: React.FC<SectionHeadingProps> = ({
             <h2 className="text-3xl sm:text-5xl md:text-6xl font-extrabold tracking-tighter text-white leading-tight">
               {title}{' '}
               {serifWord && (
-                <span className="font-editorial-serif italic font-normal text-[#FF3E00]">
+                <span className="italic font-light text-[#FF3E00] tracking-tight">
                   {serifWord}
                 </span>
               )}
@@ -60,7 +60,7 @@ export const SectionHeading: React.FC<SectionHeadingProps> = ({
           <h2 className="text-3xl sm:text-5xl md:text-6xl font-extrabold tracking-tighter text-white leading-tight mb-4">
             {title}{' '}
             {serifWord && (
-              <span className="font-editorial-serif italic font-normal text-[#FF3E00]">
+              <span className="italic font-light text-[#FF3E00] tracking-tight">
                 {serifWord}
               </span>
             )}

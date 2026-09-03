@@ -50,13 +50,16 @@
   }
 }
 
-/* Editorial typography utility styles */
-.font-editorial-serif {
-  font-family: 'Instrument Serif', 'Playfair Display', Georgia, serif;
+/* Clean editorial typographic hierarchy using primary sans-serif system */
+.font-editorial-serif,
+.font-editorial-italic {
+  font-family: inherit;
+  font-style: italic;
 }
 
 .font-handwritten {
-  font-family: 'Caveat', cursive;
+  font-family: inherit;
+  font-style: normal;
 }
 
 .font-tech-mono {

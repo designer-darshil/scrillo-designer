@@ -100,9 +100,9 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose }) => {
             })}
           </nav>
 
-          {/* Bottom Editorial Quote & Socials */}
+          {/* Bottom Editorial Tagline & Socials */}
           <div className="border-t border-white/10 pt-6 space-y-4">
-            <p className="font-handwritten text-xl text-[#FF3E00]/90">
+            <p className="text-sm font-sans text-white/70 leading-relaxed">
               "{siteConfig.tagline}"
             </p>
             <div className="flex flex-wrap items-center justify-between gap-4 text-xs font-mono text-white/60">

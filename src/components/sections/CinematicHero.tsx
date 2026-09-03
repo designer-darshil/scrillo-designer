@@ -23,7 +23,7 @@ export const CinematicHero: React.FC = () => {
             <span className="text-white/80">4+ YRS FRONTEND</span>
           </div>
 
-          <div className="font-handwritten text-lg sm:text-xl text-[#FF3E00]">
+          <div className="text-xs sm:text-sm font-mono text-white/60 tracking-wider">
             "{siteConfig.tagline}"
           </div>
         </div>
@@ -43,7 +43,7 @@ export const CinematicHero: React.FC = () => {
 
             <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-extrabold tracking-tight sm:tracking-tighter text-white leading-[0.95] sm:leading-[0.92] uppercase break-words">
               UI/UX DESIGNER <br />
-              <span className="font-editorial-serif italic font-normal text-[#FF3E00] tracking-normal lowercase text-[0.88em] sm:text-[0.92em] block my-1 sm:my-2">
+              <span className="italic font-light text-[#FF3E00] tracking-tight lowercase text-[0.88em] sm:text-[0.92em] block my-1 sm:my-2">
                 + web designer / frontend
               </span>
             </h1>

@@ -18,7 +18,7 @@ export const FinalCTA: React.FC = () => {
 
         <h2 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-extrabold tracking-tight sm:tracking-tighter text-white uppercase leading-[0.95] max-w-4xl mx-auto break-words">
           LET'S CREATE A PRODUCT THAT FEELS{' '}
-          <span className="font-editorial-serif italic font-normal text-[#FF3E00] lowercase text-[1.05em]">
+          <span className="italic font-light text-[#FF3E00] tracking-tight lowercase">
             irreplaceable.
           </span>
         </h2>

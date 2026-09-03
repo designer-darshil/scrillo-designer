@@ -60,7 +60,7 @@ export const WorkPage: React.FC = () => {
 
             <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold tracking-tight sm:tracking-tighter text-white uppercase leading-[0.95] sm:leading-none mb-6 break-words">
               PROVE BY <br />
-              <span className="font-editorial-serif italic font-normal text-[#FF3E00] lowercase text-[1.05em]">
+              <span className="italic font-light text-[#FF3E00] tracking-tight lowercase">
                 built
               </span>{' '}
               WORK.

@@ -54,9 +54,9 @@ export class ErrorBoundary extends Component<Props, State> {
                 <span className="text-white/60">UNHANDLED EXCEPTION</span>
               </div>
 
-              <h1 className="text-5xl sm:text-7xl md:text-8xl font-extrabold tracking-tighter text-white uppercase leading-[0.95] mb-6">
+              <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold tracking-tight sm:tracking-tighter text-white uppercase leading-[0.95] mb-6 break-words">
                 SOMETHING <br />
-                <span className="font-editorial-serif italic font-normal text-[#FF3E00] lowercase text-[1.05em]">
+                <span className="italic font-light text-[#FF3E00] tracking-tight lowercase">
                   went
                 </span>{' '}
                 <br />

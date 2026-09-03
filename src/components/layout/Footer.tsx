@@ -40,9 +40,9 @@ export const Footer: React.FC = () => {
               <span>Available for Q3/Q4 2026 Collaborations</span>
             </div>
             
-            <h2 className="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tighter text-white leading-none">
+            <h2 className="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight sm:tracking-tighter text-white leading-none">
               LET'S BUILD <br />
-              <span className="font-editorial-serif italic font-normal text-[#FF3E00]">
+              <span className="italic font-light text-[#FF3E00]">
                 SOMETHING
               </span>{' '}
               WORTH USING.
@@ -93,7 +93,7 @@ export const Footer: React.FC = () => {
             <p className="text-xs font-mono text-white/50 tracking-wider uppercase max-w-xs">
               {siteConfig.role}
             </p>
-            <p className="font-handwritten text-lg text-white/70">
+            <p className="text-sm font-sans text-white/60 leading-relaxed max-w-xs">
               "{siteConfig.tagline}"
             </p>
             <div className="pt-2">

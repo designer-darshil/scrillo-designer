@@ -8,7 +8,7 @@ export const experienceData: ExperienceItem[] = [
     role: 'Web Designer & UI/UX Designer',
     companyOrContext: 'BigBrainy Infotech',
     type: 'Full-time',
-    location: 'India',
+    location: 'Surat, Gujarat',
     isCurrent: true,
     description: 'Designing user interfaces, responsive websites, and digital experiences. Creating wireframes, interactive prototypes, and translating designs into clean frontend code with HTML/CSS, JavaScript, and Bootstrap.',
     achievements: [
@@ -25,7 +25,7 @@ export const experienceData: ExperienceItem[] = [
     role: 'UI/UX Designer',
     companyOrContext: 'Awesome Infotech',
     type: 'Full-time',
-    location: 'India',
+    location: 'Surat, Gujarat',
     isCurrent: false,
     description: 'Focused on user research, wireframing, and visual interface design for web and mobile platforms.',
     achievements: [
@@ -42,7 +42,7 @@ export const experienceData: ExperienceItem[] = [
     role: 'UI/UX Designer',
     companyOrContext: 'Dream World InfoSoft',
     type: 'Full-time',
-    location: 'India',
+    location: 'Surat, Gujarat',
     isCurrent: false,
     description: 'Designed web interfaces, e-commerce layouts, and digital visual assets for client applications.',
     achievements: [
@@ -59,7 +59,7 @@ export const experienceData: ExperienceItem[] = [
     role: 'UI/UX Designer',
     companyOrContext: 'Gridlab Infosys',
     type: 'Full-time',
-    location: 'India',
+    location: 'Surat, Gujarat',
     isCurrent: false,
     description: 'Created website layouts, wireframes, and user interface components for web applications.',
     achievements: [
@@ -75,5 +75,5 @@ export const craftStats = [
   { label: 'Current Role', value: 'Web & UI/UX Designer' },
   { label: 'Primary Focus', value: 'UI/UX · Web Design' },
   { label: 'Specialization', value: 'SaaS & E-commerce' },
-  { label: 'Code Skills', value: 'HTML/CSS · JS · Bootstrap' }
+  { label: 'Code Skills', value: 'HTML/CSS · JS · Bootstrap · Tailwind' }
 ];

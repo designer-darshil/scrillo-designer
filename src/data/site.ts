@@ -7,7 +7,7 @@ export const siteConfig = {
   heroHeadline: 'UI/UX DESIGNER · WEB DESIGNER',
   heroSubheadline: 'Designing clear digital experiences, web interfaces, and frontend implementations for SaaS and e-commerce products.',
   annotation: 'UI/UX DESIGN · WEB DESIGN · FRONTEND',
-  location: 'Gujarat / Bangalore, India',
+  location: 'Surat, Gujarat, India',
   availability: 'Available for UI/UX & Web Design Projects',
   email: 'darshilbhuva4322@gmail.com',
   phone: '+91 8866 90 2600',

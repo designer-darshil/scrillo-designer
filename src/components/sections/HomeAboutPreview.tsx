@@ -14,7 +14,7 @@ export const HomeAboutPreview: React.FC = () => {
             02
           </span>
           <span className="text-white/30">/</span>
-          <span className="text-white/60">ABOUT & CRAFT</span>
+          <span className="text-white/60">ABOUT ME</span>
         </div>
 
         {/* Editorial Content Grid */}
@@ -22,19 +22,19 @@ export const HomeAboutPreview: React.FC = () => {
           {/* Narrative Side */}
           <div className="lg:col-span-7 space-y-6 sm:space-y-8">
             <h2 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight sm:tracking-tighter text-white leading-[1.05] uppercase">
-              BRIDGING SYSTEMIC PRODUCT DESIGN AND{' '}
+              DESIGNING CLEAR INTERFACES AND{' '}
               <span className="italic font-light text-[#FF3E00] tracking-tight lowercase">
-                production
+                functional
               </span>{' '}
-              FRONTEND.
+              WEBSITES.
             </h2>
 
             <div className="space-y-4 text-muted-primary text-base sm:text-lg leading-relaxed border-t border-white/10 pt-6">
               <p>
-                With <span className="text-white font-semibold">8+ years of UI/UX design</span> experience and <span className="text-white font-semibold">4+ years of frontend web implementation</span>, I take digital products from information architecture to production code.
+                I am a <span className="text-white font-semibold">UI/UX Designer and Web Designer</span> with hands-on experience designing applications, SaaS products, and e-commerce websites.
               </p>
               <p>
-                Designing directly with DOM mechanics and component state in mind eliminates handoff friction. Wireframes, design tokens, and web interfaces are conceived together—producing high-performance, accessible products.
+                My process covers user research, wireframes, and interactive prototypes in Figma, through to responsive frontend implementation using HTML/CSS, JavaScript, and Bootstrap. Designing with development knowledge helps create interfaces that are practical, usable, and consistent.
               </p>
             </div>
 
@@ -44,7 +44,7 @@ export const HomeAboutPreview: React.FC = () => {
                 data-cursor="cta"
                 className="inline-flex items-center space-x-2 text-xs font-mono uppercase tracking-widest text-white hover:text-[#FF3E00] transition-colors group min-h-[44px]"
               >
-                <span>LEARN MORE ABOUT ME & MY APPROACH</span>
+                <span>READ ABOUT MY EXPERIENCE & BACKGROUND</span>
                 <ArrowUpRight size={14} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
               </Link>
             </div>
@@ -62,10 +62,10 @@ export const HomeAboutPreview: React.FC = () => {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-6">
                 <span className="text-[10px] font-mono tracking-widest text-[#FF3E00] uppercase font-bold">
-                  EXPERIENCE
+                  FOCUS
                 </span>
                 <p className="text-sm font-mono text-white mt-1">
-                  8+ Yrs UI/UX • 4+ Yrs Frontend
+                  UI/UX Design · Web Design · Frontend
                 </p>
               </div>
             </div>

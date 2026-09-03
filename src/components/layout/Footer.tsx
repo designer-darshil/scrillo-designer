@@ -49,7 +49,7 @@ export const Footer: React.FC = () => {
             </h2>
 
             <p className="max-w-xl text-muted-primary text-base md:text-lg leading-relaxed font-normal">
-              Have an ambitious product idea, a design system to architect, or a website that deserves high craft? Let's talk design-to-code.
+              Have a digital product, application interface, or website project to discuss? Feel free to reach out.
             </p>
           </div>
 
@@ -59,7 +59,7 @@ export const Footer: React.FC = () => {
               data-cursor="cta"
               className="group inline-flex items-center space-x-3 px-8 py-4 rounded-full bg-[#FF3E00] text-white font-mono text-sm uppercase tracking-widest font-bold hover:bg-white hover:text-black transition-all duration-300 shadow-xl shadow-[#FF3E00]/20"
             >
-              <span>START A CONVERSATION</span>
+              <span>GET IN TOUCH</span>
               <ArrowUpRight size={18} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
             </Link>
 
@@ -67,7 +67,7 @@ export const Footer: React.FC = () => {
             <div className="bg-white/5 border border-white/10 rounded-lg p-4 w-full sm:w-auto text-xs font-mono text-white/70 space-y-1">
               <div className="flex items-center justify-between gap-6">
                 <span className="text-white/40">LOCATION</span>
-                <span className="text-white">Bangalore, IN (UTC+5:30)</span>
+                <span className="text-white">{siteConfig.location}</span>
               </div>
               <div className="flex items-center justify-between gap-6">
                 <span className="text-white/40">LOCAL TIME</span>
@@ -96,13 +96,23 @@ export const Footer: React.FC = () => {
             <p className="text-sm font-sans text-white/60 leading-relaxed max-w-xs">
               "{siteConfig.tagline}"
             </p>
-            <div className="pt-2">
-              <a
-                href={`mailto:${siteConfig.email}`}
-                className="font-mono text-sm text-white/80 hover:text-[#FF3E00] transition-colors underline"
-              >
-                {siteConfig.email}
-              </a>
+            <div className="pt-2 space-y-1 text-sm font-mono">
+              <div>
+                <a
+                  href={`mailto:${siteConfig.email}`}
+                  className="text-white/80 hover:text-[#FF3E00] transition-colors underline"
+                >
+                  {siteConfig.email}
+                </a>
+              </div>
+              <div>
+                <a
+                  href={siteConfig.phoneHref}
+                  className="text-white/60 hover:text-white transition-colors"
+                >
+                  {siteConfig.formattedPhone}
+                </a>
+              </div>
             </div>
           </div>
 

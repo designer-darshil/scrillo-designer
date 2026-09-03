@@ -1,75 +1,80 @@
 export const siteConfig = {
-  name: 'Darshil Bhuva',
+  name: 'Darshil S. Bhuva',
   initials: 'DS',
-  title: 'Darshil Bhuva — UI/UX Designer & Frontend Web Designer',
-  role: 'UI/UX Designer & Frontend Web Designer',
-  tagline: 'I design digital products and interfaces, then build them for the web.',
-  heroHeadline: 'UI/UX DESIGNER + WEB DESIGNER / FRONTEND',
-  heroSubheadline: '8+ years designing digital products and 4+ years building production web systems.',
-  annotation: '8+ YRS UI/UX • 4+ YRS FRONTEND',
-  location: 'Bangalore, India — Available Worldwide',
-  availability: 'Available for Select Product Design & Frontend Engagements (2026)',
+  title: 'Darshil S. Bhuva — UI/UX Designer · Web Designer',
+  role: 'UI/UX Designer · Web Designer',
+  tagline: 'I design digital experiences and websites with a focus on clarity, usability, and thoughtful interaction.',
+  heroHeadline: 'UI/UX DESIGNER · WEB DESIGNER',
+  heroSubheadline: 'Designing clear digital experiences, web interfaces, and frontend implementations for SaaS and e-commerce products.',
+  annotation: 'UI/UX DESIGN · WEB DESIGN · FRONTEND',
+  location: 'Gujarat / Bangalore, India',
+  availability: 'Available for UI/UX & Web Design Projects',
   email: 'darshilbhuva4322@gmail.com',
-  yearsOfExperience: {
-    uiux: '8+',
-    frontend: '4+'
-  },
-  designStatement: `I design digital products and interfaces, then build them for the web. Combining 8+ years of UI/UX design with 4+ years of production frontend implementation in React and TypeScript.`,
+  phone: '+91 8866 90 2600',
+  formattedPhone: '+91 8866 90 2600',
+  phoneHref: 'tel:+918866902600',
+  designStatement: 'I design digital experiences and websites with a focus on clarity, usability, and thoughtful interaction. Experienced across SaaS and e-commerce products from wireframes and prototypes to clean frontend code.',
   socials: {
-    github: 'https://github.com/designer-darshil',
-    twitter: 'https://twitter.com/darshildesign',
-    linkedin: 'https://linkedin.com/in/darshil-design',
-    dribbble: 'https://dribbble.com/darshil',
-    behance: 'https://behance.net/darshil'
+    linkedin: 'https://linkedin.com/in/dsbhuva',
+    dribbble: 'https://dribbble.com',
+    behance: 'https://behance.net',
+    instagram: 'https://instagram.com'
   },
+  skills: {
+    design: [
+      'Wireframes & Flows',
+      'Prototyping',
+      'User Interface Design',
+      'Interaction Design'
+    ],
+    toolsAndCode: [
+      'Figma',
+      'Photoshop',
+      'Illustrator',
+      'Adobe XD',
+      'Sketch',
+      'InVision',
+      'HTML/CSS',
+      'JavaScript',
+      'Bootstrap',
+      'GitHub'
+    ]
+  },
+  education: [
+    {
+      institution: 'Sarvepalli Radhakrishnan University, Bhopal',
+      degree: 'Undergraduate Studies',
+      period: 'Jun 2018 – Nov 2022'
+    },
+    {
+      institution: 'Higher Secondary Education',
+      degree: 'HSC — Gujarat State Board',
+      period: 'May 2017 – Apr 2018'
+    },
+    {
+      institution: 'Secondary Education',
+      degree: 'SSC — Gujarat State Board',
+      period: 'May 2014 – Apr 2015'
+    }
+  ],
   currently: [
-    'Leading end-to-end product design for enterprise telemetry & SaaS platforms',
-    'Architecting token pipelines bridging Figma variables to React / Tailwind CSS',
-    'Building responsive web experiences with zero layout shift and sub-16ms render loops',
-    'Auditing accessibility, spatial typographic hierarchy, and keyboard navigation'
+    'Designing UI/UX for web and SaaS applications',
+    'Creating responsive layouts with clean HTML/CSS and Bootstrap',
+    'Building wireframes and interactive prototypes in Figma'
   ],
   exploring: [
-    'OKLCH Perceptual color scales for high-contrast dark modes',
-    'CSS Subgrid and modern container query layouts',
-    'Keyboard-first command canvas interaction patterns',
-    'Zero-runtime DOM performance profiling'
+    'Modern design systems and component architecture',
+    'Interactive micro-animations and user flows'
   ],
   likes: [
-    'Intentional typographic rhythm and generous whitespace',
-    'Fast websites with 0ms layout shift',
-    'Clear, uncluttered visual hierarchy',
-    'Design systems with true 1:1 code fidelity',
-    'Simple, predictable user journeys',
-    'Ergonomic, low-fatigue dark modes',
-    'Meticulous sub-pixel details'
+    'Clear, functional layouts',
+    'Fast responsive interfaces',
+    'Thoughtful interaction design',
+    'Clean typography'
   ],
   dislikes: [
-    'Pointless continuous animations that waste user battery and time',
-    'Bloated UI component libraries with unnecessary dependencies',
-    'Generic AI-generated portfolio layouts and superficial mockups',
-    'Interfaces that look good in static screenshots but feel sluggish in code',
-    'Fabricated performance metrics and vanity numbers'
-  ],
-  principles: [
-    {
-      number: '01',
-      title: 'Problem-First Craft',
-      description: 'Every interaction must solve a concrete user problem before it earns the right to visual ornamentation.'
-    },
-    {
-      number: '02',
-      title: 'Design-to-Code Fidelity',
-      description: 'Designing with an innate understanding of CSS layout models, browser rendering pipelines, and DOM performance.'
-    },
-    {
-      number: '03',
-      title: 'The Work Is The Hero',
-      description: 'The interface is the bespoke frame that gives authority to the work, never an overwhelming distraction.'
-    },
-    {
-      number: '04',
-      title: 'Performance Is UX',
-      description: 'A 60fps responsive interface with 0ms layout shift respects the user more than any decorative effect.'
-    }
+    'Over-complicated user flows',
+    'Cluttered navigation',
+    'Inconsistent UI components'
   ]
 };

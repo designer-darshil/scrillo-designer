@@ -44,8 +44,8 @@ export const Navbar: React.FC = () => {
                 {siteConfig.name}
                 <span className="w-1.5 h-1.5 rounded-full bg-[#FF3E00] inline-block animate-pulse" />
               </span>
-              <span className="text-[10px] font-mono tracking-widest text-white/40 uppercase">
-                UI/UX & Frontend
+              <span className="text-[10px] font-mono tracking-widest text-white/50 uppercase">
+                UI/UX · Web Designer
               </span>
             </div>
           </Link>

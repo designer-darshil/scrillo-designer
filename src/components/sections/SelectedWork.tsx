@@ -18,7 +18,7 @@ export const SelectedWork: React.FC = () => {
           tag="SELECTED WORK"
           title="SELECTED"
           serifWord="projects"
-          description="Recent digital product interfaces, design systems, and web platforms."
+          description="Recent digital product interfaces, application designs, and web platforms."
           align="split"
         >
           <div className="flex items-center space-x-4 text-xs font-mono">

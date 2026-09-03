@@ -6,30 +6,25 @@ export interface NavLink {
 }
 
 export const navLinks: NavLink[] = [
-  { label: 'WORK', href: '/work', number: '01', description: 'Selected digital product interfaces & web case studies' },
-  { label: 'ABOUT', href: '/about', number: '02', description: '8+ yrs UI/UX & 4+ yrs frontend experience' },
-  { label: 'CONTACT', href: '/contact', number: '03', description: 'Inquire for projects & collaborations' }
+  { label: 'WORK', href: '/work', number: '01', description: 'Selected digital product & website projects' },
+  { label: 'ABOUT', href: '/about', number: '02', description: 'Background, employment history & skills' },
+  { label: 'CONTACT', href: '/contact', number: '03', description: 'Get in touch for projects & collaborations' }
 ];
 
-export const secondaryLinks: NavLink[] = [
-  // { label: 'EXPERIENCE', href: '/experience', number: '04', description: 'Career timeline & technical stack' },
-  // { label: 'SERVICES', href: '/services', number: '05', description: 'Capabilities & deliverables' },
-  // { label: 'THINKING', href: '/thinking', number: '06', description: 'Design observations & architectural essays' }
-];
+export const secondaryLinks: NavLink[] = [];
 
 export const footerLinks = {
   navigation: navLinks,
   categories: [
-    { label: 'Product Interfaces', href: '/work?category=product' },
-    { label: 'Creative Web Design', href: '/work?category=web-design' },
-    { label: 'UI/UX Systems', href: '/work?category=ui-ux' },
-    { label: 'Frontend Engineering', href: '/work?category=frontend' }
+    { label: 'UI/UX Design', href: '/work?category=ui-ux' },
+    { label: 'Web Design', href: '/work?category=web-design' },
+    { label: 'SaaS Products', href: '/work?category=product' },
+    { label: 'Frontend Development', href: '/work?category=frontend' }
   ],
   socials: [
+    { label: 'LinkedIn', href: 'https://linkedin.com/in/dsbhuva', handle: 'in/dsbhuva' },
     { label: 'GitHub', href: 'https://github.com/designer-darshil', handle: '@designer-darshil' },
-    { label: 'LinkedIn', href: 'https://linkedin.com/in/darshil-design', handle: 'in/darshil-design' },
-    { label: 'Dribbble', href: 'https://dribbble.com/darshil', handle: '@darshil' },
-    { label: 'Behance', href: 'https://behance.net/darshil', handle: '@darshil' },
-    { label: 'X / Twitter', href: 'https://twitter.com/darshildesign', handle: '@darshildesign' }
+    { label: 'Dribbble', href: 'https://dribbble.com', handle: 'Dribbble' },
+    { label: 'Behance', href: 'https://behance.net', handle: 'Behance' }
   ]
 };

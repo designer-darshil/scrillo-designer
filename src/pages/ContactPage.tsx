@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PageTransition } from '../components/layout/PageTransition';
 import { siteConfig } from '../data/site';
-import { Mail, MapPin, ArrowRight, CheckCircle2, Send, RefreshCw, AlertCircle } from 'lucide-react';
+import { Mail, Phone, MapPin, ArrowRight, CheckCircle2, Send, RefreshCw, AlertCircle } from 'lucide-react';
 
 const RECIPIENT_EMAIL = 'darshilbhuva4322@gmail.com';
 const API_ENDPOINT = '/api/contact';
@@ -164,6 +164,22 @@ export const ContactPage: React.FC = () => {
                         <div className="text-xs font-mono text-white/40">EMAIL</div>
                         <div className="text-sm font-mono text-white group-hover:text-[#FF3E00] transition-colors">
                           {RECIPIENT_EMAIL}
+                        </div>
+                      </div>
+                    </div>
+                    <ArrowRight size={14} className="text-white/40 group-hover:text-white transition-colors" />
+                  </a>
+
+                  <a
+                    href={siteConfig.phoneHref}
+                    className="p-4 rounded-xl border border-white/10 bg-[#0C0C0C] flex items-center justify-between group hover:border-[#FF3E00] transition-colors"
+                  >
+                    <div className="flex items-center space-x-3">
+                      <Phone size={16} className="text-[#FF3E00]" />
+                      <div>
+                        <div className="text-xs font-mono text-white/40">PHONE</div>
+                        <div className="text-sm font-mono text-white group-hover:text-[#FF3E00] transition-colors">
+                          {siteConfig.formattedPhone}
                         </div>
                       </div>
                     </div>

@@ -67,7 +67,7 @@ export const WorkPage: React.FC = () => {
             </h1>
 
             <p className="max-w-2xl text-muted-primary text-base md:text-lg leading-relaxed">
-              Every project represents a deep dive into user experience architecture, bespoke art direction, and production frontend engineering.
+              A selection of digital products, web applications, and website interfaces designed with usability, clarity, and clean frontend structure.
             </p>
           </div>
 

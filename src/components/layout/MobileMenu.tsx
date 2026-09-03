@@ -106,12 +106,17 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose }) => {
               "{siteConfig.tagline}"
             </p>
             <div className="flex flex-wrap items-center justify-between gap-4 text-xs font-mono text-white/60">
-              <span>{siteConfig.location}</span>
               <a
                 href={`mailto:${siteConfig.email}`}
                 className="text-white hover:text-[#FF3E00] transition-colors underline min-h-[44px] flex items-center"
               >
                 {siteConfig.email}
+              </a>
+              <a
+                href={siteConfig.phoneHref}
+                className="text-white/80 hover:text-[#FF3E00] transition-colors min-h-[44px] flex items-center"
+              >
+                {siteConfig.formattedPhone}
               </a>
             </div>
           </div>

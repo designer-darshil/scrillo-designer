@@ -12,23 +12,23 @@ export const CinematicHero: React.FC = () => {
 
       <div className="max-w-7xl mx-auto px-6 md:px-12 w-full flex-1 flex flex-col justify-between relative z-10">
         
-        {/* Top Annotation Bar: Positioning & Proven Experience */}
+        {/* Top Annotation Bar: Clear Identity & Discipline */}
         <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
           <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs font-mono tracking-widest text-white/70 uppercase">
             <span className="w-2 h-2 rounded-full bg-[#FF3E00] shrink-0" />
             <span className="text-white font-bold">{siteConfig.name}</span>
             <span className="text-white/20">/</span>
-            <span className="text-[#FF3E00] font-bold">8+ YRS UI/UX</span>
+            <span className="text-[#FF3E00] font-bold">UI/UX DESIGNER</span>
             <span className="text-white/20">•</span>
-            <span className="text-white/80">4+ YRS FRONTEND</span>
+            <span className="text-white/80">WEB DESIGNER</span>
           </div>
 
           <div className="text-xs sm:text-sm font-mono text-white/60 tracking-wider">
-            "{siteConfig.tagline}"
+            SaaS & E-Commerce Products
           </div>
         </div>
 
-        {/* Massive Editorial Headline & Clear Bio */}
+        {/* Headline & Natural Bio */}
         <div className="my-auto py-8 sm:py-12 md:py-20">
           <motion.div
             initial={{ opacity: 0, y: 24 }}
@@ -44,7 +44,7 @@ export const CinematicHero: React.FC = () => {
             <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-extrabold tracking-tight sm:tracking-tighter text-white leading-[0.95] sm:leading-[0.92] uppercase break-words">
               UI/UX DESIGNER <br />
               <span className="italic font-light text-[#FF3E00] tracking-tight lowercase text-[0.88em] sm:text-[0.92em] block my-1 sm:my-2">
-                + web designer / frontend
+                · web designer
               </span>
             </h1>
           </motion.div>
@@ -52,21 +52,21 @@ export const CinematicHero: React.FC = () => {
           <div className="mt-8 sm:mt-10 grid grid-cols-1 md:grid-cols-12 gap-8 items-end">
             <div className="md:col-span-7 space-y-4">
               <p className="text-base sm:text-lg md:text-2xl text-white/90 font-normal leading-relaxed max-w-2xl">
-                8+ years of UI/UX design experience. 4+ years of web design and frontend implementation. I design digital products with systemic precision and build them for the web.
+                I design digital experiences and websites with a focus on clarity, usability, and thoughtful interaction. Experienced across wireframes, prototypes, and clean frontend code.
               </p>
               
               <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-xs font-mono text-white/60 pt-2">
                 <span className="flex items-center gap-1.5 text-white/90">
                   <CheckCircle2 size={13} className="text-[#FF3E00] shrink-0" />
-                  8+ Years UI/UX Design
+                  UI/UX Design & Prototyping
                 </span>
                 <span className="text-white/20">•</span>
                 <span className="flex items-center gap-1.5 text-white/90">
                   <Terminal size={13} className="text-[#FF3E00] shrink-0" />
-                  4+ Years Web Design & Frontend
+                  Web Design & Frontend
                 </span>
                 <span className="text-white/20">•</span>
-                <span className="text-emerald-400">Production Systems</span>
+                <span className="text-emerald-400">SaaS & E-Commerce</span>
               </div>
             </div>
 
@@ -93,9 +93,11 @@ export const CinematicHero: React.FC = () => {
         {/* Bottom Hero Metadata Bar */}
         <div className="pt-8 border-t border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-xs font-mono uppercase tracking-widest text-white/60">
           <div className="flex items-center space-x-4 sm:space-x-6">
-            <span className="text-white font-bold">8+ YRS UI/UX DESIGN</span>
+            <span className="text-white font-bold">UI/UX DESIGN</span>
             <span className="text-white/20">|</span>
-            <span className="text-white font-bold">4+ YRS FRONTEND WEB</span>
+            <span className="text-white font-bold">WEB DESIGN</span>
+            <span className="text-white/20">|</span>
+            <span className="text-white font-bold">FRONTEND DEVELOPMENT</span>
           </div>
 
           <a href="#selected-work" className="flex items-center space-x-2 text-white/70 hover:text-white transition-colors min-h-[44px]">

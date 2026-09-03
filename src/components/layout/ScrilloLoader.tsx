@@ -334,7 +334,7 @@ export function ScrilloLoader({ isReady }: ScrilloLoaderProps) {
         <AnimatedWordmark navId={navIdRef.current} />
 
         <div className="mt-4 sm:mt-6 font-mono text-xs sm:text-sm tracking-[0.35em] text-white/40 uppercase font-medium">
-          UI / UX · FRONTEND
+          UI/UX DESIGNER · WEB DESIGNER
         </div>
       </main>
 

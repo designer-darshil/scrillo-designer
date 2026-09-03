@@ -2,76 +2,78 @@ import { ExperienceItem } from '../types';
 
 export const experienceData: ExperienceItem[] = [
   {
-    id: 'exp-2026',
-    period: '2024 — PRESENT',
+    id: 'exp-bigbrainy',
+    period: 'Mar 2022 – Present',
     year: 2026,
-    role: 'Lead UI/UX & Frontend Web Designer',
-    companyOrContext: 'Independent Practice (Product Design & Frontend)',
-    type: 'Independent Craft',
-    location: 'Remote / Global',
+    role: 'Web Designer & UI/UX Designer',
+    companyOrContext: 'BigBrainy Infotech',
+    type: 'Full-time',
+    location: 'India',
     isCurrent: true,
-    description: 'Partnering directly with product founders and venture teams to lead end-to-end digital product design, tokenized design systems, and production React/TypeScript web implementations.',
+    description: 'Designing user interfaces, responsive websites, and digital experiences. Creating wireframes, interactive prototypes, and translating designs into clean frontend code with HTML/CSS, JavaScript, and Bootstrap.',
     achievements: [
-      'Designed and coded 12+ production web platforms with 98+ average Lighthouse performance ratings.',
-      'Created custom design system frameworks bridging Figma variables directly to Tailwind CSS and React token scales.',
-      'Constructed accessible, keyboard-first B2B dashboard interfaces with zero layout shift and sub-16ms render loops.'
+      'Designed end-to-end user interfaces and responsive layouts for web and SaaS applications.',
+      'Constructed user flows, wireframes, and interactive prototypes in Figma for team and client reviews.',
+      'Developed frontend interfaces ensuring cross-browser compatibility and clean responsive behavior.'
     ],
-    technologies: ['Figma', 'React 18', 'TypeScript', 'Tailwind CSS', 'Next.js', 'Framer Motion', 'Radix UI']
+    technologies: ['Figma', 'UI/UX Design', 'Web Design', 'HTML/CSS', 'JavaScript', 'Bootstrap', 'GitHub']
   },
   {
-    id: 'exp-2024',
-    period: '2021 — 2024',
-    year: 2024,
-    role: 'Senior Product Designer & UI Engineer',
-    companyOrContext: 'Enterprise Cloud & Data Systems',
-    type: 'Full-time',
-    location: 'Bangalore, India (Hybrid)',
-    isCurrent: false,
-    description: 'Led UI/UX architecture and frontend engineering collaboration for high-density observability dashboards and developer-focused tooling.',
-    achievements: [
-      'Spearheaded the UX restructuring of telemetry workflows, reducing mean-time-to-diagnose for operators by 38%.',
-      'Authored the corporate multi-product design system and companion React component library with 40+ tokens.',
-      'Conducted 50+ moderated user research sessions and iterative usability testing sprints.'
-    ],
-    technologies: ['Figma', 'React', 'TypeScript', 'Design Systems', 'CSS Grid', 'Storybook', 'Git']
-  },
-  {
-    id: 'exp-2021',
-    period: '2018 — 2021',
+    id: 'exp-awesome',
+    period: 'Jun 2021 – Jan 2022',
     year: 2021,
-    role: 'UI/UX & Web Designer',
-    companyOrContext: 'Digital Product & Design Agency',
+    role: 'UI/UX Designer',
+    companyOrContext: 'Awesome Infotech',
     type: 'Full-time',
-    location: 'Remote',
+    location: 'India',
     isCurrent: false,
-    description: 'Designed bespoke web products, mobile applications, and high-conversion editorial websites across SaaS, fintech, and creative commerce.',
+    description: 'Focused on user research, wireframing, and visual interface design for web and mobile platforms.',
     achievements: [
-      'Delivered 20+ responsive web platforms with custom art direction, precise typographic hierarchy, and clean CSS.',
-      'Established systematic design token libraries ensuring high fidelity between Figma mockups and live browser builds.'
+      'Created wireframes, user journeys, and high-fidelity mockups for digital products.',
+      'Collaborated closely with frontend developers to ensure design consistency and accurate implementation.',
+      'Produced visual design assets, component libraries, and interactive prototypes.'
     ],
-    technologies: ['Figma', 'HTML5', 'Modern CSS/SCSS', 'JavaScript (ES6+)', 'Prototyping', 'Design Systems']
+    technologies: ['Figma', 'Adobe XD', 'Photoshop', 'User Flows', 'Prototyping', 'Wireframes']
   },
   {
-    id: 'exp-2018',
-    period: '2016 — 2018',
+    id: 'exp-dreamworld',
+    period: 'May 2019 – Jan 2021',
+    year: 2019,
+    role: 'UI/UX Designer',
+    companyOrContext: 'Dream World InfoSoft',
+    type: 'Full-time',
+    location: 'India',
+    isCurrent: false,
+    description: 'Designed web interfaces, e-commerce layouts, and digital visual assets for client applications.',
+    achievements: [
+      'Designed responsive website layouts, e-commerce interfaces, and digital promotional graphics.',
+      'Created wireframes and structured content hierarchies for diverse client projects.',
+      'Assisted with frontend styling and markup using HTML and CSS.'
+    ],
+    technologies: ['UI/UX Design', 'Photoshop', 'Illustrator', 'HTML/CSS', 'Wireframing', 'Prototyping']
+  },
+  {
+    id: 'exp-gridlab',
+    period: 'Nov 2018 – Apr 2019',
     year: 2018,
     role: 'UI/UX Designer',
-    companyOrContext: 'Product Design Studio',
+    companyOrContext: 'Gridlab Infosys',
     type: 'Full-time',
-    location: 'Bangalore, India',
+    location: 'India',
     isCurrent: false,
-    description: 'Executed user journey mapping, wireframing, high-fidelity interface design, and usability evaluations for early-stage digital startups.',
+    description: 'Created website layouts, wireframes, and user interface components for web applications.',
     achievements: [
-      'Designed complete multi-platform UX flows from initial sketch discovery to verified production handoff.',
-      'Mastered typographic grids, spatial rhythm, and responsive layout constraints.'
+      'Designed clean, functional website layouts and user interface components.',
+      'Prepared wireframes and visual design specifications for development handoff.',
+      'Created digital brand assets, icons, and UI graphics.'
     ],
-    technologies: ['Figma', 'Sketch', 'Wireframing', 'User Research', 'Design Guidelines', 'HTML/CSS']
+    technologies: ['UI/UX Design', 'Sketch', 'Photoshop', 'Web Design', 'Wireframing']
   }
 ];
 
 export const craftStats = [
-  { label: 'UI/UX Design Experience', value: '8+ Yrs' },
-  { label: 'Web Design & Frontend', value: '4+ Yrs' },
-  { label: 'Shipped Digital Products', value: '30+' },
-  { label: 'Design-to-Code Fidelity', value: '100%' }
+  { label: 'Current Role', value: 'Web & UI/UX Designer' },
+  { label: 'Primary Focus', value: 'UI/UX · Web Design' },
+  { label: 'Specialization', value: 'SaaS & E-commerce' },
+  { label: 'Code Skills', value: 'HTML/CSS · JS · Bootstrap' }
 ];

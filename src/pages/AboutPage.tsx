@@ -28,9 +28,9 @@ export const AboutPage: React.FC = () => {
               <span className="text-white">{siteConfig.name}</span>
             </div>
 
-            <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-extrabold tracking-tighter text-white uppercase leading-[0.92] mb-8">
+            <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-extrabold tracking-tight sm:tracking-tighter text-white uppercase leading-[0.95] sm:leading-[0.92] mb-8 break-words">
               UI/UX DESIGNER <br />
-              <span className="font-editorial-serif italic font-normal text-[#FF3E00] lowercase text-[0.85em] sm:text-[0.92em] block my-1 sm:my-2">
+              <span className="font-editorial-serif italic font-normal text-[#FF3E00] lowercase text-[0.88em] sm:text-[0.92em] block my-1 sm:my-2">
                 + web designer / frontend
               </span>
             </h1>

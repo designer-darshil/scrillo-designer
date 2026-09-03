@@ -1,10 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { ArrowDown, Code2, Layers, Terminal, CheckCircle2, ArrowRight } from 'lucide-react';
-import { PerspectiveCard } from '../ui/PerspectiveCard';
-import { BrowserMockup } from '../ui/BrowserMockup';
-import { media } from '../../data/media';
+import { ArrowDown, Terminal, CheckCircle2, ArrowRight } from 'lucide-react';
 import { siteConfig } from '../../data/site';
 
 export const CinematicHero: React.FC = () => {
@@ -17,8 +14,8 @@ export const CinematicHero: React.FC = () => {
         
         {/* Top Annotation Bar: Positioning & Proven Experience */}
         <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
-          <div className="flex items-center space-x-3 text-xs font-mono tracking-widest text-white/70 uppercase">
-            <span className="w-2 h-2 rounded-full bg-[#FF3E00]" />
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs font-mono tracking-widest text-white/70 uppercase">
+            <span className="w-2 h-2 rounded-full bg-[#FF3E00] shrink-0" />
             <span className="text-white font-bold">{siteConfig.name}</span>
             <span className="text-white/20">/</span>
             <span className="text-[#FF3E00] font-bold">8+ YRS UI/UX</span>
@@ -32,7 +29,7 @@ export const CinematicHero: React.FC = () => {
         </div>
 
         {/* Massive Editorial Headline & Clear Bio */}
-        <div className="my-auto py-12 md:py-20">
+        <div className="my-auto py-8 sm:py-12 md:py-20">
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
@@ -44,28 +41,28 @@ export const CinematicHero: React.FC = () => {
               <span className="text-white">{siteConfig.name}</span>
             </div>
 
-            <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-extrabold tracking-tighter text-white leading-[0.92] uppercase">
+            <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-extrabold tracking-tight sm:tracking-tighter text-white leading-[0.95] sm:leading-[0.92] uppercase break-words">
               UI/UX DESIGNER <br />
-              <span className="font-editorial-serif italic font-normal text-[#FF3E00] tracking-normal lowercase text-[0.85em] sm:text-[0.92em] block my-1 sm:my-2">
+              <span className="font-editorial-serif italic font-normal text-[#FF3E00] tracking-normal lowercase text-[0.88em] sm:text-[0.92em] block my-1 sm:my-2">
                 + web designer / frontend
               </span>
             </h1>
           </motion.div>
 
-          <div className="mt-10 grid grid-cols-1 md:grid-cols-12 gap-8 items-end">
+          <div className="mt-8 sm:mt-10 grid grid-cols-1 md:grid-cols-12 gap-8 items-end">
             <div className="md:col-span-7 space-y-4">
-              <p className="text-lg md:text-2xl text-white/90 font-normal leading-relaxed max-w-2xl">
+              <p className="text-base sm:text-lg md:text-2xl text-white/90 font-normal leading-relaxed max-w-2xl">
                 8+ years of UI/UX design experience. 4+ years of web design and frontend implementation. I design digital products with systemic precision and build them for the web.
               </p>
               
-              <div className="flex flex-wrap items-center gap-4 text-xs font-mono text-white/60 pt-2">
+              <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-xs font-mono text-white/60 pt-2">
                 <span className="flex items-center gap-1.5 text-white/90">
-                  <CheckCircle2 size={13} className="text-[#FF3E00]" />
+                  <CheckCircle2 size={13} className="text-[#FF3E00] shrink-0" />
                   8+ Years UI/UX Design
                 </span>
                 <span className="text-white/20">•</span>
                 <span className="flex items-center gap-1.5 text-white/90">
-                  <Terminal size={13} className="text-[#FF3E00]" />
+                  <Terminal size={13} className="text-[#FF3E00] shrink-0" />
                   4+ Years Web Design & Frontend
                 </span>
                 <span className="text-white/20">•</span>
@@ -77,7 +74,7 @@ export const CinematicHero: React.FC = () => {
               <a
                 href="#selected-work"
                 data-cursor="explore"
-                className="px-8 py-4 rounded-full bg-[#FF3E00] text-white font-mono text-xs uppercase tracking-widest font-bold hover:bg-white hover:text-black transition-all text-center inline-flex items-center justify-center space-x-2 shadow-lg shadow-[#FF3E00]/25"
+                className="min-h-[48px] px-8 py-3.5 rounded-full bg-[#FF3E00] text-white font-mono text-xs uppercase tracking-widest font-bold hover:bg-white hover:text-black transition-all text-center inline-flex items-center justify-center space-x-2 shadow-lg shadow-[#FF3E00]/25"
               >
                 <span>EXPLORE WORK</span>
                 <ArrowRight size={14} />
@@ -85,7 +82,7 @@ export const CinematicHero: React.FC = () => {
               <Link
                 to="/contact"
                 data-cursor="cta"
-                className="px-8 py-4 rounded-full border border-white/20 bg-white/5 text-white font-mono text-xs uppercase tracking-widest hover:bg-white/10 transition-all text-center inline-flex items-center justify-center"
+                className="min-h-[48px] px-8 py-3.5 rounded-full border border-white/20 bg-white/5 text-white font-mono text-xs uppercase tracking-widest hover:bg-white/10 transition-all text-center inline-flex items-center justify-center"
               >
                 <span>GET IN TOUCH</span>
               </Link>
@@ -94,14 +91,14 @@ export const CinematicHero: React.FC = () => {
         </div>
 
         {/* Bottom Hero Metadata Bar */}
-        <div className="pt-8 border-t border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-xs font-mono uppercase tracking-widest text-white/50">
+        <div className="pt-8 border-t border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-xs font-mono uppercase tracking-widest text-white/60">
           <div className="flex items-center space-x-4 sm:space-x-6">
             <span className="text-white font-bold">8+ YRS UI/UX DESIGN</span>
             <span className="text-white/20">|</span>
             <span className="text-white font-bold">4+ YRS FRONTEND WEB</span>
           </div>
 
-          <a href="#selected-work" className="flex items-center space-x-2 text-white/70 hover:text-white transition-colors">
+          <a href="#selected-work" className="flex items-center space-x-2 text-white/70 hover:text-white transition-colors min-h-[44px]">
             <span>SCROLL FOR SELECTED WORK</span>
             <ArrowDown size={13} />
           </a>

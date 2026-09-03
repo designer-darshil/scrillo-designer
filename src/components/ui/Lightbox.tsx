@@ -19,15 +19,22 @@ export const Lightbox: React.FC<LightboxProps> = ({
   onNavigate
 }) => {
   useEffect(() => {
+    if (!isOpen) return;
+
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (!isOpen) return;
       if (e.key === 'Escape') onClose();
       if (e.key === 'ArrowRight') onNavigate((currentIndex + 1) % images.length);
       if (e.key === 'ArrowLeft') onNavigate((currentIndex - 1 + images.length) % images.length);
     };
 
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      window.removeEventListener('keydown', handleKeyDown);
+    };
   }, [isOpen, currentIndex, images.length, onClose, onNavigate]);
 
   if (!isOpen || images.length === 0) return null;
@@ -37,6 +44,9 @@ export const Lightbox: React.FC<LightboxProps> = ({
   return (
     <AnimatePresence>
       <motion.div
+        role="dialog"
+        aria-modal="true"
+        aria-label="Image gallery lightbox"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -44,19 +54,19 @@ export const Lightbox: React.FC<LightboxProps> = ({
       >
         {/* Header Bar */}
         <div className="flex items-center justify-between border-b border-white/10 pb-4 text-xs font-mono">
-          <div className="text-white/60 flex items-center space-x-3">
+          <div className="text-white/70 flex items-center space-x-3">
             <span className="text-[#FF3E00] font-bold">
               {String(currentIndex + 1).padStart(2, '0')} / {String(images.length).padStart(2, '0')}
             </span>
-            <span>{currentImage?.caption || currentImage?.alt}</span>
+            <span className="truncate max-w-[200px] sm:max-w-md">{currentImage?.caption || currentImage?.alt}</span>
           </div>
 
           <button
             onClick={onClose}
-            className="p-2 rounded-full border border-white/20 bg-white/10 text-white hover:bg-[#FF3E00] hover:border-[#FF3E00] transition-colors"
-            aria-label="Close Lightbox"
+            className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full border border-white/20 bg-white/10 text-white hover:bg-[#FF3E00] hover:border-[#FF3E00] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF3E00]"
+            aria-label="Close lightbox modal"
           >
-            <X size={18} />
+            <X size={20} />
           </button>
         </div>
 
@@ -66,10 +76,10 @@ export const Lightbox: React.FC<LightboxProps> = ({
             key={currentImage?.url}
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.3 }}
+            transition={{ duration: 0.25 }}
             src={currentImage?.url}
             alt={currentImage?.alt}
-            className="max-h-[82vh] max-w-[92vw] object-contain rounded-lg border border-white/10 shadow-2xl"
+            className="max-h-[80vh] max-w-[92vw] object-contain rounded-lg border border-white/10 shadow-2xl"
           />
 
           {/* Navigation Arrows */}
@@ -77,14 +87,14 @@ export const Lightbox: React.FC<LightboxProps> = ({
             <>
               <button
                 onClick={() => onNavigate((currentIndex - 1 + images.length) % images.length)}
-                className="absolute left-2 sm:left-6 p-3 rounded-full bg-black/60 border border-white/20 text-white hover:bg-white hover:text-black transition-colors"
+                className="absolute left-2 sm:left-6 min-w-[48px] min-h-[48px] flex items-center justify-center rounded-full bg-black/70 border border-white/20 text-white hover:bg-white hover:text-black transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF3E00]"
                 aria-label="Previous image"
               >
                 <ChevronLeft size={24} />
               </button>
               <button
                 onClick={() => onNavigate((currentIndex + 1) % images.length)}
-                className="absolute right-2 sm:right-6 p-3 rounded-full bg-black/60 border border-white/20 text-white hover:bg-white hover:text-black transition-colors"
+                className="absolute right-2 sm:right-6 min-w-[48px] min-h-[48px] flex items-center justify-center rounded-full bg-black/70 border border-white/20 text-white hover:bg-white hover:text-black transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF3E00]"
                 aria-label="Next image"
               >
                 <ChevronRight size={24} />
@@ -94,7 +104,7 @@ export const Lightbox: React.FC<LightboxProps> = ({
         </div>
 
         {/* Footer info */}
-        <div className="text-center text-xs font-mono text-white/40 pt-2">
+        <div className="text-center text-xs font-mono text-white/50 pt-2">
           Use Left/Right arrows to navigate • ESC to close
         </div>
       </motion.div>

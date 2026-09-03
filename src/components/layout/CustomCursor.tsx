@@ -1,16 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { motion, useSpring, useMotionValue } from 'framer-motion';
 
 export const CustomCursor: React.FC = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [cursorText, setCursorText] = useState('');
   const [cursorVariant, setCursorVariant] = useState<'default' | 'project' | 'explore' | 'cta' | 'hidden'>('default');
-  const [isTouchDevice, setIsTouchDevice] = useState(false);
+  const [isDisabled, setIsDisabled] = useState(false);
+  const isVisibleRef = useRef(false);
 
   const mouseX = useMotionValue(-100);
   const mouseY = useMotionValue(-100);
 
-  const springConfig = { damping: 24, stiffness: 300, mass: 0.5 };
+  const springConfig = { damping: 26, stiffness: 320, mass: 0.4 };
   const cursorX = useSpring(mouseX, springConfig);
   const cursorY = useSpring(mouseY, springConfig);
 
@@ -20,18 +21,28 @@ export const CustomCursor: React.FC = () => {
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     
     if (touch || reducedMotion) {
-      setIsTouchDevice(true);
+      setIsDisabled(true);
       return;
     }
 
     const moveMouse = (e: MouseEvent) => {
       mouseX.set(e.clientX);
       mouseY.set(e.clientY);
-      if (!isVisible) setIsVisible(true);
+      if (!isVisibleRef.current) {
+        isVisibleRef.current = true;
+        setIsVisible(true);
+      }
     };
 
-    const handleMouseLeave = () => setIsVisible(false);
-    const handleMouseEnter = () => setIsVisible(true);
+    const handleMouseLeave = () => {
+      isVisibleRef.current = false;
+      setIsVisible(false);
+    };
+
+    const handleMouseEnter = () => {
+      isVisibleRef.current = true;
+      setIsVisible(true);
+    };
 
     const handleElementHover = (e: MouseEvent) => {
       const target = e.target as HTMLElement | null;
@@ -71,12 +82,13 @@ export const CustomCursor: React.FC = () => {
       document.removeEventListener('mouseleave', handleMouseLeave);
       document.removeEventListener('mouseenter', handleMouseEnter);
     };
-  }, [isVisible, mouseX, mouseY]);
+  }, [mouseX, mouseY]);
 
-  if (isTouchDevice || !isVisible) return null;
+  if (isDisabled || !isVisible) return null;
 
   return (
     <motion.div
+      aria-hidden="true"
       className="fixed top-0 left-0 pointer-events-none z-[10000] flex items-center justify-center -translate-x-1/2 -translate-y-1/2 select-none"
       style={{
         x: cursorX,

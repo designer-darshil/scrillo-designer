@@ -6,7 +6,7 @@ import { ArrowUpRight } from 'lucide-react';
 
 export const HomeAboutPreview: React.FC = () => {
   return (
-    <section className="py-28 md:py-36 bg-[#080808] border-b border-white/10 relative overflow-hidden">
+    <section className="py-20 sm:py-28 md:py-36 bg-[#080808] border-b border-white/10 relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-6 md:px-12">
         {/* Section Tag */}
         <div className="flex items-center space-x-3 text-xs font-mono tracking-widest text-[#FF3E00] uppercase mb-8">
@@ -18,10 +18,10 @@ export const HomeAboutPreview: React.FC = () => {
         </div>
 
         {/* Editorial Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
           {/* Narrative Side */}
-          <div className="lg:col-span-7 space-y-8">
-            <h2 className="text-3xl sm:text-5xl md:text-6xl font-extrabold tracking-tighter text-white leading-[1.05] uppercase">
+          <div className="lg:col-span-7 space-y-6 sm:space-y-8">
+            <h2 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight sm:tracking-tighter text-white leading-[1.05] uppercase">
               BRIDGING SYSTEMIC PRODUCT DESIGN AND{' '}
               <span className="font-editorial-serif italic font-normal text-[#FF3E00] lowercase text-[1.1em]">
                 production
@@ -42,7 +42,7 @@ export const HomeAboutPreview: React.FC = () => {
               <Link
                 to="/about"
                 data-cursor="cta"
-                className="inline-flex items-center space-x-2 text-xs font-mono uppercase tracking-widest text-white hover:text-[#FF3E00] transition-colors group"
+                className="inline-flex items-center space-x-2 text-xs font-mono uppercase tracking-widest text-white hover:text-[#FF3E00] transition-colors group min-h-[44px]"
               >
                 <span>LEARN MORE ABOUT ME & MY APPROACH</span>
                 <ArrowUpRight size={14} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
@@ -52,11 +52,12 @@ export const HomeAboutPreview: React.FC = () => {
 
           {/* Portrait Side */}
           <div className="lg:col-span-5 space-y-4">
-            <div className="relative rounded-2xl overflow-hidden border border-white/10 aspect-[4/5] group bg-[#0C0C0C]">
+            <div className="relative rounded-2xl overflow-hidden border border-white/10 aspect-[4/5] group bg-[#0C0C0C] max-w-md mx-auto lg:max-w-none">
               <img
                 src={media.designerPortrait}
                 alt={`${siteConfig.name} Portrait & Workspace`}
                 className="w-full h-full object-cover grayscale contrast-125 group-hover:grayscale-0 transition-all duration-500"
+                loading="lazy"
                 decoding="async"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-6">

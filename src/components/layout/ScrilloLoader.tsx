@@ -5,8 +5,12 @@ import { siteConfig } from '../../data/site';
 
 /**
  * Configurable Minimum Loader Display Duration (ms)
+ * Initial load ensures fonts & critical layout are rendered;
+ * Internal route navigation is kept snappy and responsive.
  */
-export const MIN_LOADER_DURATION = 2500;
+export const INITIAL_LOADER_DURATION = 1800;
+export const NAV_LOADER_DURATION = 550;
+export const MIN_LOADER_DURATION = INITIAL_LOADER_DURATION;
 
 type LoaderState = 'IDLE' | 'ACTIVE' | 'EXITING';
 
@@ -172,10 +176,11 @@ export function ScrilloLoader({ isReady }: ScrilloLoaderProps) {
   }, [state]);
 
   // Navigation and refresh transition coordinator
-  const runTransition = useCallback((targetNavId: number) => {
+  const runTransition = useCallback((targetNavId: number, isInitial: boolean) => {
     setState('ACTIVE');
     setProgress(0);
 
+    const minDuration = isInitial ? INITIAL_LOADER_DURATION : NAV_LOADER_DURATION;
     const startTime = performance.now();
     let isDestinationReady = false;
     let isMinTimeElapsed = false;
@@ -215,7 +220,7 @@ export function ScrilloLoader({ isReady }: ScrilloLoaderProps) {
 
       if (!isDestinationReady || !isMinTimeElapsed) {
         // Smoothly ramp towards 98% during the loading window, then hold
-        const ratio = Math.min(elapsed / (MIN_LOADER_DURATION * 0.9), 1);
+        const ratio = Math.min(elapsed / (minDuration * 0.88), 1);
         const eased = 1 - Math.pow(1 - ratio, 3);
         const currentProg = Math.min(98, Math.floor(eased * 98));
 
@@ -231,7 +236,7 @@ export function ScrilloLoader({ isReady }: ScrilloLoaderProps) {
       if (navIdRef.current !== targetNavId) return;
       isMinTimeElapsed = true;
       attemptExit();
-    }, MIN_LOADER_DURATION);
+    }, minDuration);
 
     // 2. Parallel destination readiness checker (DOM commit, fonts, images)
     const checkReadiness = async () => {
@@ -257,7 +262,7 @@ export function ScrilloLoader({ isReady }: ScrilloLoaderProps) {
         isMinTimeElapsed = true;
         attemptExit();
       }
-    }, Math.max(MIN_LOADER_DURATION + 2500, 5000));
+    }, Math.max(minDuration + 2000, 4500));
 
     return () => {
       if (animFrameId) cancelAnimationFrame(animFrameId);
@@ -272,13 +277,14 @@ export function ScrilloLoader({ isReady }: ScrilloLoaderProps) {
   useEffect(() => {
     navIdRef.current += 1;
     const currentNavId = navIdRef.current;
+    const isInitial = isFirstMountRef.current;
 
-    if (!isFirstMountRef.current) {
+    if (!isInitial) {
       window.scrollTo(0, 0);
     }
     isFirstMountRef.current = false;
 
-    const cleanup = runTransition(currentNavId);
+    const cleanup = runTransition(currentNavId, isInitial);
     return cleanup;
   }, [location.pathname, location.search, runTransition]);
 

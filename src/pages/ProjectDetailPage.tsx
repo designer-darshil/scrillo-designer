@@ -54,11 +54,11 @@ export const ProjectDetailPage: React.FC = () => {
               <span className="text-white/40">{project.year}</span>
             </div>
 
-            <h1 className="text-5xl sm:text-7xl md:text-8xl font-extrabold tracking-tighter text-white uppercase leading-none">
+            <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold tracking-tight sm:tracking-tighter text-white uppercase leading-[0.95] sm:leading-none break-words">
               {project.title}
             </h1>
 
-            <p className="text-xl sm:text-2xl md:text-3xl text-white/80 max-w-4xl font-normal leading-relaxed">
+            <p className="text-lg sm:text-2xl md:text-3xl text-white/80 max-w-4xl font-normal leading-relaxed">
               {project.subtitle}
             </p>
 
@@ -82,11 +82,14 @@ export const ProjectDetailPage: React.FC = () => {
           </div>
 
           {/* Full-width Hero Visual */}
-          <div className="mt-12 rounded-2xl overflow-hidden border border-white/10 bg-[#0C0C0C] aspect-[16/9] shadow-2xl">
+          <div className="mt-8 sm:mt-12 rounded-2xl overflow-hidden border border-white/10 bg-[#0C0C0C] aspect-[16/9] shadow-2xl">
             <img
               src={project.heroImage}
               alt={project.title}
               className="w-full h-full object-cover"
+              loading="eager"
+              fetchPriority="high"
+              decoding="async"
             />
           </div>
         </header>
@@ -135,8 +138,17 @@ export const ProjectDetailPage: React.FC = () => {
               {project.gallery.map((item, index) => (
                 <div
                   key={index}
+                  role="button"
+                  tabIndex={0}
+                  aria-label={`View image: ${item.caption || item.alt}`}
                   onClick={() => openLightbox(index)}
-                  className="group relative rounded-xl overflow-hidden border border-white/10 bg-[#0C0C0C] aspect-[16/10] cursor-pointer"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      openLightbox(index);
+                    }
+                  }}
+                  className="group relative rounded-xl overflow-hidden border border-white/10 bg-[#0C0C0C] aspect-[16/10] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF3E00]"
                   data-cursor="project"
                 >
                   <img
@@ -144,6 +156,7 @@ export const ProjectDetailPage: React.FC = () => {
                     alt={item.alt}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     loading="lazy"
+                    decoding="async"
                   />
                   <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-6">
                     <div className="text-xs font-mono text-white font-semibold">

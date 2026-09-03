@@ -58,7 +58,7 @@ export const WorkPage: React.FC = () => {
               <span className="text-white/60">2024 — 2026</span>
             </div>
 
-            <h1 className="text-5xl sm:text-7xl md:text-8xl font-extrabold tracking-tighter text-white uppercase leading-none mb-6">
+            <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold tracking-tight sm:tracking-tighter text-white uppercase leading-[0.95] sm:leading-none mb-6 break-words">
               PROVE BY <br />
               <span className="font-editorial-serif italic font-normal text-[#FF3E00] lowercase text-[1.05em]">
                 built
@@ -72,8 +72,8 @@ export const WorkPage: React.FC = () => {
           </div>
 
           {/* Interactive Filter Pills */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-16 border-b border-white/10 no-scrollbar">
-            <div className="flex items-center space-x-1 pr-2 text-xs font-mono text-white/40">
+          <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-12 sm:mb-16 border-b border-white/10 no-scrollbar">
+            <div className="flex items-center space-x-1 pr-2 text-xs font-mono text-white/50 shrink-0">
               <Filter size={13} />
               <span>FILTER:</span>
             </div>
@@ -84,7 +84,8 @@ export const WorkPage: React.FC = () => {
                 <button
                   key={cat.id}
                   onClick={() => handleFilterChange(cat.id)}
-                  className={`px-4 py-2 rounded-full text-xs font-mono uppercase tracking-wider transition-all whitespace-nowrap flex items-center space-x-2 ${
+                  aria-pressed={isActive}
+                  className={`min-h-[44px] px-4 py-2 rounded-full text-xs font-mono uppercase tracking-wider transition-all whitespace-nowrap flex items-center space-x-2 shrink-0 ${
                     isActive
                       ? 'bg-white text-black font-bold shadow-lg shadow-white/10'
                       : 'bg-white/5 border border-white/10 text-white/70 hover:bg-white/10 hover:text-white'
@@ -92,7 +93,7 @@ export const WorkPage: React.FC = () => {
                 >
                   <span>{cat.label}</span>
                   <span
-                    className={`text-[10px] px-1.5 py-0.2 rounded-full ${
+                    className={`text-[10px] px-1.5 py-0.5 rounded-full ${
                       isActive ? 'bg-black text-white' : 'bg-white/10 text-white/60'
                     }`}
                   >

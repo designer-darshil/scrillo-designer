@@ -29,14 +29,14 @@ export const Navbar: React.FC = () => {
       <header
         className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
           isScrolled
-            ? 'py-3 bg-[#050505]/85 backdrop-blur-md border-b border-white/10'
-            : 'py-6 bg-transparent border-b border-transparent'
+            ? 'py-2.5 sm:py-3 bg-[#050505]/85 backdrop-blur-md border-b border-white/10'
+            : 'py-4 sm:py-6 bg-transparent border-b border-transparent'
         }`}
       >
-        <div className="max-w-7xl mx-auto px-6 md:px-12 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-12 flex items-center justify-between">
           {/* Logo / Personal Identity */}
-          <Link to="/" className="group flex items-center space-x-3" aria-label="Home">
-            <div className="w-8 h-8 rounded-sm bg-white text-black flex items-center justify-center font-bold text-xs tracking-wider group-hover:bg-[#FF3E00] group-hover:text-white transition-colors select-none">
+          <Link to="/" className="group flex items-center space-x-2.5 sm:space-x-3 shrink-0" aria-label="Home">
+            <div className="w-8 h-8 rounded-sm bg-white text-black flex items-center justify-center font-bold text-xs tracking-wider group-hover:bg-[#FF3E00] group-hover:text-white transition-colors select-none shrink-0">
               {siteConfig.initials}
             </div>
             <div className="flex flex-col">
@@ -91,7 +91,7 @@ export const Navbar: React.FC = () => {
             {/* Mobile Hamburger Button */}
             <button
               onClick={() => setMobileMenuOpen(true)}
-              className="lg:hidden p-2.5 rounded-full border border-white/15 bg-white/5 text-white hover:bg-white/10 transition-colors"
+              className="lg:hidden min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full border border-white/15 bg-white/5 text-white hover:bg-white/10 transition-colors"
               aria-label="Open navigation menu"
             >
               <Menu size={18} />

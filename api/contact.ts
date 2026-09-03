@@ -186,6 +186,32 @@ Reply directly to this email to respond to ${trimmedName} (${trimmedEmail}).`;
 
 // Vercel Serverless Function Handler
 export default async function handler(req: any, res: any) {
+  // Set CORS headers for Vercel preview/production/local parity
+  if (res.setHeader) {
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
+    res.setHeader(
+      'Access-Control-Allow-Headers',
+      'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
+    );
+  }
+
+  // Handle preflight OPTIONS request
+  if (req.method === 'OPTIONS') {
+    if (res.status) {
+      return res.status(200).end();
+    }
+    return new Response(null, {
+      status: 200,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET,OPTIONS,PATCH,DELETE,POST,PUT',
+        'Access-Control-Allow-Headers': 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
+      }
+    });
+  }
+
   // Only allow POST
   if (req.method !== 'POST') {
     if (res.setHeader) {

@@ -23,8 +23,8 @@ export const footerLinks = {
   ],
   socials: [
     { label: 'LinkedIn', href: 'https://linkedin.com/in/dsbhuva', handle: 'in/dsbhuva' },
-    { label: 'GitHub', href: 'https://github.com/designer-darshil', handle: '@designer-darshil' },
     { label: 'Dribbble', href: 'https://dribbble.com', handle: 'Dribbble' },
-    { label: 'Behance', href: 'https://behance.net', handle: 'Behance' }
+    { label: 'Behance', href: 'https://behance.net', handle: 'Behance' },
+    { label: 'Instagram', href: 'https://instagram.com', handle: 'Instagram' }
   ]
 };

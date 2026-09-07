@@ -36,9 +36,13 @@ export const Navbar: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-12 flex items-center justify-between">
           {/* Logo / Personal Identity */}
           <Link to="/" className="group flex items-center space-x-2.5 sm:space-x-3 shrink-0" aria-label="Home">
-            <div className="w-8 h-8 rounded-sm bg-white text-black flex items-center justify-center font-bold text-xs tracking-wider group-hover:bg-[#FF3E00] group-hover:text-white transition-colors select-none shrink-0">
+            <motion.div
+              whileHover={{ rotateX: -6, rotateY: 8, translateZ: 8, scale: 1.05 }}
+              transition={{ type: 'spring', stiffness: 350, damping: 20 }}
+              className="w-8 h-8 rounded-sm bg-white text-black flex items-center justify-center font-bold text-xs tracking-wider group-hover:bg-[#FF3E00] group-hover:text-white transition-colors select-none shrink-0 shadow-md [transform-style:preserve-3d]"
+            >
               {siteConfig.initials}
-            </div>
+            </motion.div>
             <div className="flex flex-col">
               <span className="font-extrabold tracking-tight text-sm text-white flex items-center gap-1.5">
                 {siteConfig.name}
@@ -51,7 +55,7 @@ export const Navbar: React.FC = () => {
           </Link>
 
           {/* Desktop Navigation Links */}
-          <nav className="hidden lg:flex items-center space-x-1 border border-white/10 rounded-full px-4 py-1.5 bg-black/40 backdrop-blur-sm">
+          <nav className="hidden lg:flex items-center space-x-1 border border-white/10 rounded-full px-4 py-1.5 bg-black/40 backdrop-blur-sm [perspective:800px]">
             {navLinks.map((item) => {
               const isActive = location.pathname === item.href || 
                 (item.href !== '/' && location.pathname.startsWith(item.href));
@@ -60,14 +64,14 @@ export const Navbar: React.FC = () => {
                 <Link
                   key={item.href}
                   to={item.href}
-                  className={`relative px-4 py-1.5 text-xs font-mono tracking-widest uppercase transition-colors rounded-full ${
+                  className={`relative px-4 py-1.5 text-xs font-mono tracking-widest uppercase transition-all duration-200 rounded-full hover:translate-y-[-1px] ${
                     isActive ? 'text-white font-semibold' : 'text-white/60 hover:text-white'
                   }`}
                 >
                   {isActive && (
                     <motion.span
                       layoutId="activeNavIndicator"
-                      className="absolute inset-0 bg-white/10 rounded-full border border-white/20"
+                      className="absolute inset-0 bg-white/10 rounded-full border border-white/20 shadow-sm"
                       transition={{ type: 'spring', stiffness: 350, damping: 30 }}
                     />
                   )}

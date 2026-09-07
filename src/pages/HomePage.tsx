@@ -1,34 +1,35 @@
 import React from 'react';
 import { PageTransition } from '../components/layout/PageTransition';
-import { CinematicIntro } from '../components/cinematic/CinematicIntro';
-import { CinematicFilmHero } from '../components/cinematic/CinematicFilmHero';
-import { CinematicSelectedWork } from '../components/cinematic/CinematicSelectedWork';
-import { CinematicStatement } from '../components/cinematic/CinematicStatement';
-import { CinematicCredits } from '../components/cinematic/CinematicCredits';
-import { CinematicClosing } from '../components/cinematic/CinematicClosing';
+import { Interactive3DHero } from '../components/interactive3d/Interactive3DHero';
+import { Interactive3DProjects } from '../components/interactive3d/Interactive3DProjects';
+import { Interactive3DAbout } from '../components/interactive3d/Interactive3DAbout';
+import { Interactive3DExperience } from '../components/interactive3d/Interactive3DExperience';
+import { Interactive3DSkills } from '../components/interactive3d/Interactive3DSkills';
+import { Interactive3DContact } from '../components/interactive3d/Interactive3DContact';
 
 export const HomePage: React.FC = () => {
   return (
     <PageTransition>
-      <div className="relative bg-[#030303]">
-        {/* Prologue: 1.4s Fast Filmic Entrance Sequence */}
-        <CinematicIntro />
+      <div className="relative bg-[#050505]">
+        {/* 01. 3D Interactive Hero: Massive Typography & Interactive 3D Product Slab */}
+        <Interactive3DHero />
 
-        {/* Act 01: Dramatic Photographic Film Title Opening */}
-        <CinematicFilmHero />
+        {/* 02. 3D Interactive Selected Work: Art-Directed Non-Uniform Grid with Multi-Layer Depth */}
+        <Interactive3DProjects />
 
-        {/* Act 02: Selected Work as a Sequence of Distinct Film Shots */}
-        <CinematicSelectedWork />
+        {/* 03. About: Spatial Typography & Authentic Background */}
+        <Interactive3DAbout />
 
-        {/* Act 03: Quiet Moment & Typographic Statement */}
-        <CinematicStatement />
+        {/* 04. Experience: Clean Interactive Timeline with Subtle Depth Hover */}
+        <Interactive3DExperience />
 
-        {/* Act 04: Production Credits & Career Timeline */}
-        <CinematicCredits />
+        {/* 05. Skills: 3-Column Interactive Category List with Micro 3D Response */}
+        <Interactive3DSkills />
 
-        {/* Act 05: Epilogue, Typographic Closing & Fallback Contact */}
-        <CinematicClosing />
+        {/* 06. Contact: Tactile 3D Form Card with Real Delivery & Fallback */}
+        <Interactive3DContact />
       </div>
     </PageTransition>
   );
 };
+

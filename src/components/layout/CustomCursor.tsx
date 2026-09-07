@@ -95,23 +95,32 @@ export const CustomCursor: React.FC = () => {
         y: cursorY,
       }}
     >
+      {/* Refined Minimal Ring */}
       <motion.div
-        className={`flex items-center justify-center rounded-full transition-colors duration-200 ${
+        className={`rounded-full border transition-all duration-200 flex items-center justify-center ${
           cursorVariant === 'project' || cursorVariant === 'explore'
-            ? 'w-20 h-20 bg-[#FF3E00] text-white font-mono text-[11px] font-bold tracking-wider shadow-lg shadow-[#FF3E00]/30'
+            ? 'w-9 h-9 border-[#FF3E00] bg-[#FF3E00]/10 backdrop-blur-[1px]'
             : cursorVariant === 'cta'
-            ? 'w-10 h-10 bg-white/90 text-black text-sm font-bold border border-white/20'
-            : 'w-3.5 h-3.5 bg-white/80 border border-white/40'
+            ? 'w-7 h-7 border-white/60 bg-white/10'
+            : 'w-5 h-5 border-white/30 bg-transparent'
         }`}
         animate={{
           scale: cursorVariant === 'default' ? 1 : 1.15,
         }}
-        transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+        transition={{ type: 'spring', stiffness: 450, damping: 28 }}
       >
-        {cursorText && (
-          <span className="text-center font-bold tracking-widest">{cursorText}</span>
-        )}
+        {/* Tiny center focal dot */}
+        <div
+          className={`rounded-full transition-all duration-150 ${
+            cursorVariant === 'project' || cursorVariant === 'explore'
+              ? 'w-1.5 h-1.5 bg-[#FF3E00]'
+              : cursorVariant === 'cta'
+              ? 'w-1 h-1 bg-white'
+              : 'w-1 h-1 bg-white/70'
+          }`}
+        />
       </motion.div>
     </motion.div>
   );
 };
+

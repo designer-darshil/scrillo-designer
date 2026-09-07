@@ -83,14 +83,14 @@ export const SpatialProjectShowcase: React.FC = () => {
   return (
     <section
       id="spatial-gallery"
-      className="py-24 sm:py-32 md:py-40 bg-[#050505] border-b border-white/10 relative overflow-hidden select-none"
+      className="section-padding bg-[#050505] border-b border-white/10 relative overflow-hidden select-none"
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-12">
+      <div className="site-container">
         
         {/* Spatial Gallery Header & Coordinates */}
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 pb-8 border-b border-white/10 mb-12 sm:mb-16">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 pb-6 sm:pb-8 border-b border-white/10 mb-8 sm:mb-12">
           <div>
-            <div className="flex items-center space-x-3 text-xs font-mono tracking-widest text-[#FF3E00] uppercase mb-4">
+            <div className="flex items-center space-x-3 text-xs font-mono tracking-widest text-[#FF3E00] uppercase mb-3 sm:mb-4">
               <span className="px-2.5 py-0.5 rounded-full border border-[#FF3E00]/30 bg-[#FF3E00]/10 font-bold">
                 GALLERY
               </span>
@@ -98,20 +98,20 @@ export const SpatialProjectShowcase: React.FC = () => {
               <span className="text-white/60">3D PROJECT MONOLITH</span>
             </div>
 
-            <h2 className="text-4xl sm:text-6xl md:text-7xl font-extrabold uppercase tracking-tight text-white leading-none">
+            <h2 className="text-3xl sm:text-5xl md:text-6xl font-extrabold uppercase tracking-tight text-white leading-none">
               SELECTED <br />
               <span className="text-white/50">PROJECTS.</span>
             </h2>
           </div>
 
           {/* Spatial Selector Pills */}
-          <div className="flex flex-col sm:items-end gap-3">
-            <div className="flex items-center gap-2">
+          <div className="flex flex-col sm:items-end gap-2.5 w-full sm:w-auto">
+            <div className="flex items-center gap-2 overflow-x-auto max-w-full pb-1 scrollbar-none">
               {showcaseProjects.map((p, idx) => (
                 <button
                   key={p.id}
                   onClick={() => setActiveIndex(idx)}
-                  className={`min-h-[38px] px-3.5 py-1.5 rounded-full text-xs font-mono tracking-wider transition-all ${
+                  className={`min-h-[38px] whitespace-nowrap shrink-0 px-3.5 py-1.5 rounded-full text-xs font-mono tracking-wider transition-all ${
                     activeIndex === idx
                       ? 'bg-white text-black font-bold shadow-lg shadow-white/10'
                       : 'bg-white/5 border border-white/10 text-white/60 hover:text-white hover:bg-white/10'
@@ -122,7 +122,7 @@ export const SpatialProjectShowcase: React.FC = () => {
               ))}
             </div>
 
-            <span className="text-[11px] font-mono text-white/40">
+            <span className="text-[10px] sm:text-[11px] font-mono text-white/40">
               USE ARROW KEYS OR BUTTONS TO ROTATE SPECIMENS
             </span>
           </div>
@@ -136,7 +136,7 @@ export const SpatialProjectShowcase: React.FC = () => {
           onMouseEnter={handleMouseEnter}
           onMouseMove={handleMouseMove}
           onMouseLeave={handleMouseLeave}
-          className="relative w-full [perspective:1400px] mb-12"
+          className="relative w-full [perspective:1400px] mb-8 sm:mb-12"
         >
           <motion.div
             style={{
@@ -144,7 +144,7 @@ export const SpatialProjectShowcase: React.FC = () => {
               rotateY: isDisabled ? 0 : smoothRotateY,
               transformStyle: 'preserve-3d',
             }}
-            className="w-full rounded-3xl border border-white/15 bg-gradient-to-b from-[#111111] via-[#0A0A0A] to-[#050505] p-6 sm:p-10 md:p-12 shadow-[0_30px_100px_rgba(0,0,0,0.85)] relative overflow-hidden transition-all duration-500 will-change-transform [transform-style:preserve-3d]"
+            className="w-full rounded-2xl sm:rounded-3xl border border-white/15 bg-gradient-to-b from-[#111111] via-[#0A0A0A] to-[#050505] p-5 sm:p-8 lg:p-10 shadow-[0_30px_100px_rgba(0,0,0,0.85)] relative overflow-hidden transition-all duration-500 will-change-transform [transform-style:preserve-3d]"
           >
             {/* Background fine grid overlay */}
             <div
@@ -213,10 +213,10 @@ export const SpatialProjectShowcase: React.FC = () => {
                     <span className="text-xs font-mono uppercase tracking-widest text-[#FF3E00] font-bold">
                       {activeProject.categoryLabel}
                     </span>
-                    <h3 className="text-3xl sm:text-5xl font-extrabold uppercase tracking-tight text-white leading-tight">
+                    <h3 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold uppercase tracking-tight text-white leading-tight text-balance">
                       {activeProject.title}
                     </h3>
-                    <p className="text-sm sm:text-base text-white/70 leading-relaxed font-sans pt-1">
+                    <p className="text-sm sm:text-base text-white/70 leading-relaxed font-sans pt-1 text-pretty">
                       {activeProject.subtitle}
                     </p>
                   </div>
@@ -250,7 +250,7 @@ export const SpatialProjectShowcase: React.FC = () => {
                   <div style={{ transform: 'translateZ(65px)' }} className="pt-2">
                     <Link
                       to={`/work/${activeProject.slug}`}
-                      className="group inline-flex items-center space-x-3 px-8 py-4 rounded-full bg-white text-black font-mono text-xs uppercase tracking-widest font-bold hover:bg-[#FF3E00] hover:text-white transition-all duration-300 shadow-2xl"
+                      className="group inline-flex items-center space-x-3 min-h-[48px] px-6 sm:px-8 py-3.5 rounded-full bg-white text-black font-mono text-xs uppercase tracking-widest font-bold hover:bg-[#FF3E00] hover:text-white transition-all duration-300 shadow-2xl"
                     >
                       <span>EXPLORE PROJECT</span>
                       <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
@@ -265,7 +265,7 @@ export const SpatialProjectShowcase: React.FC = () => {
         </div>
 
         {/* Spatial Navigation Controls (Bottom Bar) */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-white/10">
+        <div className="flex flex-wrap items-center justify-between gap-4 pt-5 sm:pt-6 border-t border-white/10">
           
           <div className="flex items-center space-x-3">
             <button
@@ -293,7 +293,7 @@ export const SpatialProjectShowcase: React.FC = () => {
 
           <Link
             to="/work"
-            className="inline-flex items-center space-x-2 text-xs font-mono uppercase tracking-widest text-white/70 hover:text-[#FF3E00] transition-colors"
+            className="min-h-[44px] inline-flex items-center space-x-2 text-xs font-mono uppercase tracking-widest text-white/70 hover:text-[#FF3E00] transition-colors"
           >
             <span>ALL PROJECTS ARCHIVE ({projects.length})</span>
             <ArrowUpRight size={13} />

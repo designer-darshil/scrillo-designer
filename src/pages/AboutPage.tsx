@@ -10,11 +10,11 @@ import { Link } from 'react-router-dom';
 export const AboutPage: React.FC = () => {
   return (
     <PageTransition>
-      <div className="pt-32 pb-20 md:pt-40 md:pb-28">
-        <div className="max-w-7xl mx-auto px-6 md:px-12">
+      <div className="pt-24 pb-16 sm:pt-32 sm:pb-24">
+        <div className="site-container">
           
           {/* Hero Header */}
-          <div className="mb-16">
+          <div className="mb-12 sm:mb-16">
             <div className="flex items-center space-x-3 text-xs font-mono tracking-widest text-[#FF3E00] uppercase mb-4">
               <span className="px-2 py-0.5 rounded border border-[#FF3E00]/30 bg-[#FF3E00]/10 font-bold">
                 ABOUT
@@ -29,14 +29,14 @@ export const AboutPage: React.FC = () => {
               <span className="text-white">{siteConfig.name}</span>
             </div>
 
-            <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-extrabold tracking-tight sm:tracking-tighter text-white uppercase leading-[0.95] sm:leading-[0.92] mb-8 break-words">
+            <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-extrabold tracking-tight sm:tracking-tighter text-white uppercase leading-[0.95] mb-6 text-balance">
               UI/UX DESIGNER <br />
               <span className="italic font-light text-[#FF3E00] tracking-tight lowercase text-[0.88em] sm:text-[0.92em] block my-1 sm:my-2">
                 · web designer
               </span>
             </h1>
 
-            <p className="max-w-3xl text-lg sm:text-xl text-white/80 leading-relaxed font-normal">
+            <p className="max-w-3xl text-base sm:text-lg lg:text-xl text-white/80 leading-relaxed font-normal text-pretty">
               I design digital experiences and websites with a focus on clarity, usability, and thoughtful interaction. Experienced across SaaS and e-commerce platforms from wireframes and prototypes to frontend web implementation.
             </p>
           </div>

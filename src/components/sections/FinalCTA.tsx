@@ -5,18 +5,18 @@ import { siteConfig } from '../../data/site';
 
 export const FinalCTA: React.FC = () => {
   return (
-    <section className="py-20 sm:py-28 md:py-36 bg-[#080808] border-b border-white/10 relative overflow-hidden">
+    <section className="section-padding bg-[#080808] border-b border-white/10 relative overflow-hidden">
       {/* Background radial accent */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[350px] bg-[#FF3E00]/5 rounded-full blur-[150px] pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] sm:w-[800px] h-[350px] bg-[#FF3E00]/5 rounded-full blur-[150px] pointer-events-none" />
 
-      <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10 text-center">
+      <div className="site-container relative z-10 text-center">
         
         <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full border border-white/15 bg-white/5 text-xs font-mono text-white/80 mb-6">
           <span className="w-2 h-2 rounded-full bg-emerald-400 inline-block animate-pulse" />
           <span>AVAILABLE FOR NEW PROJECTS</span>
         </div>
 
-        <h2 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-extrabold tracking-tight sm:tracking-tighter text-white uppercase leading-[0.95] max-w-4xl mx-auto break-words">
+        <h2 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-extrabold tracking-tight sm:tracking-tighter text-white uppercase leading-[0.95] max-w-4xl mx-auto text-balance">
           LET'S BUILD A CLEAR, INTENTIONAL{' '}
           <span className="italic font-light text-[#FF3E00] tracking-tight lowercase">
             experience.

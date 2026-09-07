@@ -30,17 +30,17 @@ export const Footer: React.FC = () => {
   };
 
   return (
-    <footer className="relative bg-[#080808] border-t border-white/10 pt-20 pb-12 overflow-hidden">
-      <div className="max-w-7xl mx-auto px-6 md:px-12">
+    <footer className="relative bg-[#080808] border-t border-white/10 pt-16 sm:pt-20 pb-10 sm:pb-12 overflow-hidden">
+      <div className="site-container">
         {/* Big Editorial Header Statement */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 pb-16 border-b border-white/10">
-          <div className="lg:col-span-8 space-y-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-12 pb-12 sm:pb-16 border-b border-white/10">
+          <div className="lg:col-span-8 space-y-5 sm:space-y-6">
             <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 text-xs font-mono">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
               <span>Available for Q3/Q4 2026 Collaborations</span>
             </div>
             
-            <h2 className="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight sm:tracking-tighter text-white leading-none">
+            <h2 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight sm:tracking-tighter text-white leading-none text-balance">
               LET'S BUILD <br />
               <span className="italic font-light text-[#FF3E00]">
                 SOMETHING
@@ -48,23 +48,23 @@ export const Footer: React.FC = () => {
               WORTH USING.
             </h2>
 
-            <p className="max-w-xl text-muted-primary text-base md:text-lg leading-relaxed font-normal">
+            <p className="max-w-xl text-white/70 text-sm sm:text-base md:text-lg leading-relaxed font-normal text-pretty">
               Have a digital product, application interface, or website project to discuss? Feel free to reach out.
             </p>
           </div>
 
-          <div className="lg:col-span-4 flex flex-col justify-between items-start lg:items-end space-y-6">
+          <div className="lg:col-span-4 flex flex-col justify-between items-start lg:items-end gap-6">
             <Link
               to="/contact"
               data-cursor="cta"
-              className="group inline-flex items-center space-x-3 px-8 py-4 rounded-full bg-[#FF3E00] text-white font-mono text-sm uppercase tracking-widest font-bold hover:bg-white hover:text-black transition-all duration-300 shadow-xl shadow-[#FF3E00]/20"
+              className="group inline-flex items-center space-x-3 px-6 sm:px-8 py-3.5 sm:py-4 rounded-full bg-[#FF3E00] text-white font-mono text-xs sm:text-sm uppercase tracking-widest font-bold hover:bg-white hover:text-black transition-all duration-300 shadow-xl shadow-[#FF3E00]/20 min-h-[48px]"
             >
               <span>GET IN TOUCH</span>
               <ArrowUpRight size={18} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
             </Link>
 
             {/* Time & Location Pill */}
-            <div className="bg-white/5 border border-white/10 rounded-lg p-4 w-full sm:w-auto text-xs font-mono text-white/70 space-y-1">
+            <div className="bg-white/5 border border-white/10 rounded-xl p-4 w-full sm:w-auto text-xs font-mono text-white/70 space-y-1.5">
               <div className="flex items-center justify-between gap-6">
                 <span className="text-white/40">LOCATION</span>
                 <span className="text-white">{siteConfig.location}</span>

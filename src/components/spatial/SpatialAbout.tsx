@@ -6,11 +6,11 @@ import { Compass, Monitor, Code2, MapPin, CheckCircle } from 'lucide-react';
 
 export const SpatialAbout: React.FC = () => {
   return (
-    <section id="spatial-about" className="py-24 sm:py-32 md:py-40 bg-[#050505] border-b border-white/10 relative overflow-hidden select-none">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-12">
+    <section id="spatial-about" className="section-padding bg-[#050505] border-b border-white/10 relative overflow-hidden select-none">
+      <div className="site-container">
         
         {/* Spatial Header */}
-        <div className="flex items-center space-x-3 text-xs font-mono tracking-widest text-[#FF3E00] uppercase mb-6">
+        <div className="flex items-center space-x-3 text-xs font-mono tracking-widest text-[#FF3E00] uppercase mb-4 sm:mb-6">
           <span className="px-2.5 py-0.5 rounded-full border border-[#FF3E00]/30 bg-[#FF3E00]/10 font-bold">
             02
           </span>
@@ -19,23 +19,23 @@ export const SpatialAbout: React.FC = () => {
         </div>
 
         {/* Editorial Heading answering 'Who is this designer?' */}
-        <div className="mb-14 sm:mb-20 pb-8 border-b border-white/10">
-          <h2 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold uppercase tracking-tight text-white leading-[0.9] mb-6">
+        <div className="mb-10 sm:mb-16 pb-6 sm:pb-8 border-b border-white/10">
+          <h2 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold uppercase tracking-tight text-white leading-[0.95] mb-4 sm:mb-6 text-balance">
             DESIGNER · <br />
             <span className="text-[#FF3E00]">VISUAL THINKER</span>
           </h2>
-          <p className="max-w-3xl text-base sm:text-xl text-white/70 leading-relaxed font-normal">
+          <p className="max-w-3xl text-sm sm:text-base lg:text-lg text-white/70 leading-relaxed font-normal text-pretty">
             Specializing in user interface architecture, interactive web engineering, and cognitive design clarity. 8+ years designing digital products across SaaS and e-commerce platforms from Surat, Gujarat, India.
           </p>
         </div>
 
         {/* Asymmetrical Spatial Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-10 lg:gap-12 items-center">
           
           {/* Left Column: 3D Portrait Specimen */}
           <div className="lg:col-span-5">
             <ThreeDCard maxRotation={6} depthZ={16} glareOpacity={0.18}>
-              <div className="rounded-3xl border border-white/15 bg-gradient-to-b from-[#141414] to-[#070707] p-6 sm:p-7 shadow-2xl relative overflow-hidden [transform-style:preserve-3d]">
+              <div className="rounded-2xl sm:rounded-3xl border border-white/15 bg-gradient-to-b from-[#141414] to-[#070707] p-5 sm:p-7 shadow-2xl relative overflow-hidden [transform-style:preserve-3d]">
                 
                 {/* Layer 1: Fine grid pattern */}
                 <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:28px_28px] pointer-events-none" />
@@ -65,16 +65,16 @@ export const SpatialAbout: React.FC = () => {
 
                 {/* Layer 3: Identity Monogram Bar */}
                 <div
-                  className="pt-5 flex items-center justify-between font-mono text-xs"
+                  className="pt-4 sm:pt-5 flex items-center justify-between font-mono text-xs"
                   style={{ transform: 'translateZ(35px)' }}
                 >
                   <div className="flex items-center space-x-2.5">
                     <div className="w-7 h-7 rounded bg-white text-black font-extrabold flex items-center justify-center text-xs">
                       {siteConfig.initials}
                     </div>
-                    <span className="text-white font-bold tracking-wider">DS · DESIGN & ENGINEERING</span>
+                    <span className="text-white font-bold tracking-wider text-[11px] sm:text-xs">DS · DESIGN & ENGINEERING</span>
                   </div>
-                  <span className="text-white/40">EST. 2018</span>
+                  <span className="text-white/40 text-[10px] sm:text-xs">EST. 2018</span>
                 </div>
 
               </div>
@@ -82,13 +82,13 @@ export const SpatialAbout: React.FC = () => {
           </div>
 
           {/* Right Column: Spatial Milestone Telemetry */}
-          <div className="lg:col-span-7 space-y-8">
+          <div className="lg:col-span-7 space-y-6 sm:space-y-8">
             
             {/* Primary Spatial Metrics */}
-            <div className="grid grid-cols-2 gap-4">
-              <div className="p-6 rounded-3xl border border-white/10 bg-[#0A0A0A] space-y-2 hover:border-[#FF3E00]/40 transition-colors">
-                <div className="text-4xl sm:text-6xl font-extrabold text-white font-mono leading-none">
-                  8+<span className="text-[#FF3E00] text-2xl">YRS</span>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+              <div className="p-5 sm:p-6 rounded-2xl sm:rounded-3xl border border-white/10 bg-[#0A0A0A] space-y-2 hover:border-[#FF3E00]/40 transition-colors">
+                <div className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-white font-mono leading-none">
+                  8+<span className="text-[#FF3E00] text-xl sm:text-2xl">YRS</span>
                 </div>
                 <div className="text-xs font-mono uppercase tracking-widest text-[#FF3E00] font-bold">
                   UI/UX DESIGN
@@ -98,9 +98,9 @@ export const SpatialAbout: React.FC = () => {
                 </p>
               </div>
 
-              <div className="p-6 rounded-3xl border border-white/10 bg-[#0A0A0A] space-y-2 hover:border-[#FF3E00]/40 transition-colors">
-                <div className="text-4xl sm:text-6xl font-extrabold text-white font-mono leading-none">
-                  4+<span className="text-[#FF3E00] text-2xl">YRS</span>
+              <div className="p-5 sm:p-6 rounded-2xl sm:rounded-3xl border border-white/10 bg-[#0A0A0A] space-y-2 hover:border-[#FF3E00]/40 transition-colors">
+                <div className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-white font-mono leading-none">
+                  4+<span className="text-[#FF3E00] text-xl sm:text-2xl">YRS</span>
                 </div>
                 <div className="text-xs font-mono uppercase tracking-widest text-[#FF3E00] font-bold">
                   WEB / FRONTEND
@@ -112,7 +112,7 @@ export const SpatialAbout: React.FC = () => {
             </div>
 
             {/* Specialization Domains */}
-            <div className="p-6 sm:p-8 rounded-3xl border border-white/10 bg-[#090909] space-y-4">
+            <div className="p-5 sm:p-8 rounded-2xl sm:rounded-3xl border border-white/10 bg-[#090909] space-y-4">
               <div className="flex items-center space-x-2 text-xs font-mono text-white/40 uppercase tracking-widest">
                 <Compass size={14} className="text-[#FF3E00]" />
                 <span>PRIMARY SPECIALIZATIONS</span>
@@ -162,9 +162,9 @@ export const SpatialAbout: React.FC = () => {
             </div>
 
             {/* Philosophy Pill */}
-            <div className="px-6 py-4 rounded-2xl border border-white/10 bg-white/[0.02] flex items-center justify-between text-xs font-mono text-white/70">
-              <span>DESIGN PHILOSOPHY</span>
-              <span className="text-white font-semibold">"Clarity, usability, and functional design come first."</span>
+            <div className="px-4 sm:px-6 py-3.5 sm:py-4 rounded-2xl border border-white/10 bg-white/[0.02] flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs font-mono text-white/70">
+              <span className="shrink-0 text-[#FF3E00] font-semibold">DESIGN PHILOSOPHY</span>
+              <span className="text-white font-normal sm:text-right">"Clarity, usability, and functional design come first."</span>
             </div>
 
           </div>

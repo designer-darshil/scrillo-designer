@@ -57,25 +57,25 @@ export const SpatialHero: React.FC = () => {
       onMouseEnter={handleMouseEnter}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      className="relative min-h-[95vh] flex flex-col justify-between pt-24 sm:pt-32 pb-12 sm:pb-16 overflow-hidden border-b border-white/10 bg-[#050505] [perspective:1600px] select-none"
+      className="relative min-h-[calc(100svh-4rem)] lg:min-h-[92vh] flex flex-col justify-between pt-20 sm:pt-24 lg:pt-28 pb-8 sm:pb-12 overflow-hidden border-b border-white/10 bg-[#050505] [perspective:1600px] select-none"
     >
       {/* Subtle controlled spatial lighting */}
-      <div className="absolute top-1/3 left-1/4 w-[650px] h-[650px] bg-[#FF3E00]/[0.03] rounded-full blur-[160px] pointer-events-none" />
-      <div className="absolute -bottom-20 right-10 w-[450px] h-[450px] bg-white/[0.015] rounded-full blur-[140px] pointer-events-none" />
+      <div className="absolute top-1/3 left-1/4 w-[500px] sm:w-[650px] h-[500px] sm:h-[650px] bg-[#FF3E00]/[0.03] rounded-full blur-[140px] pointer-events-none" />
+      <div className="absolute -bottom-20 right-10 w-[350px] sm:w-[450px] h-[350px] sm:h-[450px] bg-white/[0.015] rounded-full blur-[120px] pointer-events-none" />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-12 w-full flex-1 flex flex-col justify-between relative z-10">
+      <div className="site-container flex-1 flex flex-col justify-between relative z-10">
         
         {/* Top Spatial Coordinate & Telemetry Bar */}
-        <div className="flex flex-wrap items-center justify-between gap-4 font-mono text-xs uppercase tracking-widest text-white/40 pb-6 border-b border-white/10">
-          <div className="flex items-center space-x-3">
+        <div className="flex flex-wrap items-center justify-between gap-3 font-mono text-[11px] sm:text-xs uppercase tracking-widest text-white/40 pb-4 sm:pb-5 border-b border-white/10">
+          <div className="flex items-center space-x-2.5 sm:space-x-3">
             <span className="w-2 h-2 rounded-full bg-[#FF3E00] animate-pulse" />
             <span className="text-white font-bold tracking-wider">DS</span>
             <span className="text-white/20">•</span>
             <span className="text-white/60">SPATIAL PORTFOLIO 2026</span>
           </div>
 
-          <div className="flex items-center space-x-5 text-[11px]">
-            <span className="text-emerald-400 flex items-center gap-1.5">
+          <div className="flex items-center space-x-4 sm:space-x-5 text-[10px] sm:text-[11px]">
+            <span className="text-emerald-400 flex items-center gap-1.5 font-medium">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
               AVAILABLE FOR COLLABORATION
             </span>
@@ -85,49 +85,49 @@ export const SpatialHero: React.FC = () => {
         </div>
 
         {/* Center Stage: Integrated Typographic Architecture + 3D Specimen Slab */}
-        <div className="my-auto py-10 sm:py-16 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-8 items-center">
+        <div className="my-auto py-8 sm:py-12 lg:py-16 grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-10 lg:gap-12 items-center">
           
           {/* Left / Upper: Craft-First Display Typography */}
-          <div className="lg:col-span-7 space-y-6 sm:space-y-8">
+          <div className="lg:col-span-7 space-y-5 sm:space-y-6 lg:space-y-8">
             {/* Single quiet, editorial appearance of full name */}
-            <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full border border-white/10 bg-white/5 text-[11px] font-mono tracking-widest text-white/80 uppercase font-bold">
-              <span className="w-2 h-2 rounded-full bg-[#FF3E00]" />
-              <span>PORTFOLIO OF {siteConfig.name.toUpperCase()} · SURAT, INDIA</span>
+            <div className="inline-flex items-center gap-2 px-3 sm:px-3.5 py-1 sm:py-1.5 rounded-full border border-white/10 bg-white/5 text-[10px] sm:text-[11px] font-mono tracking-widest text-white/80 uppercase font-bold">
+              <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#FF3E00]" />
+              <span className="truncate">PORTFOLIO OF {siteConfig.name.toUpperCase()} · SURAT, INDIA</span>
             </div>
 
             {/* Oversized Architectural Typography focused on Work & Disciplines */}
             <div className="space-y-1 sm:space-y-2">
-              <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold uppercase tracking-tight sm:tracking-tighter text-white leading-[0.9] break-words">
+              <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-extrabold uppercase tracking-tight sm:tracking-tighter text-white leading-[0.95] text-balance">
                 DIGITAL <br />
                 <span className="text-white/90">EXPERIENCES</span>
               </h1>
               
-              <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1 pt-2">
-                <span className="text-xl sm:text-3xl md:text-4xl font-light text-white/60 uppercase tracking-tight">
+              <div className="flex flex-wrap items-baseline gap-x-3 sm:gap-x-4 gap-y-1 pt-2">
+                <span className="text-lg sm:text-2xl md:text-3xl lg:text-4xl font-light text-white/60 uppercase tracking-tight">
                   UI/UX DESIGNER
                 </span>
-                <span className="text-lg sm:text-2xl md:text-3xl font-semibold text-[#FF3E00] uppercase tracking-tight">
+                <span className="text-base sm:text-xl md:text-2xl lg:text-3xl font-semibold text-[#FF3E00] uppercase tracking-tight">
                   · WEB DESIGNER
                 </span>
               </div>
             </div>
 
-            <p className="max-w-xl text-base sm:text-lg text-white/70 leading-relaxed font-normal">
+            <p className="max-w-xl text-sm sm:text-base lg:text-lg text-white/70 leading-relaxed font-normal text-pretty">
               An interactive 3D portfolio exploring physical depth, cognitive interface clarity, and tactile digital products. 8+ years designing across SaaS and e-commerce platforms.
             </p>
 
             {/* Spatial Navigation Actions */}
-            <div className="pt-2 flex flex-wrap items-center gap-3.5">
+            <div className="pt-2 flex flex-wrap items-center gap-3">
               <a
                 href="#spatial-gallery"
-                className="min-h-[48px] px-8 py-3.5 rounded-full bg-[#FF3E00] text-white font-mono text-xs uppercase tracking-widest font-bold hover:bg-white hover:text-black transition-all inline-flex items-center justify-center space-x-2 shadow-xl shadow-[#FF3E00]/25"
+                className="min-h-[48px] px-6 sm:px-8 py-3 rounded-full bg-[#FF3E00] text-white font-mono text-[11px] sm:text-xs uppercase tracking-widest font-bold hover:bg-white hover:text-black transition-all inline-flex items-center justify-center space-x-2 shadow-xl shadow-[#FF3E00]/25"
               >
                 <span>ENTER GALLERY</span>
                 <ArrowDownRight size={15} />
               </a>
               <Link
                 to="/contact"
-                className="min-h-[48px] px-8 py-3.5 rounded-full border border-white/20 bg-white/5 text-white font-mono text-xs uppercase tracking-widest hover:bg-white/10 hover:border-white/40 transition-all inline-flex items-center justify-center space-x-2"
+                className="min-h-[48px] px-6 sm:px-8 py-3 rounded-full border border-white/20 bg-white/5 text-white font-mono text-[11px] sm:text-xs uppercase tracking-widest hover:bg-white/10 hover:border-white/40 transition-all inline-flex items-center justify-center space-x-2"
               >
                 <span>START A PROJECT</span>
                 <ArrowUpRight size={14} />
@@ -143,7 +143,7 @@ export const SpatialHero: React.FC = () => {
                 rotateY: isDisabled ? 0 : smoothRotateY,
                 transformStyle: 'preserve-3d',
               }}
-              className="relative w-full max-w-[460px] aspect-[4/5] sm:aspect-square rounded-3xl border border-white/15 bg-gradient-to-b from-[#141414] via-[#0E0E0E] to-[#070707] p-6 sm:p-8 shadow-[0_30px_90px_rgba(0,0,0,0.8)] will-change-transform flex flex-col justify-between [transform-style:preserve-3d]"
+              className="relative w-full max-w-[440px] aspect-[4/5] sm:aspect-square rounded-2xl sm:rounded-3xl border border-white/15 bg-gradient-to-b from-[#141414] via-[#0E0E0E] to-[#070707] p-5 sm:p-7 lg:p-8 shadow-[0_30px_90px_rgba(0,0,0,0.8)] will-change-transform flex flex-col justify-between [transform-style:preserve-3d]"
             >
               {/* Background Precision Grid */}
               <div

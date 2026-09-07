@@ -31,9 +31,9 @@ export const FloatingSpatialNav: React.FC = () => {
 
   return (
     <>
-      <header className="fixed top-0 left-0 right-0 z-50 pointer-events-none flex justify-center p-4 sm:p-6 select-none">
+      <header className="fixed top-0 left-0 right-0 z-50 pointer-events-none flex justify-center p-3 sm:p-5 select-none">
         <nav
-          className={`pointer-events-auto flex items-center justify-between gap-6 px-4 sm:px-6 py-2.5 rounded-full border transition-all duration-300 shadow-2xl [transform-style:preserve-3d] ${
+          className={`pointer-events-auto flex items-center justify-between gap-4 sm:gap-6 px-3.5 sm:px-6 py-2 sm:py-2.5 rounded-full border transition-all duration-300 shadow-2xl [transform-style:preserve-3d] ${
             isScrolled
               ? 'bg-[#090909]/90 backdrop-blur-xl border-white/20 shadow-black/80'
               : 'bg-[#0E0E0E]/80 backdrop-blur-md border-white/15'

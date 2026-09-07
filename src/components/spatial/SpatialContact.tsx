@@ -137,12 +137,12 @@ export const SpatialContact: React.FC = () => {
   };
 
   return (
-    <section id="spatial-contact" className="py-24 sm:py-32 md:py-40 bg-[#050505] border-b border-white/10 relative overflow-hidden select-none">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-12">
+    <section id="spatial-contact" className="section-padding bg-[#050505] border-b border-white/10 relative overflow-hidden select-none">
+      <div className="site-container">
         
         {/* Spatial Heading (As requested: LET'S MAKE SOMETHING GOOD.) */}
-        <div className="mb-14 sm:mb-20 pb-8 border-b border-white/10">
-          <div className="flex items-center space-x-3 text-xs font-mono tracking-widest text-[#FF3E00] uppercase mb-4">
+        <div className="mb-10 sm:mb-16 pb-6 sm:pb-8 border-b border-white/10">
+          <div className="flex items-center space-x-3 text-xs font-mono tracking-widest text-[#FF3E00] uppercase mb-3 sm:mb-4">
             <span className="px-2.5 py-0.5 rounded-full border border-[#FF3E00]/30 bg-[#FF3E00]/10 font-bold">
               05
             </span>
@@ -150,12 +150,12 @@ export const SpatialContact: React.FC = () => {
             <span className="text-white/60">INITIATE COLLABORATION</span>
           </div>
 
-          <h2 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-extrabold uppercase tracking-tight text-white leading-[0.88] mb-6">
+          <h2 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-extrabold uppercase tracking-tight text-white leading-[0.92] mb-4 sm:mb-6 text-balance">
             LET'S MAKE <br />
             <span className="text-[#FF3E00]">SOMETHING GOOD.</span>
           </h2>
 
-          <div className="flex flex-wrap items-center gap-6 font-mono text-sm text-white/80 pt-2">
+          <div className="flex flex-wrap items-center gap-4 sm:gap-6 font-mono text-xs sm:text-sm text-white/80 pt-2">
             <a
               href={`mailto:${RECIPIENT_EMAIL}`}
               className="text-white hover:text-[#FF3E00] transition-colors underline font-bold"
@@ -168,7 +168,7 @@ export const SpatialContact: React.FC = () => {
         </div>
 
         {/* Spatial Contact Stage: Direct Coordinate Cards (Left) + Tactile 3D Form (Right) */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-10 lg:gap-12 items-start">
           
           {/* Left Column: Direct Inquiries */}
           <div className="lg:col-span-5 space-y-6 sm:space-y-8">
@@ -239,7 +239,7 @@ export const SpatialContact: React.FC = () => {
           {/* Right Column: 3D Form Card */}
           <div className="lg:col-span-7">
             <ThreeDCard maxRotation={4} depthZ={12} glareOpacity={0.12}>
-              <div className="rounded-3xl border border-white/15 bg-gradient-to-b from-[#111111] via-[#090909] to-[#060606] p-6 sm:p-10 shadow-2xl relative [transform-style:preserve-3d]">
+              <div className="rounded-2xl sm:rounded-3xl border border-white/15 bg-gradient-to-b from-[#111111] via-[#090909] to-[#060606] p-5 sm:p-8 lg:p-10 shadow-2xl relative [transform-style:preserve-3d]">
                 
                 <AnimatePresence mode="wait">
                   {!isSubmitted ? (
@@ -249,7 +249,7 @@ export const SpatialContact: React.FC = () => {
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
                       onSubmit={handleSubmit}
-                      className="space-y-5 [transform-style:preserve-3d]"
+                      className="space-y-4 sm:space-y-5 [transform-style:preserve-3d]"
                       noValidate
                     >
                       {/* Honeypot */}
@@ -300,9 +300,9 @@ export const SpatialContact: React.FC = () => {
                           placeholder="Your Name"
                           disabled={isSubmitting}
                           autoComplete="name"
-                          className={`w-full px-4 py-3.5 rounded-xl bg-black/60 border ${
+                          className={`w-full px-4 py-3 rounded-xl bg-black/60 border ${
                             errors.name ? 'border-red-500' : 'border-white/10 focus:border-[#FF3E00]'
-                          } text-white text-sm font-sans placeholder-white/20 focus:outline-none transition-colors disabled:opacity-50`}
+                          } text-white text-base sm:text-sm font-sans placeholder-white/20 focus:outline-none transition-colors disabled:opacity-50 min-h-[44px]`}
                         />
                         {errors.name && (
                           <p className="text-[11px] font-mono text-red-400 mt-1">{errors.name}</p>
@@ -325,9 +325,9 @@ export const SpatialContact: React.FC = () => {
                           placeholder="your@email.com"
                           disabled={isSubmitting}
                           autoComplete="email"
-                          className={`w-full px-4 py-3.5 rounded-xl bg-black/60 border ${
+                          className={`w-full px-4 py-3 rounded-xl bg-black/60 border ${
                             errors.email ? 'border-red-500' : 'border-white/10 focus:border-[#FF3E00]'
-                          } text-white text-sm font-sans placeholder-white/20 focus:outline-none transition-colors disabled:opacity-50`}
+                          } text-white text-base sm:text-sm font-sans placeholder-white/20 focus:outline-none transition-colors disabled:opacity-50 min-h-[44px]`}
                         />
                         {errors.email && (
                           <p className="text-[11px] font-mono text-red-400 mt-1">{errors.email}</p>
@@ -349,9 +349,9 @@ export const SpatialContact: React.FC = () => {
                           }}
                           placeholder="Tell me about your project, goals, or requirements..."
                           disabled={isSubmitting}
-                          className={`w-full px-4 py-3.5 rounded-xl bg-black/60 border ${
+                          className={`w-full px-4 py-3 rounded-xl bg-black/60 border ${
                             errors.message ? 'border-red-500' : 'border-white/10 focus:border-[#FF3E00]'
-                          } text-white text-sm font-sans placeholder-white/20 focus:outline-none transition-colors resize-none disabled:opacity-50`}
+                          } text-white text-base sm:text-sm font-sans placeholder-white/20 focus:outline-none transition-colors resize-none disabled:opacity-50`}
                         />
                         {errors.message && (
                           <p className="text-[11px] font-mono text-red-400 mt-1">{errors.message}</p>

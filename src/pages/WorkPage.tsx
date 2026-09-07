@@ -45,11 +45,11 @@ export const WorkPage: React.FC = () => {
 
   return (
     <PageTransition>
-      <div className="pt-32 pb-20 md:pt-40 md:pb-28">
-        <div className="max-w-7xl mx-auto px-6 md:px-12">
+      <div className="pt-24 pb-16 sm:pt-32 sm:pb-24">
+        <div className="site-container">
           
           {/* Header Section */}
-          <div className="mb-16">
+          <div className="mb-12 sm:mb-16">
             <div className="flex items-center space-x-3 text-xs font-mono tracking-widest text-[#FF3E00] uppercase mb-4">
               <span className="px-2 py-0.5 rounded border border-[#FF3E00]/30 bg-[#FF3E00]/10 font-bold">
                 PORTFOLIO ARCHIVE
@@ -58,7 +58,7 @@ export const WorkPage: React.FC = () => {
               <span className="text-white/60">2024 — 2026</span>
             </div>
 
-            <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold tracking-tight sm:tracking-tighter text-white uppercase leading-[0.95] sm:leading-none mb-6 break-words">
+            <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-extrabold tracking-tight sm:tracking-tighter text-white uppercase leading-[0.95] sm:leading-none mb-6 text-balance">
               PROVE BY <br />
               <span className="italic font-light text-[#FF3E00] tracking-tight lowercase">
                 built
@@ -66,7 +66,7 @@ export const WorkPage: React.FC = () => {
               WORK.
             </h1>
 
-            <p className="max-w-2xl text-muted-primary text-base md:text-lg leading-relaxed">
+            <p className="max-w-2xl text-white/70 text-sm sm:text-base md:text-lg leading-relaxed text-pretty">
               A selection of digital products, web applications, and website interfaces designed with usability, clarity, and clean frontend structure.
             </p>
           </div>

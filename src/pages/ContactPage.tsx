@@ -141,27 +141,27 @@ export const ContactPage: React.FC = () => {
 
   return (
     <PageTransition>
-      <div className="pt-24 pb-16 sm:pt-32 sm:pb-20 md:pt-40 md:pb-28">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-12">
+      <div className="pt-24 pb-16 sm:pt-32 sm:pb-24">
+        <div className="site-container">
           
           {/* Header */}
           <div className="mb-8 sm:mb-12 md:mb-16">
             <div className="flex items-center space-x-3 text-xs font-mono tracking-widest text-[#FF3E00] uppercase mb-3 sm:mb-4">
-              <span className="px-2 py-0.5 rounded border border-[#FF3E00]/30 bg-[#FF3E00]/10 font-bold">
+              <span className="px-2.5 py-0.5 rounded-full border border-[#FF3E00]/30 bg-[#FF3E00]/10 font-bold">
                 CONTACT
               </span>
               <span className="text-white/30">/</span>
               <span className="text-white/60">GET IN TOUCH</span>
             </div>
 
-            <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-extrabold tracking-tight sm:tracking-tighter text-white uppercase leading-[1.0] sm:leading-[0.95] mb-4 sm:mb-6 break-words">
+            <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-extrabold tracking-tight sm:tracking-tighter text-white uppercase leading-[0.95] mb-4 sm:mb-6 text-balance">
               LET'S START A <br />
               <span className="italic font-light text-[#FF3E00] tracking-tight lowercase text-[0.88em] sm:text-[0.92em] block my-0.5 sm:my-1">
                 conversation.
               </span>
             </h1>
 
-            <p className="max-w-xl text-sm sm:text-base md:text-lg text-muted-primary leading-relaxed">
+            <p className="max-w-xl text-sm sm:text-base md:text-lg text-white/70 leading-relaxed text-pretty">
               Have a digital product to design, a UI/UX project to discuss, or a website to build? Send me a message below.
             </p>
           </div>

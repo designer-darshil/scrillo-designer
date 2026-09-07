@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ScrilloLoader } from './components/layout/ScrilloLoader';
-import { Navbar } from './components/layout/Navbar';
+import { FloatingSpatialNav } from './components/spatial/FloatingSpatialNav';
 import { Footer } from './components/layout/Footer';
 import { CustomCursor } from './components/layout/CustomCursor';
 import { ScrollProgress } from './components/layout/ScrollProgress';
@@ -43,8 +43,8 @@ export function App() {
         {/* Auto Scroll to Top on Navigation */}
         <ScrollToTopOnRoute />
 
-        {/* Global Floating Editorial Navbar */}
-        <Navbar />
+        {/* Reimagined Floating Spatial Navigation */}
+        <FloatingSpatialNav />
 
         {/* Main Application Routes with Error Boundary Guard */}
         <main id="main-content">

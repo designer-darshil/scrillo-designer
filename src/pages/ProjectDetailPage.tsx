@@ -3,13 +3,12 @@ import { useParams, Link } from 'react-router-dom';
 import { projects } from '../data/projects';
 import { PageTransition } from '../components/layout/PageTransition';
 import { Lightbox } from '../components/ui/Lightbox';
-import { BeforeAfter } from '../components/ui/BeforeAfter';
-import { ArrowLeft, ArrowUpRight, CheckCircle2 } from 'lucide-react';
+import { ThreeDCard } from '../components/ui/ThreeDCard';
+import { ArrowLeft, ArrowRight, ArrowUpRight, CheckCircle2, Eye, ExternalLink } from 'lucide-react';
 import { NotFoundPage } from './NotFoundPage';
 
 export const ProjectDetailPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
-
   const project = projects.find((p) => p.slug === slug);
 
   if (!project) {
@@ -28,24 +27,26 @@ export const ProjectDetailPage: React.FC = () => {
 
   return (
     <PageTransition>
-      <div className="pt-32 pb-20 md:pt-36 md:pb-28">
+      <div className="pt-28 pb-20 sm:pt-36 sm:pb-28 bg-[#050505] text-white">
         
-        {/* Back Navigation Bar */}
-        <div className="max-w-7xl mx-auto px-6 md:px-12 mb-12">
+        {/* Navigation Bar */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-12 mb-10">
           <Link
             to="/work"
-            className="inline-flex items-center space-x-2 text-xs font-mono uppercase tracking-widest text-white/60 hover:text-[#FF3E00] transition-colors"
+            className="inline-flex items-center space-x-2 text-xs font-mono uppercase tracking-widest text-white/50 hover:text-[#FF3E00] transition-colors"
           >
             <ArrowLeft size={14} />
-            <span>BACK TO ALL PROJECTS</span>
+            <span>RETURN TO GALLERY</span>
           </Link>
         </div>
 
-        {/* Hero Section */}
-        <header className="max-w-7xl mx-auto px-6 md:px-12 mb-16">
+        {/* ========================================================================= */}
+        {/* 01. IMMERSIVE OPENING: Huge Title + Visual Canvas                          */}
+        {/* ========================================================================= */}
+        <header className="max-w-7xl mx-auto px-4 sm:px-6 md:px-12 mb-16 sm:mb-24">
           <div className="space-y-6">
             <div className="flex flex-wrap items-center gap-3 text-xs font-mono uppercase tracking-widest text-[#FF3E00]">
-              <span className="px-2 py-0.5 rounded bg-[#FF3E00]/10 border border-[#FF3E00]/20 font-bold">
+              <span className="px-2.5 py-0.5 rounded-full bg-[#FF3E00]/10 border border-[#FF3E00]/30 font-bold">
                 {project.number}
               </span>
               <span>/</span>
@@ -54,19 +55,24 @@ export const ProjectDetailPage: React.FC = () => {
               <span className="text-white/40">{project.year}</span>
             </div>
 
-            <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold tracking-tight sm:tracking-tighter text-white uppercase leading-[0.95] sm:leading-none break-words">
+            <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-extrabold tracking-tight sm:tracking-tighter text-white uppercase leading-[0.88] break-words">
               {project.title}
             </h1>
 
-            <p className="text-lg sm:text-2xl md:text-3xl text-white/80 max-w-4xl font-normal leading-relaxed">
+            <p className="text-lg sm:text-2xl md:text-3xl text-white/70 max-w-4xl font-normal leading-relaxed">
               {project.subtitle}
             </p>
 
-            {/* Metadata Bar */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-6 pt-8 border-t border-white/10 text-xs font-mono">
+            {/* Small Role / Date / Client Metadata Strip */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 pt-8 border-t border-white/10 text-xs font-mono">
               <div className="space-y-1">
-                <span className="text-white/40 uppercase">MY ROLE</span>
+                <span className="text-white/40 uppercase">ROLE</span>
                 <p className="text-white font-semibold">{project.roles.join(' • ')}</p>
+              </div>
+
+              <div className="space-y-1">
+                <span className="text-white/40 uppercase">CLIENT</span>
+                <p className="text-white font-semibold">{project.client}</p>
               </div>
 
               <div className="space-y-1">
@@ -75,93 +81,98 @@ export const ProjectDetailPage: React.FC = () => {
               </div>
 
               <div className="space-y-1">
-                <span className="text-white/40 uppercase">CATEGORY</span>
-                <p className="text-white font-semibold">{project.categoryLabel}</p>
+                <span className="text-white/40 uppercase">DOMAIN</span>
+                <p className="text-[#FF3E00] font-semibold">{project.categoryLabel}</p>
               </div>
             </div>
           </div>
 
-          {/* Full-width Hero Visual */}
-          <div className="mt-8 sm:mt-12 rounded-2xl overflow-hidden border border-white/10 bg-[#0C0C0C] aspect-[16/9] shadow-2xl">
-            <img
-              src={project.heroImage}
-              alt={project.title}
-              className="w-full h-full object-cover"
-              loading="eager"
-              fetchPriority="high"
-              decoding="async"
-            />
+          {/* Full-width 3D Visual Stage */}
+          <div className="mt-10 sm:mt-14">
+            <ThreeDCard maxRotation={4} depthZ={12} glareOpacity={0.15}>
+              <div className="rounded-3xl overflow-hidden border border-white/15 bg-[#0A0A0A] aspect-[16/9] shadow-2xl relative">
+                <img
+                  src={project.heroImage}
+                  alt={project.title}
+                  className="w-full h-full object-cover"
+                  loading="eager"
+                  fetchPriority="high"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none" />
+                
+                <div className="absolute bottom-6 left-6 right-6 flex items-center justify-between font-mono text-xs text-white">
+                  <span className="px-3 py-1 rounded bg-black/70 border border-white/20">
+                    PRIMARY INTERFACE SPECIMEN
+                  </span>
+                  <span className="text-white/70">{project.title} · {project.year}</span>
+                </div>
+              </div>
+            </ThreeDCard>
           </div>
         </header>
 
-        {/* 01: WHAT & CONTEXT */}
-        <section className="max-w-7xl mx-auto px-6 md:px-12 py-16 border-t border-white/10">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+        {/* ========================================================================= */}
+        {/* 02. EXPLORATION & CONTEXT: The Challenge & Architectural Solution          */}
+        {/* ========================================================================= */}
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 md:px-12 py-16 sm:py-20 border-t border-white/10">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16">
             <div className="lg:col-span-4 space-y-2">
               <span className="text-xs font-mono uppercase tracking-widest text-[#FF3E00] font-bold">
-                01. WHAT & CONTEXT
+                01 / CONTEXT
               </span>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-                The Problem
+              <h2 className="text-3xl sm:text-4xl font-extrabold uppercase tracking-tight text-white">
+                THE OBJECTIVE & CHALLENGE
               </h2>
             </div>
-            <div className="lg:col-span-8 space-y-6 text-muted-primary text-base sm:text-lg leading-relaxed">
+
+            <div className="lg:col-span-8 space-y-6 text-base sm:text-lg text-white/75 leading-relaxed font-sans">
               <p>{project.description}</p>
-              <p>{project.challenge}</p>
+              <p className="text-sm sm:text-base text-white/60 font-mono pt-2 border-l-2 border-[#FF3E00] pl-4">
+                {project.challenge}
+              </p>
             </div>
           </div>
         </section>
 
-        {/* Optional Before/After comparison if available */}
-        {project.beforeAfter && (
-          <section className="max-w-7xl mx-auto px-6 md:px-12 py-12 border-t border-white/10">
-            <BeforeAfter data={project.beforeAfter} />
-          </section>
-        )}
-
-        {/* 02: THE DESIGN (Visual Archive & Gallery) */}
+        {/* ========================================================================= */}
+        {/* 03. DESIGN: Screens Displayed as Large Visual Compositions                 */}
+        {/* ========================================================================= */}
         {project.gallery.length > 0 && (
-          <section className="max-w-7xl mx-auto px-6 md:px-12 py-16 border-t border-white/10">
-            <div className="mb-10">
-              <span className="text-xs font-mono uppercase tracking-widest text-[#FF3E00] font-bold">
-                02. THE DESIGN
+          <section className="max-w-7xl mx-auto px-4 sm:px-6 md:px-12 py-16 sm:py-24 border-t border-white/10">
+            <div className="mb-12 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+              <div>
+                <span className="text-xs font-mono uppercase tracking-widest text-[#FF3E00] font-bold">
+                  02 / INTERFACE COMPOSITIONS
+                </span>
+                <h3 className="text-3xl sm:text-5xl font-extrabold uppercase tracking-tight text-white mt-1">
+                  SCREENS & SYSTEMS
+                </h3>
+              </div>
+              <span className="text-xs font-mono text-white/40">
+                CLICK TO INSPECT FULL RESOLUTION
               </span>
-              <h3 className="text-3xl font-extrabold text-white tracking-tight mt-2">
-                Interface Screens & Systems
-              </h3>
-              <p className="text-xs font-mono text-white/40 mt-1">
-                Click any image to inspect high-resolution preview
-              </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {project.gallery.map((item, index) => (
                 <div
                   key={index}
-                  role="button"
-                  tabIndex={0}
-                  aria-label={`View image: ${item.caption || item.alt}`}
                   onClick={() => openLightbox(index)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
-                      openLightbox(index);
-                    }
-                  }}
-                  className="group relative rounded-xl overflow-hidden border border-white/10 bg-[#0C0C0C] aspect-[16/10] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF3E00]"
-                  data-cursor="project"
+                  className="group relative rounded-2xl overflow-hidden border border-white/15 bg-[#090909] aspect-[16/10] cursor-pointer shadow-xl transition-all duration-300 hover:border-white/30"
                 >
                   <img
                     src={item.url}
                     alt={item.alt}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
                     loading="lazy"
-                    decoding="async"
                   />
-                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-6">
-                    <div className="text-xs font-mono text-white font-semibold">
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-between p-6">
+                    <span className="text-xs font-mono text-white font-bold">
                       {item.caption || item.alt}
-                    </div>
+                    </span>
+                    <span className="w-8 h-8 rounded-full bg-white text-black flex items-center justify-center">
+                      <Eye size={14} />
+                    </span>
                   </div>
                 </div>
               ))}
@@ -169,21 +180,24 @@ export const ProjectDetailPage: React.FC = () => {
           </section>
         )}
 
-        {/* 03: THE RESULT */}
+        {/* ========================================================================= */}
+        {/* 04. OUTCOMES: Real Verified Results & Decisions                           */}
+        {/* ========================================================================= */}
         {project.impactStatements && project.impactStatements.length > 0 && (
-          <section className="max-w-7xl mx-auto px-6 md:px-12 py-16 border-t border-white/10">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+          <section className="max-w-7xl mx-auto px-4 sm:px-6 md:px-12 py-16 sm:py-20 border-t border-white/10">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16">
               <div className="lg:col-span-4 space-y-2">
                 <span className="text-xs font-mono uppercase tracking-widest text-[#FF3E00] font-bold">
-                  03. THE RESULT
+                  03 / OUTCOME
                 </span>
-                <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-                  Outcomes & Impact
+                <h2 className="text-3xl sm:text-4xl font-extrabold uppercase tracking-tight text-white">
+                  VERIFIED IMPACT
                 </h2>
               </div>
+
               <div className="lg:col-span-8">
-                <div className="p-8 rounded-2xl bg-[#0D0D0D] border border-white/10 space-y-4">
-                  <ul className="space-y-3 text-sm sm:text-base font-mono text-white/80">
+                <div className="p-6 sm:p-8 rounded-3xl bg-[#090909] border border-white/10 space-y-4">
+                  <ul className="space-y-3.5 text-sm sm:text-base font-mono text-white/80">
                     {project.impactStatements.map((stmt, idx) => (
                       <li key={idx} className="flex items-start space-x-3">
                         <CheckCircle2 size={16} className="text-[#FF3E00] shrink-0 mt-1" />
@@ -197,31 +211,41 @@ export const ProjectDetailPage: React.FC = () => {
           </section>
         )}
 
-        {/* Next Project Footer */}
-        <section className="max-w-7xl mx-auto px-6 md:px-12 py-20 border-t border-white/10">
-          <Link
-            to={`/work/${nextProject.slug}`}
-            data-cursor="project"
-            className="group block p-8 sm:p-12 rounded-3xl border border-white/10 bg-[#080808] hover:border-[#FF3E00]/50 hover:bg-[#0D0D0D] transition-all duration-300"
-          >
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
-              <div className="space-y-2">
-                <span className="text-xs font-mono uppercase tracking-widest text-[#FF3E00] font-bold">
-                  NEXT CASE STUDY
-                </span>
-                <h3 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight group-hover:text-[#FF3E00] transition-colors">
-                  {nextProject.title}
-                </h3>
-                <p className="text-sm text-white/60">
-                  {nextProject.subtitle}
-                </p>
-              </div>
+        {/* ========================================================================= */}
+        {/* 05. NEXT PROJECT PORTAL: Immersive Spatial Transition                      */}
+        {/* ========================================================================= */}
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 md:px-12 py-20 sm:py-28 border-t border-white/10">
+          <ThreeDCard maxRotation={4} depthZ={12} glareOpacity={0.15}>
+            <Link
+              to={`/work/${nextProject.slug}`}
+              className="group block p-8 sm:p-14 rounded-3xl border border-white/15 bg-gradient-to-b from-[#111111] via-[#090909] to-[#050505] hover:border-[#FF3E00]/40 transition-all duration-300 shadow-2xl relative overflow-hidden"
+            >
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
+                <div className="space-y-3">
+                  <div className="flex items-center space-x-2 text-xs font-mono uppercase tracking-widest text-[#FF3E00] font-bold">
+                    <span>NEXT SPECIMEN</span>
+                    <span>/</span>
+                    <span>{nextProject.number}</span>
+                  </div>
+                  
+                  <h3 className="text-4xl sm:text-6xl md:text-7xl font-extrabold uppercase tracking-tight text-white group-hover:text-white transition-colors">
+                    {nextProject.title}
+                  </h3>
+                  
+                  <p className="text-sm sm:text-base text-white/70 max-w-xl font-sans">
+                    {nextProject.subtitle}
+                  </p>
+                </div>
 
-              <div className="w-14 h-14 rounded-full bg-white/5 border border-white/15 flex items-center justify-center text-white group-hover:bg-[#FF3E00] group-hover:border-[#FF3E00] transition-all duration-300 shrink-0">
-                <ArrowUpRight size={24} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                <div className="shrink-0 flex items-center space-x-3">
+                  <span className="px-8 py-4 rounded-full bg-white text-black font-mono text-xs uppercase tracking-widest font-bold group-hover:bg-[#FF3E00] group-hover:text-white transition-all shadow-xl inline-flex items-center space-x-2">
+                    <span>EXPLORE SPECIMEN</span>
+                    <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                  </span>
+                </div>
               </div>
-            </div>
-          </Link>
+            </Link>
+          </ThreeDCard>
         </section>
 
       </div>
@@ -237,3 +261,4 @@ export const ProjectDetailPage: React.FC = () => {
     </PageTransition>
   );
 };
+

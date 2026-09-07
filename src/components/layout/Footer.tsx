@@ -86,7 +86,7 @@ export const Footer: React.FC = () => {
                 {siteConfig.initials}
               </div>
               <span className="font-extrabold text-2xl tracking-tight text-white flex items-center gap-1.5">
-                {siteConfig.name}
+                {siteConfig.initials}
                 <span className="w-1.5 h-1.5 rounded-full bg-[#FF3E00]" />
               </span>
             </div>
@@ -181,7 +181,7 @@ export const Footer: React.FC = () => {
         {/* Bottom Colophon & Scroll to Top */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono text-white/40">
           <div>
-            © 2026 {siteConfig.name}. ALL RIGHTS RESERVED.
+            © 2026 DS. ALL RIGHTS RESERVED.
           </div>
           
           <div className="flex items-center space-x-6">

@@ -18,14 +18,14 @@ export const SpatialAbout: React.FC = () => {
           <span className="text-white/60">SPATIAL INTRODUCTION</span>
         </div>
 
-        {/* Massive Typography Name */}
+        {/* Editorial Heading answering 'Who is this designer?' */}
         <div className="mb-14 sm:mb-20 pb-8 border-b border-white/10">
-          <h2 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-extrabold uppercase tracking-tight text-white leading-[0.88] mb-6">
-            DARSHIL S. <br />
-            <span className="text-[#FF3E00]">BHUVA</span>
+          <h2 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold uppercase tracking-tight text-white leading-[0.9] mb-6">
+            DESIGNER · <br />
+            <span className="text-[#FF3E00]">VISUAL THINKER</span>
           </h2>
-          <p className="max-w-2xl text-base sm:text-xl text-white/70 leading-relaxed font-normal">
-            Digital product designer and web engineer based in Surat, Gujarat. Combining ergonomic interaction clarity with clean frontend structure.
+          <p className="max-w-3xl text-base sm:text-xl text-white/70 leading-relaxed font-normal">
+            Specializing in user interface architecture, interactive web engineering, and cognitive design clarity. 8+ years designing digital products across SaaS and e-commerce platforms from Surat, Gujarat, India.
           </p>
         </div>
 
@@ -47,7 +47,7 @@ export const SpatialAbout: React.FC = () => {
                 >
                   <img
                     src={media.designerPortrait}
-                    alt={siteConfig.name}
+                    alt="Designer Portrait"
                     className="w-full h-full object-cover grayscale contrast-125 hover:grayscale-0 transition-all duration-700"
                     loading="lazy"
                   />
@@ -72,7 +72,7 @@ export const SpatialAbout: React.FC = () => {
                     <div className="w-7 h-7 rounded bg-white text-black font-extrabold flex items-center justify-center text-xs">
                       {siteConfig.initials}
                     </div>
-                    <span className="text-white font-bold tracking-wider">{siteConfig.name}</span>
+                    <span className="text-white font-bold tracking-wider">DS · DESIGN & ENGINEERING</span>
                   </div>
                   <span className="text-white/40">EST. 2018</span>
                 </div>

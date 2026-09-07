@@ -69,7 +69,7 @@ export const SpatialHero: React.FC = () => {
         <div className="flex flex-wrap items-center justify-between gap-4 font-mono text-xs uppercase tracking-widest text-white/40 pb-6 border-b border-white/10">
           <div className="flex items-center space-x-3">
             <span className="w-2 h-2 rounded-full bg-[#FF3E00] animate-pulse" />
-            <span className="text-white font-bold tracking-wider">{siteConfig.name}</span>
+            <span className="text-white font-bold tracking-wider">DS</span>
             <span className="text-white/20">•</span>
             <span className="text-white/60">SPATIAL PORTFOLIO 2026</span>
           </div>
@@ -87,26 +87,26 @@ export const SpatialHero: React.FC = () => {
         {/* Center Stage: Integrated Typographic Architecture + 3D Specimen Slab */}
         <div className="my-auto py-10 sm:py-16 grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-8 items-center">
           
-          {/* Left / Upper: Massive Asymmetrical Typography */}
+          {/* Left / Upper: Craft-First Display Typography */}
           <div className="lg:col-span-7 space-y-6 sm:space-y-8">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/10 bg-white/5 text-[11px] font-mono tracking-widest text-[#FF3E00] uppercase font-bold">
-              <span>00</span>
-              <span className="text-white/30">/</span>
-              <span className="text-white">INTERACTIVE DESIGN SPECIMEN</span>
+            {/* Single quiet, editorial appearance of full name */}
+            <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full border border-white/10 bg-white/5 text-[11px] font-mono tracking-widest text-white/80 uppercase font-bold">
+              <span className="w-2 h-2 rounded-full bg-[#FF3E00]" />
+              <span>PORTFOLIO OF {siteConfig.name.toUpperCase()} · SURAT, INDIA</span>
             </div>
 
-            {/* Oversized Architectural Typography */}
+            {/* Oversized Architectural Typography focused on Work & Disciplines */}
             <div className="space-y-1 sm:space-y-2">
-              <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-[7rem] xl:text-[8rem] font-extrabold uppercase tracking-tight sm:tracking-tighter text-white leading-[0.88] break-words">
-                DARSHIL S. <br />
-                <span className="text-white/90">BHUVA</span>
+              <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold uppercase tracking-tight sm:tracking-tighter text-white leading-[0.9] break-words">
+                DIGITAL <br />
+                <span className="text-white/90">EXPERIENCES</span>
               </h1>
               
               <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1 pt-2">
-                <span className="text-2xl sm:text-4xl md:text-5xl font-light text-white/60 uppercase tracking-tight">
+                <span className="text-xl sm:text-3xl md:text-4xl font-light text-white/60 uppercase tracking-tight">
                   UI/UX DESIGNER
                 </span>
-                <span className="text-xl sm:text-3xl md:text-4xl font-semibold text-[#FF3E00] uppercase tracking-tight">
+                <span className="text-lg sm:text-2xl md:text-3xl font-semibold text-[#FF3E00] uppercase tracking-tight">
                   · WEB DESIGNER
                 </span>
               </div>

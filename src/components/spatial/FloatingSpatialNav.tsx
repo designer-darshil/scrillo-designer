@@ -43,7 +43,7 @@ export const FloatingSpatialNav: React.FC = () => {
           <Link
             to="/"
             className="group flex items-center space-x-3 shrink-0"
-            aria-label="Darshil S. Bhuva Home"
+            aria-label="DS Portfolio Home"
           >
             <motion.div
               whileHover={{ rotateX: -8, rotateY: 10, translateZ: 8, scale: 1.08 }}
@@ -53,8 +53,8 @@ export const FloatingSpatialNav: React.FC = () => {
               {siteConfig.initials}
             </motion.div>
 
-            <span className="font-extrabold text-xs tracking-tight text-white hidden sm:flex items-center gap-1.5">
-              <span>{siteConfig.name}</span>
+            <span className="font-mono text-[11px] tracking-widest text-white/50 uppercase hidden sm:flex items-center gap-1.5">
+              <span>UI/UX · WEB</span>
               <span className="w-1.5 h-1.5 rounded-full bg-[#FF3E00] inline-block animate-pulse" />
             </span>
           </Link>
@@ -139,7 +139,7 @@ export const FloatingSpatialNav: React.FC = () => {
             </div>
 
             <div className="pt-4 border-t border-white/10 flex items-center justify-between text-xs font-mono text-white/50">
-              <span>{siteConfig.name}</span>
+              <span className="font-bold text-white">DS · UI/UX & WEB</span>
               <span className="text-[#FF3E00]">{siteConfig.location}</span>
             </div>
           </motion.div>

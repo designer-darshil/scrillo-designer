@@ -19,6 +19,7 @@ import {
   PanelLeftOpen,
   CheckCircle2,
   Globe,
+  Layers,
 } from 'lucide-react';
 import { useTheme } from '../../hooks/useTheme';
 import { useAuth } from '../hooks/useAuth';
@@ -33,6 +34,7 @@ interface NavItem {
 const navItems: NavItem[] = [
   { path: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { path: '/admin/content', label: 'Website Content', icon: FileText },
+  { path: '/admin/content/sections', label: 'Section Layout', icon: Layers, badge: '10' },
   { path: '/admin/content/footer', label: 'Footer & Outreach', icon: Globe },
   { path: '/admin/projects', label: 'Projects', icon: FolderGit2, badge: '8' },
   { path: '/admin/skills', label: 'Skills', icon: Sparkles },

@@ -13,6 +13,7 @@ import { ContactCTA } from '../sections/ContactCTA/ContactCTA';
 import { Footer } from '../components/Footer/Footer';
 import { CustomCursor } from '../components/CustomCursor/CustomCursor';
 import { useWebsiteData } from '../hooks/useWebsiteData';
+import { SectionId } from '../types';
 
 export const PortfolioHome: React.FC = () => {
   const { data } = useWebsiteData();
@@ -110,7 +111,39 @@ export const PortfolioHome: React.FC = () => {
   const isCursorEnabled =
     animations?.cursorEnabled !== false && settings.enableCustomCursor !== false;
   const isMarqueeEnabled =
-    animations?.marqueeEnabled !== false && sections.marquee?.visible !== false;
+    animations?.marqueeEnabled !== false && sections?.marquee?.visible !== false;
+
+  // Section Component Map
+  const sectionRenderMap: Record<SectionId, () => React.ReactNode> = {
+    hero: () => <Hero key="hero" content={data.hero} />,
+    marquee: () =>
+      isMarqueeEnabled ? (
+        <Marquee
+          key="marquee"
+          items={marquee.items}
+          speed={marquee.speed || 30}
+          direction={marquee.direction || 'left'}
+          enableVelocity={marquee.enableVelocity ?? true}
+          velocityMultiplier={1.2}
+          size="display"
+          separator={marquee.separator || '✦'}
+        />
+      ) : null,
+    projects: () => <SelectedWorks key="projects" projects={data.projects} />,
+    statement: () => <Statement key="statement" content={data.about} />,
+    skills: () => <Skills key="skills" categories={data.skills} />,
+    philosophy: () => <Philosophy key="philosophy" content={data.philosophy} />,
+    services: () => <Services key="services" services={data.services} />,
+    image: () => <ExperimentalImage key="image" content={data.image} />,
+    contact: () => <ContactCTA key="contact" content={data.contact} />,
+    footer: () => null, // Rendered as root terminal section
+  };
+
+  // Sort and filter active main body sections
+  const mainSectionKeys = (Object.keys(sections || {}) as SectionId[])
+    .filter((id) => id !== 'footer')
+    .filter((id) => sections[id]?.visible !== false)
+    .sort((a, b) => (sections[a]?.order ?? 0) - (sections[b]?.order ?? 0));
 
   return (
     <div className="relative min-h-screen bg-background text-foreground selection:bg-foreground selection:text-background">
@@ -137,62 +170,13 @@ export const PortfolioHome: React.FC = () => {
         }}
       />
 
-      {/* Main Content */}
+      {/* Main Dynamic Content in Configured Order */}
       <main id="main-content" tabIndex={-1} className="relative z-10 focus:outline-none">
-        {/* 1. Hero Section */}
-        {sections.hero?.visible !== false && <Hero content={data.hero} />}
-
-        {/* 2. Reusable Marquee Divider */}
-        {isMarqueeEnabled && (
-          <Marquee
-            items={marquee.items}
-            speed={marquee.speed || 30}
-            direction={marquee.direction || 'left'}
-            enableVelocity={marquee.enableVelocity ?? true}
-            velocityMultiplier={1.2}
-            size="display"
-            separator={marquee.separator || '✦'}
-          />
-        )}
-
-        {/* 3. Selected Works Section */}
-        {sections.projects?.visible !== false && (
-          <SelectedWorks projects={data.projects} />
-        )}
-
-        {/* 4. Creative Statement Section */}
-        {sections.statement?.visible !== false && (
-          <Statement content={data.about} />
-        )}
-
-        {/* 5. Discipline & Skills Section */}
-        {sections.skills?.visible !== false && (
-          <Skills categories={data.skills} />
-        )}
-
-        {/* 6. Design Philosophy Section */}
-        {sections.philosophy?.visible !== false && (
-          <Philosophy content={data.philosophy} />
-        )}
-
-        {/* 7. Services Section */}
-        {sections.services?.visible !== false && (
-          <Services services={data.services} />
-        )}
-
-        {/* 8. Experimental Cinematic Visual Break */}
-        {sections.image?.visible !== false && (
-          <ExperimentalImage content={data.image} />
-        )}
-
-        {/* 9. Final Contact CTA Climax */}
-        {sections.contact?.visible !== false && (
-          <ContactCTA content={data.contact} />
-        )}
+        {mainSectionKeys.map((sectionId) => sectionRenderMap[sectionId]?.())}
       </main>
 
-      {/* 10. Large Editorial Footer */}
-      {sections.footer?.visible !== false && (
+      {/* Large Structural Editorial Footer */}
+      {sections?.footer?.visible !== false && (
         <Footer content={data.footer} />
       )}
     </div>

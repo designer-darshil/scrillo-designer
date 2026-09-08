@@ -400,6 +400,14 @@ export const ContentManager: React.FC = () => {
         </button>
 
         <Link
+          to="/admin/content/sections"
+          className="flex items-center gap-2 px-4 py-2.5 text-xs font-semibold rounded-lg transition-all text-muted hover:text-foreground hover:bg-surface border border-dashed border-border"
+        >
+          <Layers className="w-3.5 h-3.5" />
+          <span>Section Layout →</span>
+        </Link>
+
+        <Link
           to="/admin/content/footer"
           className="flex items-center gap-2 px-4 py-2.5 text-xs font-semibold rounded-lg transition-all text-muted hover:text-foreground hover:bg-surface border border-dashed border-border"
         >

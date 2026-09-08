@@ -6,11 +6,10 @@ export interface NavItem {
 }
 
 export const navigationItems: NavItem[] = [
-  { id: 'work', label: 'Index / Works', href: '#works', number: '01' },
-  { id: 'about', label: 'Statement', href: '#statement', number: '02' },
-  { id: 'skills', label: 'Discipline', href: '#skills', number: '03' },
-  { id: 'services', label: 'Services', href: '#services', number: '04' },
-  { id: 'contact', label: 'Contact', href: '#contact', number: '05' },
+  { id: 'home', label: 'Home', href: '#home', number: '01' },
+  { id: 'about', label: 'About', href: '#about', number: '02' },
+  { id: 'works', label: 'Works', href: '#works', number: '03' },
+  { id: 'contact', label: "Let's Talk", href: '#contact', number: '04' },
 ];
 
 export const socialLinks = [

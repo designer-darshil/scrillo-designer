@@ -1,8 +1,14 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { ArrowUp, Asterisk } from 'lucide-react';
 import { MagneticButton } from '../MagneticButton/MagneticButton';
+import { gsap, ScrollTrigger } from '../../animations/gsapConfig';
 
 export const Footer: React.FC = () => {
+  const footerRef = useRef<HTMLElement>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
+  const brandRef = useRef<HTMLHeadingElement>(null);
+  const copyStripRef = useRef<HTMLDivElement>(null);
+
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -15,13 +21,85 @@ export const Footer: React.FC = () => {
     { label: 'X', href: 'https://x.com' },
   ];
 
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      // 1. Staggered reveal for 4 editorial columns
+      const cols = gridRef.current?.querySelectorAll('.footer-col');
+      if (cols && cols.length > 0) {
+        gsap.fromTo(
+          cols,
+          { opacity: 0, y: 30 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.9,
+            stagger: 0.1,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: gridRef.current,
+              start: 'top 85%',
+              toggleActions: 'play none none reverse',
+            },
+          }
+        );
+      }
+
+      // 2. Line reveal for the massive brand name
+      const brandInner = brandRef.current?.querySelector('.footer-brand-inner');
+      if (brandInner) {
+        gsap.fromTo(
+          brandInner,
+          { yPercent: 115, opacity: 0 },
+          {
+            yPercent: 0,
+            opacity: 1,
+            duration: 1.2,
+            ease: 'power4.out',
+            scrollTrigger: {
+              trigger: brandRef.current,
+              start: 'top 90%',
+              toggleActions: 'play none none reverse',
+            },
+          }
+        );
+      }
+
+      // 3. Bottom copyright strip fade-in
+      if (copyStripRef.current) {
+        gsap.fromTo(
+          copyStripRef.current,
+          { opacity: 0, y: 15 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.8,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: copyStripRef.current,
+              start: 'top 95%',
+              toggleActions: 'play none none reverse',
+            },
+          }
+        );
+      }
+    }, footerRef);
+
+    return () => ctx.revert();
+  }, []);
+
   return (
-    <footer className="relative w-full bg-background text-foreground border-t border-border pt-20 sm:pt-28 pb-12 select-none overflow-hidden">
+    <footer
+      ref={footerRef}
+      className="relative w-full bg-background text-foreground border-t border-border pt-20 sm:pt-28 pb-12 select-none overflow-hidden"
+    >
       <div className="page-container flex flex-col justify-between min-h-[70vh]">
         {/* Top Tier: Desktop 4-Column Editorial Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8 pb-20 border-b border-border">
+        <div
+          ref={gridRef}
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8 pb-20 border-b border-border"
+        >
           {/* Col 1: Location */}
-          <div className="space-y-4">
+          <div className="footer-col space-y-4">
             <span className="font-mono text-meta text-muted block">[01 // LOCATION]</span>
             <div className="font-mono text-sm uppercase text-foreground leading-relaxed">
               <p className="font-semibold">INDIA</p>
@@ -33,7 +111,7 @@ export const Footer: React.FC = () => {
           </div>
 
           {/* Col 2: Social Links with Animated Underline */}
-          <div className="space-y-4">
+          <div className="footer-col space-y-4">
             <span className="font-mono text-meta text-muted block">[02 // SOCIAL]</span>
             <ul className="space-y-2">
               {socialList.map((item) => (
@@ -54,7 +132,7 @@ export const Footer: React.FC = () => {
           </div>
 
           {/* Col 3: Contact */}
-          <div className="space-y-4">
+          <div className="footer-col space-y-4">
             <span className="font-mono text-meta text-muted block">[03 // CONTACT]</span>
             <div className="space-y-2">
               <a
@@ -72,11 +150,11 @@ export const Footer: React.FC = () => {
           </div>
 
           {/* Col 4: Rotating Symbol & Back to Top */}
-          <div className="flex flex-col justify-between items-start lg:items-end space-y-6">
+          <div className="footer-col flex flex-col justify-between items-start lg:items-end space-y-6">
             <div className="flex items-center gap-3">
               {/* Rotating Small Geometric Symbol */}
               <div className="w-8 h-8 rounded-full border border-border flex items-center justify-center text-muted">
-                <Asterisk className="w-4 h-4 animate-[spin_10s_linear_infinite]" />
+                <Asterisk className="w-4 h-4 animate-[spin_12s_linear_infinite]" />
               </div>
               <span className="font-mono text-meta text-muted">[TOP]</span>
             </div>
@@ -97,15 +175,25 @@ export const Footer: React.FC = () => {
 
         {/* Bottom Tier: Massive Editorial Brand Name & Rights */}
         <div className="pt-16 sm:pt-24 space-y-8">
-          {/* Large Brand Name near Bottom */}
+          {/* Large Brand Name near Bottom with Line Reveal */}
           <div className="w-full overflow-hidden">
-            <h2 className="font-sans text-[clamp(2.75rem,10.5vw,11.5rem)] font-extrabold uppercase tracking-tighter text-foreground/90 leading-[0.85] text-left select-none">
-              DARSHIL BHUVA
+            <h2
+              ref={brandRef}
+              className="font-sans text-[clamp(2.75rem,10.5vw,11.5rem)] font-extrabold uppercase tracking-tighter text-foreground/90 leading-[0.85] text-left select-none"
+            >
+              <span className="block overflow-hidden py-1">
+                <span className="footer-brand-inner inline-block will-change-transform">
+                  DARSHIL BHUVA
+                </span>
+              </span>
             </h2>
           </div>
 
           {/* Bottom Copyright Strip */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 font-mono text-meta text-muted border-t border-border pt-6">
+          <div
+            ref={copyStripRef}
+            className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 font-mono text-meta text-muted border-t border-border pt-6"
+          >
             <span>© 2026 ALL RIGHTS RESERVED</span>
             <span>CREATIVE DIRECTION & INTERFACE ARCHITECTURE</span>
             <span className="hidden md:inline">PORTFOLIO VOL. 04</span>

@@ -3,10 +3,18 @@ import Lenis from 'lenis';
 import { ScrollTrigger } from '../animations/gsapConfig';
 import gsap from 'gsap';
 
-export function useLenis() {
+export function useLenis(enabled: boolean = true) {
   const lenisRef = useRef<Lenis | null>(null);
 
   useEffect(() => {
+    if (!enabled) {
+      if (lenisRef.current) {
+        lenisRef.current.destroy();
+        lenisRef.current = null;
+      }
+      return;
+    }
+
     // Check for reduced motion preference
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (prefersReducedMotion) {

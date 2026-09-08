@@ -11,9 +11,11 @@ import {
   PhilosophyContent,
   ContactCTA,
   FooterContent,
+  WebsiteSettings,
 } from '../types';
 import { defaultWebsiteData } from '../data/defaultWebsiteData';
 import { websiteService } from '../admin/services/websiteService';
+import { settingsService } from '../admin/services/settingsService';
 import { projectService } from '../admin/services/projectService';
 import { skillService } from '../admin/services/skillService';
 import { servicesService } from '../admin/services/servicesService';
@@ -29,6 +31,7 @@ interface WebsiteDataContextType {
   updatePhilosophy: (philosophy: PhilosophyContent) => Promise<boolean>;
   updateContactCTA: (contact: ContactCTA) => Promise<boolean>;
   updateFooter: (footer: FooterContent) => Promise<boolean>;
+  updateSettings: (settings: WebsiteSettings) => Promise<boolean>;
   updateSectionVisibility: (sectionId: string, visible: boolean) => void;
   // Project methods
   createProject: (project: Omit<Project, 'id'> & { id?: string }) => Promise<Project | null>;
@@ -70,6 +73,7 @@ const WebsiteDataContext = createContext<WebsiteDataContextType>({
   updatePhilosophy: async () => true,
   updateContactCTA: async () => true,
   updateFooter: async () => true,
+  updateSettings: async () => true,
   updateSectionVisibility: () => {},
   createProject: async () => null,
   updateProject: async () => true,
@@ -105,15 +109,17 @@ export const WebsiteDataProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const refreshData = useCallback(async () => {
     try {
       setLoading(true);
-      const [remoteData, projects, skills, services] = await Promise.all([
+      const [remoteData, projects, skills, services, settings] = await Promise.all([
         websiteService.getWebsiteData(),
         projectService.getProjects(),
         skillService.getSkillCategories(),
         servicesService.getServices(),
+        settingsService.getSettings(),
       ]);
 
       setData((prev) => ({
         ...prev,
+        settings: settings || prev.settings,
         hero: remoteData.hero || prev.hero,
         about: remoteData.about || prev.about,
         marquee: remoteData.marquee || prev.marquee,
@@ -199,6 +205,18 @@ export const WebsiteDataProvider: React.FC<{ children: React.ReactNode }> = ({ c
       const success = await websiteService.updateFooterContent(footer);
       if (success) {
         setData((prev) => ({ ...prev, footer }));
+      }
+      return success;
+    } catch {
+      return false;
+    }
+  };
+
+  const updateSettings = async (settings: WebsiteSettings): Promise<boolean> => {
+    try {
+      const success = await settingsService.updateSettings(settings);
+      if (success) {
+        setData((prev) => ({ ...prev, settings }));
       }
       return success;
     } catch {
@@ -615,6 +633,7 @@ export const WebsiteDataProvider: React.FC<{ children: React.ReactNode }> = ({ c
         updatePhilosophy,
         updateContactCTA,
         updateFooter,
+        updateSettings,
         updateSectionVisibility,
         createProject,
         updateProject,
@@ -661,6 +680,7 @@ export const useWebsiteData = () => {
       updatePhilosophy: async () => true,
       updateContactCTA: async () => true,
       updateFooter: async () => true,
+      updateSettings: async () => true,
       updateSectionVisibility: () => {},
       createProject: async () => null,
       updateProject: async () => true,

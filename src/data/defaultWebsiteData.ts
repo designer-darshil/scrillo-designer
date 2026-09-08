@@ -6,6 +6,30 @@ export const defaultWebsiteData: WebsiteData = {
     siteDescription: 'Digital product designer & creative developer focused on thoughtful interfaces, products and interactive experiences.',
     siteUrl: 'https://darshilbhuva.com',
     defaultTheme: 'dark',
+    darkModeEnabled: true,
+    lightModeEnabled: true,
+    colors: {
+      dark: {
+        background: '#050505',
+        text: '#F5F5F2',
+        muted: '#8E8E8E',
+        border: '#292929',
+        surface: '#0B0B0B',
+      },
+      light: {
+        background: '#F3F2EE',
+        text: '#111111',
+        muted: '#6F6F6A',
+        border: '#C9C8C2',
+        surface: '#EAE9E4',
+      },
+    },
+    animations: {
+      animationsEnabled: true,
+      smoothScrollEnabled: true,
+      cursorEnabled: true,
+      marqueeEnabled: true,
+    },
     enableCustomCursor: true,
     enableSmoothScroll: true,
     enableMarqueeVelocity: true,
@@ -13,6 +37,7 @@ export const defaultWebsiteData: WebsiteData = {
       metaTitle: 'DARSHIL BHUVA — Portfolio 2026',
       metaDescription: 'Building digital experiences that feel inevitable. Full-stack designer & creative developer based in India.',
       ogImage: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=2400&q=85',
+      favicon: '/favicon.ico',
       keywords: [
         'Creative Developer',
         'Digital Product Designer',

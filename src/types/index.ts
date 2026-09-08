@@ -2,10 +2,31 @@
 // CENTRAL DATA MODELS FOR SCRiLLO PORTFOLIO & CMS
 // ==================================================
 
+export interface ThemeColorPalette {
+  background: string;
+  text: string;
+  muted: string;
+  border: string;
+  surface?: string;
+}
+
+export interface ThemeColorSettings {
+  dark: ThemeColorPalette;
+  light: ThemeColorPalette;
+}
+
+export interface AnimationSettings {
+  animationsEnabled: boolean;
+  smoothScrollEnabled: boolean;
+  cursorEnabled: boolean;
+  marqueeEnabled: boolean;
+}
+
 export interface SEOSettings {
   metaTitle: string;
   metaDescription: string;
   ogImage?: string;
+  favicon?: string;
   keywords?: string[];
   canonicalUrl?: string;
 }
@@ -36,9 +57,14 @@ export interface WebsiteSettings {
   siteDescription: string;
   siteUrl?: string;
   defaultTheme: 'dark' | 'light' | 'system';
-  enableCustomCursor: boolean;
-  enableSmoothScroll: boolean;
-  enableMarqueeVelocity: boolean;
+  darkModeEnabled: boolean;
+  lightModeEnabled: boolean;
+  colors: ThemeColorSettings;
+  animations: AnimationSettings;
+  // Aliases for compatibility
+  enableCustomCursor?: boolean;
+  enableSmoothScroll?: boolean;
+  enableMarqueeVelocity?: boolean;
   seo: SEOSettings;
   sections: SectionSettings;
 }

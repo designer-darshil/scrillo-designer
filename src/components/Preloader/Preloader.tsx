@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { gsap } from '../../animations/gsapConfig';
 import { Asterisk } from 'lucide-react';
 
@@ -19,20 +19,17 @@ const statusPhrases = [
 export const Preloader: React.FC<PreloaderProps> = ({
   brandText = 'DARSHIL BHUVA',
   brandSubtitle = 'DIGITAL PRODUCT DESIGNER',
-  isReady = false,
   onExitComplete,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const brandRef = useRef<HTMLDivElement>(null);
   const mainTextInnerRef = useRef<HTMLSpanElement>(null);
+  const statusNumberRef = useRef<HTMLSpanElement>(null);
   const statusTextRef = useRef<HTMLSpanElement>(null);
   const counterRef = useRef<HTMLSpanElement>(null);
   const symbolRef = useRef<HTMLDivElement>(null);
   const progressBarRef = useRef<HTMLDivElement>(null);
   const gridOverlayRef = useRef<HTMLDivElement>(null);
-
-  const [currentStatusIndex, setCurrentStatusIndex] = useState<number>(0);
-  const isExitingRef = useRef<boolean>(false);
 
   useEffect(() => {
     // Check for reduced motion preference
@@ -42,6 +39,7 @@ export const Preloader: React.FC<PreloaderProps> = ({
       const container = containerRef.current;
       const brand = brandRef.current;
       const mainTextInner = mainTextInnerRef.current;
+      const statusNumber = statusNumberRef.current;
       const statusText = statusTextRef.current;
       const counter = counterRef.current;
       const symbol = symbolRef.current;
@@ -51,14 +49,12 @@ export const Preloader: React.FC<PreloaderProps> = ({
 
       if (prefersReducedMotion) {
         // Fast, accessible transition for reduced motion users
-        const tl = gsap.timeline({
-          onComplete: () => onExitComplete?.(),
-        });
-        tl.to(container, {
+        gsap.to(container, {
           opacity: 0,
           duration: 0.35,
-          delay: 0.15,
+          delay: 0.2,
           ease: 'power2.out',
+          onComplete: () => onExitComplete?.(),
         });
         return;
       }
@@ -67,129 +63,110 @@ export const Preloader: React.FC<PreloaderProps> = ({
       if (symbol) {
         gsap.to(symbol, {
           rotate: 360,
-          duration: 9,
+          duration: 8,
           repeat: -1,
           ease: 'linear',
         });
       }
 
-      // 1. Entrance timeline (0.0s - 0.4s)
-      const entranceTl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+      // Master Unified Timeline
+      const masterTl = gsap.timeline({
+        onComplete: () => {
+          onExitComplete?.();
+        },
+      });
 
-      entranceTl
+      // 1. Entrance (0.0s - 0.4s)
+      masterTl
         .fromTo(
           brand,
           { opacity: 0, y: -10 },
-          { opacity: 1, y: 0, duration: 0.5, delay: 0.08 }
+          { opacity: 1, y: 0, duration: 0.45, delay: 0.05, ease: 'power3.out' }
         )
         .fromTo(
           mainTextInner,
           { yPercent: 110, opacity: 0 },
-          { yPercent: 0, opacity: 1, duration: 0.8, ease: 'power4.out' },
-          '-=0.35'
+          { yPercent: 0, opacity: 1, duration: 0.65, ease: 'power4.out' },
+          '-=0.3'
         )
         .fromTo(
-          [statusText, counter, symbol],
+          [statusNumber, statusText, counter, symbol],
           { opacity: 0, y: 12 },
-          { opacity: 1, y: 0, duration: 0.5, stagger: 0.06 },
-          '-=0.45'
+          { opacity: 1, y: 0, duration: 0.4, stagger: 0.04, ease: 'power3.out' },
+          '-=0.4'
         );
 
-      // 2. Percentage counter object and progress line animation (0.3s - 1.5s)
+      // 2. Counter & Progress Animation (0.3s - 1.5s)
       const progressObj = { value: 0 };
 
-      // Animate smoothly to ~88% while waiting for isReady
-      const countTween = gsap.to(progressObj, {
-        value: 88,
-        duration: 1.4,
-        ease: 'power1.out',
-        onUpdate: () => {
-          const currentVal = Math.floor(progressObj.value);
-          if (counter) {
-            counter.textContent = `${String(currentVal).padStart(2, '0')}%`;
-          }
-          if (progressBar) {
-            gsap.set(progressBar, { scaleX: progressObj.value / 100 });
-          }
+      masterTl.to(
+        progressObj,
+        {
+          value: 100,
+          duration: 1.35,
+          ease: 'power2.out',
+          onUpdate: () => {
+            const currentVal = Math.floor(progressObj.value);
+            if (counter) {
+              counter.textContent = `${String(currentVal).padStart(2, '0')}%`;
+            }
+            if (progressBar) {
+              progressBar.style.transform = `scaleX(${progressObj.value / 100})`;
+            }
 
-          // Cycle status phrase smoothly based on progress
-          if (currentVal < 32) {
-            setCurrentStatusIndex(0);
-          } else if (currentVal < 68) {
-            setCurrentStatusIndex(1);
-          } else {
-            setCurrentStatusIndex(2);
-          }
+            // Update status text based on percentage
+            let statusIdx = 0;
+            if (currentVal >= 95) {
+              statusIdx = 3;
+            } else if (currentVal >= 60) {
+              statusIdx = 2;
+            } else if (currentVal >= 25) {
+              statusIdx = 1;
+            }
+
+            if (statusNumber) {
+              statusNumber.textContent = `[0${statusIdx + 1}]`;
+            }
+            if (statusText) {
+              statusText.textContent = statusPhrases[statusIdx];
+            }
+          },
         },
-      });
+        '-=0.2'
+      );
 
-      // Status text transition animation
-      const updateStatusText = (phrase: string) => {
-        if (!statusText) return;
-        gsap.fromTo(
-          statusText,
-          { opacity: 0, y: 5 },
-          { opacity: 1, y: 0, duration: 0.3, ease: 'power2.out' }
-        );
-      };
+      // 3. Status text shift to final & micro pause (1.5s - 1.7s)
+      masterTl.to(
+        [mainTextInner, statusNumber, statusText, counter, brand, symbol],
+        {
+          y: -14,
+          opacity: 0,
+          duration: 0.35,
+          stagger: 0.02,
+          ease: 'power2.in',
+        },
+        '+=0.15'
+      );
 
-      // 3. When isReady flips to true (1.0s - 1.8s), smoothly finish to 100% and execute upward curtain lift
-      if (isReady && !isExitingRef.current) {
-        isExitingRef.current = true;
-        countTween.kill();
-        const finishTl = gsap.timeline();
-
-        finishTl
-          .to(progressObj, {
-            value: 100,
-            duration: 0.4,
-            ease: 'power2.out',
-            onUpdate: () => {
-              const currentVal = Math.floor(progressObj.value);
-              if (counter) {
-                counter.textContent = `${String(currentVal).padStart(2, '0')}%`;
-              }
-              if (progressBar) {
-                gsap.set(progressBar, { scaleX: progressObj.value / 100 });
-              }
-            },
-          })
-          .add(() => {
-            setCurrentStatusIndex(3);
-            updateStatusText(statusPhrases[3]);
-          })
-          // Micro delay before curtain lift so 100% is perceived
-          .to(
-            [mainTextInner, statusText, counter, brand, symbol],
-            {
-              y: -16,
-              opacity: 0,
-              duration: 0.35,
-              stagger: 0.03,
-              ease: 'power2.in',
-            },
-            '+=0.15'
-          )
-          // Master curtain lift upward out of the viewport
-          .to(container, {
-            yPercent: -100,
-            duration: 0.95,
-            ease: 'power4.inOut',
-            onStart: () => {
-              // Disable pointer events immediately on exit start
-              if (container) {
-                container.style.pointerEvents = 'none';
-              }
-            },
-            onComplete: () => {
-              onExitComplete?.();
-            },
-          });
-      }
+      // 4. Master Curtain Lift Upward (1.7s - 2.2s)
+      masterTl.to(
+        container,
+        {
+          yPercent: -100,
+          duration: 0.75,
+          ease: 'power4.inOut',
+          onStart: () => {
+            if (container) {
+              container.style.pointerEvents = 'none';
+            }
+          },
+        },
+        '-=0.1'
+      );
     }, containerRef);
 
     return () => ctx.revert();
-  }, [isReady, onExitComplete]);
+  }, [onExitComplete]);
 
   return (
     <div
@@ -244,11 +221,11 @@ export const Preloader: React.FC<PreloaderProps> = ({
       <div className="relative z-10 flex flex-col sm:flex-row sm:items-end justify-between gap-4 sm:gap-6 border-t border-border/70 pt-5 sm:pt-6">
         {/* Left: Dynamic Small Status Label */}
         <div className="flex items-center gap-3 font-mono text-xs sm:text-[13px] tracking-widest uppercase text-muted">
-          <span className="text-foreground/60 font-semibold">
-            [0{currentStatusIndex + 1}]
+          <span ref={statusNumberRef} className="text-foreground/60 font-semibold">
+            [01]
           </span>
           <span ref={statusTextRef} className="text-foreground font-medium truncate">
-            {statusPhrases[currentStatusIndex]}
+            {statusPhrases[0]}
           </span>
         </div>
 
@@ -282,3 +259,4 @@ export const Preloader: React.FC<PreloaderProps> = ({
 };
 
 export default Preloader;
+

@@ -41,17 +41,12 @@ export const PortfolioHome: React.FC = () => {
   const { sections, colors, animations, seo } = settings;
   const marquee = activeData.marquee;
 
-  // Preloader management for public website (bypassed in preview mode if desired, runs on initial load)
+  // Preloader management for public website (runs on initial load)
   const {
-    isReady: isPreloaderReady,
     isComplete: isPreloaderComplete,
     shouldShow: shouldShowPreloader,
     onExitComplete: onPreloaderExitComplete,
-  } = usePreloader({
-    minDuration: 1000,
-    maxTimeout: 2400,
-    heroImageUrl: activeData.hero?.heroImage,
-  });
+  } = usePreloader();
 
   // Sync admin default theme if no explicit user override is stored
   useEffect(() => {
@@ -206,7 +201,6 @@ export const PortfolioHome: React.FC = () => {
         <Preloader
           brandText={activeData.footer?.brandText || settings.siteTitle || 'DARSHIL BHUVA'}
           brandSubtitle={activeData.hero?.subEyebrow || settings.siteDescription || 'DIGITAL PRODUCT DESIGNER'}
-          isReady={isPreloaderReady}
           onExitComplete={onPreloaderExitComplete}
         />
       )}

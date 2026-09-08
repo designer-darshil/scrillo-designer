@@ -102,7 +102,7 @@ export const Hero: React.FC<HeroProps> = ({
     }, containerRef);
 
     return () => ctx.revert();
-  }, []);
+  }, [isPreloaderActive]);
 
   // Desktop subtle mouse parallax
   useEffect(() => {

@@ -96,7 +96,7 @@ export const CustomCursor: React.FC = () => {
             width: 72,
             height: 72,
             scale: 1,
-            backgroundColor: '#FFFFFF',
+            backgroundColor: 'var(--cursor-bg)',
             duration: 0.35,
             ease: 'back.out(1.5)',
           });
@@ -111,7 +111,7 @@ export const CustomCursor: React.FC = () => {
             width: 76,
             height: 76,
             scale: 1,
-            backgroundColor: '#FFFFFF',
+            backgroundColor: 'var(--cursor-bg)',
             duration: 0.35,
             ease: 'back.out(1.5)',
           });
@@ -134,7 +134,7 @@ export const CustomCursor: React.FC = () => {
             width: customText ? 64 : 32,
             height: customText ? 64 : 32,
             scale: 1,
-            backgroundColor: '#FFFFFF',
+            backgroundColor: 'var(--cursor-bg)',
             duration: 0.3,
             ease: 'power3.out',
           });
@@ -149,7 +149,7 @@ export const CustomCursor: React.FC = () => {
             width: 10,
             height: 10,
             scale: 1,
-            backgroundColor: '#FFFFFF',
+            backgroundColor: 'var(--cursor-bg)',
             duration: 0.3,
             ease: 'power3.out',
           });
@@ -179,17 +179,19 @@ export const CustomCursor: React.FC = () => {
       {/* Small 8-10px center pinpoint dot */}
       <div
         ref={cursorDotRef}
-        className="fixed top-0 left-0 w-2.5 h-2.5 -ml-[5px] -mt-[5px] rounded-full bg-white opacity-0 mix-blend-difference will-change-transform"
+        className="fixed top-0 left-0 w-2.5 h-2.5 -ml-[5px] -mt-[5px] rounded-full bg-foreground opacity-0 will-change-transform transition-colors duration-300"
       />
 
       {/* Trailing follower element with dynamic expansion states */}
       <div
         ref={cursorFollowerRef}
-        className="fixed top-0 left-0 w-2.5 h-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white opacity-0 mix-blend-difference flex items-center justify-center will-change-transform"
+        className="fixed top-0 left-0 w-2.5 h-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full opacity-0 flex items-center justify-center will-change-transform shadow-sm"
+        style={{ backgroundColor: 'var(--cursor-bg)' }}
       >
         <span
           ref={textRef}
-          className="opacity-0 font-mono text-[10px] font-bold tracking-wider uppercase text-black select-none pointer-events-none text-center px-1 leading-none"
+          className="opacity-0 font-mono text-[10px] font-bold tracking-wider uppercase select-none pointer-events-none text-center px-1 leading-none"
+          style={{ color: 'var(--cursor-text)' }}
         />
       </div>
     </div>

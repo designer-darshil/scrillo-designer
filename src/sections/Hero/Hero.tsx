@@ -199,7 +199,7 @@ export const Hero: React.FC<HeroProps> = ({ onHoverStateChange }) => {
                   data-cursor-text="OPEN →"
                   onMouseEnter={() => onHoverStateChange?.(true, 'link')}
                   onMouseLeave={() => onHoverStateChange?.(false)}
-                  className="group w-full sm:w-auto min-h-[48px] flex items-center justify-between sm:justify-center gap-4 px-6 sm:px-8 py-4 sm:py-5 bg-foreground text-background font-mono text-xs sm:text-sm font-semibold uppercase tracking-widest hover:bg-[#E0E0DC] transition-colors focus-visible:outline focus-visible:outline-1 focus-visible:outline-foreground"
+                  className="group w-full sm:w-auto min-h-[48px] flex items-center justify-between sm:justify-center gap-4 px-6 sm:px-8 py-4 sm:py-5 bg-foreground text-background font-mono text-xs sm:text-sm font-semibold uppercase tracking-widest hover:opacity-90 transition-all focus-visible:outline focus-visible:outline-1 focus-visible:outline-foreground"
                 >
                   <span>VIEW SELECTED WORKS</span>
                   <div className="w-5 h-5 flex items-center justify-center bg-background text-foreground group-hover:rotate-45 transition-transform duration-300">

@@ -4,11 +4,40 @@
 
 @layer base {
   :root {
-    --background: #050505;
+    --bg: #050505;
     --surface: #0B0B0B;
-    --foreground: #F5F5F2;
-    --muted: #8E8E8E;
+    --text: #F5F5F2;
+    --text-muted: #8E8E8E;
     --border: #292929;
+    --accent: #F5F5F2;
+    --cursor-bg: #FFFFFF;
+    --cursor-text: #050505;
+    --dot-grid: rgba(255, 255, 255, 0.04);
+    --btn-hover: #E0E0DC;
+    
+    /* Alias variables */
+    --background: var(--bg);
+    --foreground: var(--text);
+    --muted: var(--text-muted);
+  }
+
+  [data-theme="light"],
+  html.light {
+    --bg: #F3F2EE;
+    --surface: #EAE9E4;
+    --text: #111111;
+    --text-muted: #6F6F6A;
+    --border: #C9C8C2;
+    --accent: #111111;
+    --cursor-bg: #111111;
+    --cursor-text: #F3F2EE;
+    --dot-grid: rgba(0, 0, 0, 0.05);
+    --btn-hover: #222222;
+
+    /* Alias variables */
+    --background: var(--bg);
+    --foreground: var(--text);
+    --muted: var(--text-muted);
   }
 
   *, *::before, *::after {
@@ -17,9 +46,20 @@
     padding: 0;
   }
 
+  /* Smooth Theme Transition */
+  html.theme-transition,
+  html.theme-transition *,
+  html.theme-transition *::before,
+  html.theme-transition *::after {
+    transition: background-color 500ms cubic-bezier(0.16, 1, 0.3, 1),
+                color 500ms cubic-bezier(0.16, 1, 0.3, 1),
+                border-color 500ms cubic-bezier(0.16, 1, 0.3, 1),
+                box-shadow 500ms cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+
   html {
-    background-color: var(--background);
-    color: var(--foreground);
+    background-color: var(--bg);
+    color: var(--text);
     font-family: 'General Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
@@ -27,8 +67,8 @@
   }
 
   body {
-    background-color: var(--background);
-    color: var(--foreground);
+    background-color: var(--bg);
+    color: var(--text);
     overflow-x: hidden;
     min-height: 100vh;
     line-height: 1.5;

@@ -122,7 +122,7 @@ export const ContactCTA: React.FC = () => {
       <div
         ref={bgGridRef}
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 opacity-[0.035] bg-[linear-gradient(to_right,#ffffff_1px,transparent_1px),linear-gradient(to_bottom,#ffffff_1px,transparent_1px)] bg-[size:48px_48px] will-change-transform"
+        className="pointer-events-none absolute inset-0 opacity-[0.035] bg-[linear-gradient(to_right,var(--text)_1px,transparent_1px),linear-gradient(to_bottom,var(--text)_1px,transparent_1px)] bg-[size:48px_48px] will-change-transform"
       />
 
       {/* Top Header Label */}

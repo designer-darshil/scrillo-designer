@@ -3,6 +3,7 @@ import { navigationItems, socialLinks } from '../../data/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { gsap } from '../../animations/gsapConfig';
 import { ArrowUpRight } from 'lucide-react';
+import { useTheme } from '../../hooks/useTheme';
 
 interface HeaderProps {
   activeSection?: string;
@@ -13,6 +14,7 @@ export const Header: React.FC<HeaderProps> = ({
   activeSection = 'home',
   onNavigate,
 }) => {
+  const { theme, toggleTheme } = useTheme();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeItem, setActiveItem] = useState(activeSection);
   const headerRef = useRef<HTMLElement>(null);
@@ -124,64 +126,79 @@ export const Header: React.FC<HeaderProps> = ({
         ref={headerRef}
         className="fixed top-0 left-0 w-full z-50 pointer-events-none select-none transition-transform duration-300 will-change-transform"
       >
-        {/* Difference blend container ensures legibility over both dark and light/image content */}
-        <div className="w-full mix-blend-difference text-white">
-          <div className="page-container flex items-center justify-between py-5 sm:py-6">
+        {/* Dynamic Theme-Aware Backdrop Container */}
+        <div className="w-full bg-background/85 backdrop-blur-md border-b border-border/50 text-foreground transition-colors duration-300">
+          <div className="page-container flex items-center justify-between py-4 sm:py-5">
             {/* LEFT: Portfolio name / brand */}
             <div className="pointer-events-auto">
               <a
                 href="#home"
                 onClick={(e) => handleNavClick(e, 'home', '#home')}
-                className="group inline-flex items-center gap-2.5 text-xs sm:text-[13px] font-mono uppercase tracking-widest text-white/90 hover:text-white transition-opacity"
+                className="group inline-flex items-center gap-2.5 text-xs sm:text-[13px] font-mono uppercase tracking-widest text-foreground/90 hover:text-foreground transition-opacity"
               >
-                <span className="w-1.5 h-1.5 bg-white rounded-none group-hover:rotate-45 transition-transform duration-300" />
+                <span className="w-1.5 h-1.5 bg-foreground rounded-none group-hover:rotate-45 transition-transform duration-300" />
                 <span className="font-semibold">DARSHIL BHUVA</span>
               </a>
             </div>
 
             {/* CENTER: Digital Product Designer (Desktop) */}
-            <div className="hidden md:flex items-center gap-2 text-xs sm:text-[13px] font-mono uppercase tracking-widest text-white/60 pointer-events-none">
-              <span className="text-white/30">/</span>
+            <div className="hidden lg:flex items-center gap-2 text-xs sm:text-[13px] font-mono uppercase tracking-widest text-muted pointer-events-none">
+              <span className="text-muted/40">/</span>
               <span>DIGITAL PRODUCT DESIGNER</span>
             </div>
 
-            {/* RIGHT: Navigation (Desktop) */}
-            <nav className="hidden md:flex items-center gap-8 pointer-events-auto">
-              {navigationItems.map((item) => {
-                const isActive = activeItem === item.id;
-                return (
-                  <a
-                    key={item.id}
-                    href={item.href}
-                    onClick={(e) => handleNavClick(e, item.id, item.href)}
-                    className="group relative py-1 text-xs sm:text-[13px] font-mono uppercase tracking-widest text-white/70 hover:text-white transition-colors duration-200"
-                  >
-                    <span className="flex items-center gap-1.5">
-                      {isActive && (
-                        <span className="w-1 h-1 bg-white inline-block" />
-                      )}
-                      <span>{item.label}</span>
-                    </span>
+            {/* RIGHT: Navigation & Theme Toggle (Desktop) */}
+            <div className="hidden md:flex items-center gap-6 lg:gap-8 pointer-events-auto">
+              <nav className="flex items-center gap-6 lg:gap-8">
+                {navigationItems.map((item) => {
+                  const isActive = activeItem === item.id;
+                  return (
+                    <a
+                      key={item.id}
+                      href={item.href}
+                      onClick={(e) => handleNavClick(e, item.id, item.href)}
+                      className="group relative py-1 text-xs sm:text-[13px] font-mono uppercase tracking-widest text-muted hover:text-foreground transition-colors duration-200"
+                    >
+                      <span className="flex items-center gap-1.5">
+                        {isActive && (
+                          <span className="w-1 h-1 bg-foreground inline-block" />
+                        )}
+                        <span className={isActive ? 'text-foreground font-semibold' : ''}>{item.label}</span>
+                      </span>
 
-                    {/* Hover Underline Animation */}
-                    <span
-                      className={`absolute left-0 bottom-0 w-full h-px bg-white origin-left transition-transform duration-300 ease-out ${
-                        isActive
-                          ? 'scale-x-100'
-                          : 'scale-x-0 group-hover:scale-x-100'
-                      }`}
-                    />
-                  </a>
-                );
-              })}
-            </nav>
+                      {/* Hover Underline Animation */}
+                      <span
+                        className={`absolute left-0 bottom-0 w-full h-px bg-foreground origin-left transition-transform duration-300 ease-out ${
+                          isActive
+                            ? 'scale-x-100'
+                            : 'scale-x-0 group-hover:scale-x-100'
+                        }`}
+                      />
+                    </a>
+                  );
+                })}
+              </nav>
+
+              {/* Theme Toggle (Desktop Minimalist Editorial Control) */}
+              <button
+                type="button"
+                onClick={toggleTheme}
+                data-cursor="link"
+                className="flex items-center gap-1.5 px-2.5 py-1 font-mono text-[11px] uppercase tracking-widest text-foreground/80 hover:text-foreground border border-border/80 hover:border-foreground transition-all duration-200 focus-visible:outline focus-visible:outline-1 focus-visible:outline-foreground"
+                aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
+              >
+                <span className={theme === 'dark' ? 'text-foreground font-bold' : 'text-muted/60'}>DARK</span>
+                <span className="text-muted/30">/</span>
+                <span className={theme === 'light' ? 'text-foreground font-bold' : 'text-muted/60'}>LIGHT</span>
+              </button>
+            </div>
 
             {/* Mobile Menu Trigger (44px touch target) */}
             <div className="md:hidden pointer-events-auto">
               <button
                 type="button"
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="min-h-[44px] min-w-[44px] flex items-center justify-end gap-2 py-2 px-1 text-xs font-mono uppercase tracking-widest text-white/90 hover:text-white focus-visible:outline focus-visible:outline-1 focus-visible:outline-white"
+                className="min-h-[44px] min-w-[44px] flex items-center justify-end gap-2 py-2 px-1 text-xs font-mono uppercase tracking-widest text-foreground/90 hover:text-foreground focus-visible:outline focus-visible:outline-1 focus-visible:outline-foreground"
                 aria-label={isMobileMenuOpen ? 'Close Menu' : 'Open Menu'}
                 aria-expanded={isMobileMenuOpen}
               >
@@ -203,10 +220,10 @@ export const Header: React.FC<HeaderProps> = ({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-            className="fixed inset-0 z-40 bg-[#050505] text-[#F5F5F2] flex flex-col justify-between pt-24 pb-10 px-6 sm:px-10 md:hidden"
+            className="fixed inset-0 z-40 bg-background text-foreground flex flex-col justify-between pt-24 pb-10 px-6 sm:px-10 md:hidden transition-colors duration-300"
           >
-            {/* Background Subtle Grid Texture */}
-            <div className="absolute inset-0 pointer-events-none opacity-5 bg-[linear-gradient(to_right,#ffffff_1px,transparent_1px),linear-gradient(to_bottom,#ffffff_1px,transparent_1px)] bg-[size:32px_32px]" />
+            {/* Background Subtle Dot Grid Texture */}
+            <div className="absolute inset-0 pointer-events-none opacity-5 bg-[linear-gradient(to_right,var(--text)_1px,transparent_1px),linear-gradient(to_bottom,var(--text)_1px,transparent_1px)] bg-[size:32px_32px]" />
 
             {/* Mobile Nav Links */}
             <div className="relative z-10 my-auto flex flex-col gap-6">
@@ -228,7 +245,7 @@ export const Header: React.FC<HeaderProps> = ({
                     <a
                       href={item.href}
                       onClick={(e) => handleNavClick(e, item.id, item.href)}
-                      className="group flex items-baseline justify-between py-2 border-b border-[#292929] text-foreground hover:text-white transition-colors"
+                      className="group flex items-baseline justify-between py-2 border-b border-border text-foreground hover:text-foreground transition-colors"
                     >
                       <div className="flex items-center gap-3">
                         <span className="font-mono text-xs text-muted">
@@ -243,6 +260,33 @@ export const Header: React.FC<HeaderProps> = ({
                   </motion.div>
                 );
               })}
+
+              {/* Mobile Theme Toggle Item */}
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -10 }}
+                transition={{
+                  delay: 0.08 * navigationItems.length,
+                  duration: 0.4,
+                  ease: [0.16, 1, 0.3, 1],
+                }}
+                className="pt-2"
+              >
+                <div className="flex items-center justify-between py-3 border-b border-border">
+                  <span className="font-mono text-xs text-muted">[APPEARANCE]</span>
+                  <button
+                    type="button"
+                    onClick={toggleTheme}
+                    className="min-h-[44px] flex items-center gap-2 px-3 py-1.5 font-mono text-xs uppercase tracking-widest text-foreground border border-border focus-visible:outline focus-visible:outline-1 focus-visible:outline-foreground"
+                    aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
+                  >
+                    <span className={theme === 'dark' ? 'font-bold underline underline-offset-4' : 'text-muted'}>DARK</span>
+                    <span className="text-muted/40">/</span>
+                    <span className={theme === 'light' ? 'font-bold underline underline-offset-4' : 'text-muted'}>LIGHT</span>
+                  </button>
+                </div>
+              </motion.div>
             </div>
 
             {/* Mobile Menu Footer Information */}
@@ -251,7 +295,7 @@ export const Header: React.FC<HeaderProps> = ({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
               transition={{ delay: 0.25, duration: 0.35 }}
-              className="relative z-10 border-t border-[#292929] pt-6 space-y-4"
+              className="relative z-10 border-t border-border pt-6 space-y-4"
             >
               <div className="flex items-center justify-between text-meta text-muted">
                 <span>DIGITAL PRODUCT DESIGNER</span>
@@ -286,3 +330,5 @@ export const Header: React.FC<HeaderProps> = ({
     </>
   );
 };
+
+export default Header;

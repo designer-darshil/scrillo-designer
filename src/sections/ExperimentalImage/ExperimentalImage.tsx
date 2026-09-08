@@ -101,7 +101,7 @@ export const ExperimentalImage: React.FC = () => {
         {/* CSS-Only Lightweight Subtle Film Grain Texture Overlay */}
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 opacity-[0.035] bg-[radial-gradient(#ffffff_1px,transparent_1px)] bg-[size:4px_4px]"
+          className="pointer-events-none absolute inset-0 opacity-[0.035] bg-[radial-gradient(var(--text)_1px,transparent_1px)] bg-[size:4px_4px]"
         />
 
         {/* Subtle Vignette Shading for Cinematic Depth */}

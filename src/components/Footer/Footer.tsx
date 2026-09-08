@@ -138,7 +138,7 @@ export const Footer: React.FC = () => {
               <a
                 href="mailto:hello@example.com"
                 data-cursor="link"
-                className="group relative inline-block font-mono text-sm uppercase text-foreground hover:text-white transition-colors"
+                className="group relative inline-block font-mono text-sm uppercase text-foreground hover:opacity-80 transition-opacity"
               >
                 <span>hello@example.com</span>
                 <span className="absolute left-0 bottom-0 w-full h-px bg-foreground scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-300 ease-out" />

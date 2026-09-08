@@ -98,7 +98,19 @@
   background-size: 4px 4px;
 }
 
-/* 3D Perspective container */
+/* 3D Perspective containers & transforms */
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.perspective-1200 {
+  perspective: 1200px;
+}
+
+.perspective-1400 {
+  perspective: 1400px;
+}
+
 .perspective-container {
   perspective: 1200px;
   transform-style: preserve-3d;
@@ -106,6 +118,45 @@
 
 .preserve-3d {
   transform-style: preserve-3d;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+}
+
+/* Thin Editorial Structural Rules */
+.hairline-border {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.hairline-divide > * + * {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+/* Typography safeguards: no accidental hyphenation or mid-word line breaks */
+.editorial-title {
+  hyphens: none;
+  word-break: keep-all;
+  overflow-wrap: normal;
+  text-wrap: balance;
+}
+
+.clamp-hero {
+  font-size: clamp(2.75rem, 8vw, 8rem);
+  line-height: 0.92;
+  letter-spacing: -0.04em;
+}
+
+.clamp-spread-title {
+  font-size: clamp(2rem, 5.5vw, 5.5rem);
+  line-height: 0.95;
+  letter-spacing: -0.035em;
+}
+
+.clamp-statement {
+  font-size: clamp(1.75rem, 4vw, 3.75rem);
+  line-height: 1.08;
+  letter-spacing: -0.03em;
 }
 
 /* Thin Grid Line Accents */
@@ -130,50 +181,50 @@
 /* Standardized Layout & Spacing System */
 .site-container {
   width: 100%;
-  max-width: 80rem; /* 1280px / 7xl */
+  max-width: 82rem; /* 1312px */
   margin-left: auto;
   margin-right: auto;
-  padding-left: 1rem;
-  padding-right: 1rem;
+  padding-left: 1.25rem;
+  padding-right: 1.25rem;
 }
 
 @media (min-width: 640px) {
-  .site-container {
-    padding-left: 1.5rem;
-    padding-right: 1.5rem;
-  }
-}
-
-@media (min-width: 1024px) {
   .site-container {
     padding-left: 2rem;
     padding-right: 2rem;
   }
 }
 
-@media (min-width: 1280px) {
+@media (min-width: 1024px) {
   .site-container {
     padding-left: 3rem;
     padding-right: 3rem;
   }
 }
 
+@media (min-width: 1280px) {
+  .site-container {
+    padding-left: 4rem;
+    padding-right: 4rem;
+  }
+}
+
 .section-padding {
-  padding-top: 4rem;
-  padding-bottom: 4rem;
+  padding-top: 4.5rem;
+  padding-bottom: 4.5rem;
 }
 
 @media (min-width: 640px) {
   .section-padding {
-    padding-top: 6rem;
-    padding-bottom: 6rem;
+    padding-top: 6.5rem;
+    padding-bottom: 6.5rem;
   }
 }
 
 @media (min-width: 1024px) {
   .section-padding {
-    padding-top: 8rem;
-    padding-bottom: 8rem;
+    padding-top: 8.5rem;
+    padding-bottom: 8.5rem;
   }
 }
 
@@ -194,4 +245,5 @@
     scroll-behavior: auto !important;
   }
 }
+
 

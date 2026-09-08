@@ -309,7 +309,7 @@ export function ScrilloLoader({ isReady }: ScrilloLoaderProps) {
       id="personal-brand-loader"
       aria-live="polite"
       aria-busy={state === 'ACTIVE'}
-      className="fixed inset-0 w-screen h-[100dvh] z-[99999] pointer-events-auto select-none overflow-hidden bg-[#050505] flex flex-col justify-between p-8 sm:p-12 md:p-16 text-[#F5F5F5]"
+      className="fixed inset-0 w-screen h-[100dvh] z-[99999] pointer-events-auto select-none overflow-hidden bg-[#060606] flex flex-col justify-between p-8 sm:p-12 md:p-16 text-[#F5F5F5]"
       style={{
         transform: isExiting && !prefersReducedMotion ? 'translateY(-100%)' : 'translateY(0%)',
         opacity: isExiting && prefersReducedMotion ? 0 : 1,
@@ -320,8 +320,8 @@ export function ScrilloLoader({ isReady }: ScrilloLoaderProps) {
     >
       {/* Top Brand Bar */}
       <header className="flex items-center justify-between w-full">
-        <span className="font-mono text-xs tracking-[0.25em] uppercase text-white/50 font-medium">
-          {siteConfig.name}
+        <span className="font-mono text-xs tracking-[0.25em] uppercase text-white/60 font-medium">
+          DS // PORTFOLIO
         </span>
         <span className="font-mono text-xs tracking-[0.25em] text-white/40">
           2026

@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ScrilloLoader } from './components/layout/ScrilloLoader';
-import { FloatingSpatialNav } from './components/spatial/FloatingSpatialNav';
+import { Navbar } from './components/layout/Navbar';
 import { Footer } from './components/layout/Footer';
 import { CustomCursor } from './components/layout/CustomCursor';
 import { ScrollProgress } from './components/layout/ScrollProgress';
@@ -27,7 +27,7 @@ export function App() {
         Skip to main content
       </a>
 
-      <div className="relative min-h-screen bg-[#050505] text-[#F5F5F5] selection:bg-[#FF3E00] selection:text-white overflow-x-hidden font-sans">
+      <div className="relative min-h-screen bg-[#060606] text-[#F5F5F5] selection:bg-[#FF3E00] selection:text-white overflow-x-hidden font-sans">
         {/* Full-Screen Signature Entry Loader */}
         <ScrilloLoader />
 
@@ -43,8 +43,8 @@ export function App() {
         {/* Auto Scroll to Top on Navigation */}
         <ScrollToTopOnRoute />
 
-        {/* Reimagined Floating Spatial Navigation */}
-        <FloatingSpatialNav />
+        {/* Minimal Editorial Header */}
+        <Navbar />
 
         {/* Main Application Routes with Error Boundary Guard */}
         <main id="main-content">

@@ -27,7 +27,7 @@ export const ProjectDetailPage: React.FC = () => {
 
   return (
     <PageTransition>
-      <div className="pt-24 pb-16 sm:pt-32 sm:pb-24 bg-[#050505] text-white">
+      <div className="pt-24 pb-16 sm:pt-32 sm:pb-24 bg-[#060606] text-white">
         
         {/* Navigation Bar */}
         <div className="site-container mb-8 sm:mb-10">

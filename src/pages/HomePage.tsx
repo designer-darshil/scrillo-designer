@@ -1,36 +1,32 @@
 import React from 'react';
 import { PageTransition } from '../components/layout/PageTransition';
-import { SpatialHero } from '../components/spatial/SpatialHero';
-import { SpatialProjectShowcase } from '../components/spatial/SpatialProjectShowcase';
-import { SpatialAbout } from '../components/spatial/SpatialAbout';
-import { SpatialTimeline } from '../components/spatial/SpatialTimeline';
-import { TypographicSkills } from '../components/spatial/TypographicSkills';
-import { SpatialContact } from '../components/spatial/SpatialContact';
+import { EditorialHero } from '../components/editorial/EditorialHero';
+import { EditorialSelectedWork } from '../components/editorial/EditorialSelectedWork';
+import { EditorialCapabilities } from '../components/editorial/EditorialCapabilities';
+import { EditorialExperience } from '../components/editorial/EditorialExperience';
+import { EditorialContact } from '../components/editorial/EditorialContact';
 
 export const HomePage: React.FC = () => {
   return (
     <PageTransition>
-      <div className="relative bg-[#050505]">
-        {/* 01. Spatial Architectural Opening */}
-        <SpatialHero />
+      <div className="relative bg-[#060606] selection:bg-[#FF3E00] selection:text-white">
+        {/* 01. INTRO / Editorial Spatial Hero */}
+        <EditorialHero />
 
-        {/* 02. Spatial Interactive Project Showcase (Floating 3D Monolith) */}
-        <SpatialProjectShowcase />
+        {/* 02. SELECTED WORK / Editorial Spreads with Alternating Rhythms */}
+        <EditorialSelectedWork />
 
-        {/* 03. Spatial Personal Introduction */}
-        <SpatialAbout />
+        {/* 03. CAPABILITIES / Structured Editorial Groupings (No percentage bars) */}
+        <EditorialCapabilities />
 
-        {/* 04. Horizontal Spatial Timeline (2018 → NOW) */}
-        <SpatialTimeline />
+        {/* 04. EXPERIENCE / Verified Professional Timeline */}
+        <EditorialExperience />
 
-        {/* 05. Architectural Typographic Skills */}
-        <TypographicSkills />
-
-        {/* 06. Spatial Contact */}
-        <SpatialContact />
+        {/* 05. CONTACT / Final Editorial Spread with Fallback */}
+        <EditorialContact />
       </div>
     </PageTransition>
   );
 };
 
-
+export default HomePage;

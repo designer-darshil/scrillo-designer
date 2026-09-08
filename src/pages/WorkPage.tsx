@@ -4,10 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { projects } from '../data/projects';
 import { ProjectCategory } from '../types';
 import { PageTransition } from '../components/layout/PageTransition';
-import { SectionHeading } from '../components/ui/SectionHeading';
-import { PerspectiveCard } from '../components/ui/PerspectiveCard';
-import { FinalCTA } from '../components/sections/FinalCTA';
-import { ArrowUpRight, Filter } from 'lucide-react';
+import { ArrowUpRight } from 'lucide-react';
 
 const filterCategories: Array<{ id: ProjectCategory; label: string; count: number }> = [
   { id: 'all', label: 'ALL WORK', count: 8 },
@@ -45,39 +42,28 @@ export const WorkPage: React.FC = () => {
 
   return (
     <PageTransition>
-      <div className="pt-24 pb-16 sm:pt-32 sm:pb-24">
+      <div className="pt-24 sm:pt-32 pb-20 sm:pb-28 bg-[#060606] text-white">
         <div className="site-container">
           
-          {/* Header Section */}
-          <div className="mb-12 sm:mb-16">
-            <div className="flex items-center space-x-3 text-xs font-mono tracking-widest text-[#FF3E00] uppercase mb-4">
-              <span className="px-2 py-0.5 rounded border border-[#FF3E00]/30 bg-[#FF3E00]/10 font-bold">
-                PORTFOLIO ARCHIVE
-              </span>
-              <span className="text-white/30">/</span>
-              <span className="text-white/60">2024 — 2026</span>
-            </div>
+          {/* Header Bar */}
+          <div className="flex items-center gap-3 font-mono text-xs text-[#FF3E00] tracking-widest uppercase mb-8 pb-4 border-b border-white/[0.08]">
+            <span className="text-white font-bold">WORK</span>
+            <span className="text-white/20">/</span>
+            <span className="text-white/60">DIRECTORY & CASE STUDIES</span>
+          </div>
 
-            <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-extrabold tracking-tight sm:tracking-tighter text-white uppercase leading-[0.95] sm:leading-none mb-6 text-balance">
-              PROVE BY <br />
-              <span className="italic font-light text-[#FF3E00] tracking-tight lowercase">
-                built
-              </span>{' '}
-              WORK.
+          {/* Heading */}
+          <div className="mb-10 sm:mb-14">
+            <h1 className="clamp-spread-title font-extrabold uppercase tracking-tight text-white editorial-title">
+              SELECTED PROJECTS.
             </h1>
-
-            <p className="max-w-2xl text-white/70 text-sm sm:text-base md:text-lg leading-relaxed text-pretty">
-              A selection of digital products, web applications, and website interfaces designed with usability, clarity, and clean frontend structure.
+            <p className="mt-4 text-white/70 text-base sm:text-lg max-w-xl text-pretty font-normal">
+              A curated archive of web design, digital interfaces, and frontend implementations built with cognitive clarity and deliberate typography.
             </p>
           </div>
 
-          {/* Interactive Filter Pills */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-12 sm:mb-16 border-b border-white/10 no-scrollbar">
-            <div className="flex items-center space-x-1 pr-2 text-xs font-mono text-white/50 shrink-0">
-              <Filter size={13} />
-              <span>FILTER:</span>
-            </div>
-
+          {/* Minimalist Filter Tabs */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-12 sm:mb-16 border-b border-white/[0.08] no-scrollbar">
             {filterCategories.map((cat) => {
               const isActive = activeCategory === cat.id;
               return (
@@ -85,110 +71,102 @@ export const WorkPage: React.FC = () => {
                   key={cat.id}
                   onClick={() => handleFilterChange(cat.id)}
                   aria-pressed={isActive}
-                  className={`min-h-[44px] px-4 py-2 rounded-full text-xs font-mono uppercase tracking-wider transition-all whitespace-nowrap flex items-center space-x-2 shrink-0 ${
+                  className={`min-h-[38px] px-3.5 py-1.5 rounded text-xs font-mono uppercase tracking-wider transition-all whitespace-nowrap flex items-center gap-2 shrink-0 ${
                     isActive
-                      ? 'bg-white text-black font-bold shadow-lg shadow-white/10'
-                      : 'bg-white/5 border border-white/10 text-white/70 hover:bg-white/10 hover:text-white'
+                      ? 'bg-white text-black font-bold'
+                      : 'bg-white/[0.04] border border-white/[0.08] text-white/60 hover:text-white hover:bg-white/[0.08]'
                   }`}
                 >
                   <span>{cat.label}</span>
-                  <span
-                    className={`text-[10px] px-1.5 py-0.5 rounded-full ${
-                      isActive ? 'bg-black text-white' : 'bg-white/10 text-white/60'
-                    }`}
-                  >
-                    {cat.count}
+                  <span className="text-[10px] opacity-60">
+                    ({cat.count})
                   </span>
                 </button>
               );
             })}
           </div>
 
-          {/* Projects Grid or Empty State */}
-          {filteredProjects.length > 0 ? (
-            <motion.div
-              layout
-              className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12"
-            >
-              <AnimatePresence>
-                {filteredProjects.map((project) => (
-                  <motion.article
-                    key={project.id}
-                    layout
-                    initial={{ opacity: 0, scale: 0.96 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.96 }}
-                    transition={{ duration: 0.35 }}
-                    className="group flex flex-col justify-between border border-white/10 rounded-2xl bg-[#0A0A0A] p-6 hover:border-white/25 transition-all duration-300"
-                  >
-                    <div>
-                      {/* Top Metadata */}
-                      <div className="flex items-center justify-between text-xs font-mono text-white/50 mb-4 pb-3 border-b border-white/5">
-                        <span className="text-white/70 uppercase tracking-wider">{project.roles.join(' • ')}</span>
-                        <span>{project.year}</span>
-                      </div>
-
-                      {/* Image Preview */}
-                      <Link to={`/work/${project.slug}`} data-cursor="project" className="block mb-6">
-                        <PerspectiveCard intensity={6}>
-                          <div className="relative rounded-xl overflow-hidden aspect-[16/10] bg-[#141414] border border-white/5">
-                            <img
-                              src={project.heroImage}
-                              alt={project.title}
-                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                              loading="lazy"
-                            />
-                            <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors" />
-                          </div>
-                        </PerspectiveCard>
-                      </Link>
-
-                      {/* Title & Tagline */}
-                      <div className="space-y-2 mb-4">
-                        <h2 className="text-2xl sm:text-3xl font-extrabold text-white group-hover:text-[#FF3E00] transition-colors flex items-center justify-between">
-                          <span>{project.title}</span>
-                          <ArrowUpRight size={20} className="opacity-0 group-hover:opacity-100 group-hover:translate-x-1 group-hover:-translate-y-1 transition-all text-[#FF3E00]" />
-                        </h2>
-                        <p className="text-sm text-white/70 font-normal leading-relaxed">
-                          {project.subtitle}
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Bottom Action */}
-                    <div className="pt-4 border-t border-white/5 flex items-center justify-end">
-                      <Link
-                        to={`/work/${project.slug}`}
-                        data-cursor="project"
-                        className="text-xs font-mono uppercase tracking-wider text-white font-bold hover:text-[#FF3E00] transition-colors inline-flex items-center gap-1.5"
-                      >
-                        <span>VIEW PROJECT</span>
-                        <ArrowUpRight size={13} />
-                      </Link>
-                    </div>
-                  </motion.article>
-                ))}
-              </AnimatePresence>
-            </motion.div>
-          ) : (
-            <div className="p-12 rounded-2xl border border-white/10 bg-[#0A0A0A] text-center space-y-4">
-              <p className="text-muted-primary text-sm font-mono">No projects found for the selected category filter.</p>
-              <button
-                onClick={() => handleFilterChange('all')}
-                className="px-6 py-2.5 rounded-full bg-[#FF3E00] text-white font-mono text-xs uppercase tracking-widest font-bold hover:bg-white hover:text-black transition-colors"
+          {/* Projects Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-10 sm:gap-14">
+            {filteredProjects.map((project) => (
+              <article
+                key={project.id}
+                className="group flex flex-col justify-between border-b border-white/[0.08] pb-10"
               >
-                VIEW ALL PROJECTS
-              </button>
+                <div>
+                  {/* Top Meta */}
+                  <div className="flex items-center justify-between font-mono text-xs text-white/40 mb-3">
+                    <span>{project.number} / {project.categoryLabel}</span>
+                    <span>{project.year}</span>
+                  </div>
+
+                  {/* Visual Preview */}
+                  <Link
+                    to={`/work/${project.slug}`}
+                    className="block relative rounded overflow-hidden aspect-[16/10] bg-[#0E0E0E] border border-white/10 mb-6 group-hover:border-white/25 transition-all duration-300"
+                  >
+                    <img
+                      src={project.heroImage}
+                      alt={project.title}
+                      className="w-full h-full object-cover opacity-85 group-hover:opacity-100 group-hover:scale-[1.02] transition-all duration-500"
+                      loading="lazy"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+                  </Link>
+
+                  {/* Title & Description */}
+                  <div className="space-y-2">
+                    <h2 className="text-2xl sm:text-3xl font-extrabold uppercase tracking-tight text-white group-hover:text-[#FF3E00] transition-colors flex items-center justify-between">
+                      <Link to={`/work/${project.slug}`}>
+                        {project.title}
+                      </Link>
+                      <ArrowUpRight size={18} className="opacity-0 group-hover:opacity-100 text-[#FF3E00] transition-all" />
+                    </h2>
+                    <p className="text-sm sm:text-base text-white/70 leading-relaxed max-w-lg">
+                      {project.subtitle}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Bottom Role Tag */}
+                <div className="pt-4 mt-6 border-t border-white/[0.06] flex items-center justify-between font-mono text-xs text-white/50">
+                  <span>{project.roles[0]}</span>
+                  <Link
+                    to={`/work/${project.slug}`}
+                    className="text-white hover:text-[#FF3E00] transition-colors uppercase tracking-wider flex items-center gap-1 font-bold"
+                  >
+                    <span>EXPLORE</span>
+                    <ArrowUpRight size={13} />
+                  </Link>
+                </div>
+              </article>
+            ))}
+          </div>
+
+          {/* Bottom Editorial Inquiry Banner */}
+          <div className="mt-20 pt-12 border-t border-white/[0.08] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+            <div>
+              <span className="font-mono text-xs text-[#FF3E00] uppercase tracking-widest block mb-1">
+                START A PROJECT
+              </span>
+              <p className="text-white text-base sm:text-lg font-medium">
+                Let's discuss requirements, user experience goals, and technical specs.
+              </p>
             </div>
-          )}
 
-        </div>
+            <Link
+              to="/contact"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded bg-[#FF3E00] text-white font-mono text-xs uppercase tracking-widest font-bold hover:bg-white hover:text-black transition-colors shrink-0"
+            >
+              <span>CONNECT DIRECTLY</span>
+              <ArrowUpRight size={14} />
+            </Link>
+          </div>
 
-        {/* Bottom CTA */}
-        <div className="mt-28">
-          <FinalCTA />
         </div>
       </div>
     </PageTransition>
   );
 };
+
+export default WorkPage;

@@ -1,199 +1,89 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
-import { navLinks, footerLinks } from '../../data/navigation';
-import { siteConfig } from '../../data/site';
-import { ArrowUpRight, ArrowUp } from 'lucide-react';
+import { ArrowUp } from 'lucide-react';
 
 export const Footer: React.FC = () => {
-  const [localTime, setLocalTime] = useState('');
-
-  useEffect(() => {
-    const updateTime = () => {
-      const options: Intl.DateTimeFormatOptions = {
-        timeZone: 'Asia/Kolkata',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-        hour12: false
-      };
-      const timeStr = new Intl.DateTimeFormat([], options).format(new Date());
-      setLocalTime(timeStr);
-    };
-
-    updateTime();
-    const interval = setInterval(updateTime, 1000);
-    return () => clearInterval(interval);
-  }, []);
-
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const navLinks = [
+    { label: 'WORK', href: '/work' },
+    { label: 'ABOUT', href: '/about' },
+    { label: 'CONTACT', href: '/contact' }
+  ];
+
+  const socialLinks = [
+    { label: 'LINKEDIN', href: 'https://linkedin.com/in/dsbhuva' },
+    { label: 'DRIBBBLE', href: 'https://dribbble.com' },
+    { label: 'BEHANCE', href: 'https://behance.net' }
+  ];
+
   return (
-    <footer className="relative bg-[#080808] border-t border-white/10 pt-16 sm:pt-20 pb-10 sm:pb-12 overflow-hidden">
-      <div className="site-container">
-        {/* Big Editorial Header Statement */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-12 pb-12 sm:pb-16 border-b border-white/10">
-          <div className="lg:col-span-8 space-y-5 sm:space-y-6">
-            <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 text-xs font-mono">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span>Available for Q3/Q4 2026 Collaborations</span>
-            </div>
-            
-            <h2 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight sm:tracking-tighter text-white leading-none text-balance">
-              LET'S BUILD <br />
-              <span className="italic font-light text-[#FF3E00]">
-                SOMETHING
-              </span>{' '}
-              WORTH USING.
-            </h2>
-
-            <p className="max-w-xl text-white/70 text-sm sm:text-base md:text-lg leading-relaxed font-normal text-pretty">
-              Have a digital product, application interface, or website project to discuss? Feel free to reach out.
-            </p>
-          </div>
-
-          <div className="lg:col-span-4 flex flex-col justify-between items-start lg:items-end gap-6">
-            <Link
-              to="/contact"
-              data-cursor="cta"
-              className="group inline-flex items-center space-x-3 px-6 sm:px-8 py-3.5 sm:py-4 rounded-full bg-[#FF3E00] text-white font-mono text-xs sm:text-sm uppercase tracking-widest font-bold hover:bg-white hover:text-black transition-all duration-300 shadow-xl shadow-[#FF3E00]/20 min-h-[48px]"
-            >
-              <span>GET IN TOUCH</span>
-              <ArrowUpRight size={18} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-            </Link>
-
-            {/* Time & Location Pill */}
-            <div className="bg-white/5 border border-white/10 rounded-xl p-4 w-full sm:w-auto text-xs font-mono text-white/70 space-y-1.5">
-              <div className="flex items-center justify-between gap-6">
-                <span className="text-white/40">LOCATION</span>
-                <span className="text-white">{siteConfig.location}</span>
-              </div>
-              <div className="flex items-center justify-between gap-6">
-                <span className="text-white/40">LOCAL TIME</span>
-                <span className="text-[#FF3E00] font-bold">{localTime || '18:30:00'} IST</span>
-              </div>
-            </div>
-          </div>
+    <footer className="border-t border-white/[0.08] bg-[#060606] py-12 sm:py-16 text-white/70">
+      <div className="site-container flex flex-col md:flex-row items-start md:items-center justify-between gap-8 sm:gap-10">
+        
+        {/* Left: DS Mark & Location */}
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6">
+          <Link
+            to="/"
+            className="font-extrabold text-lg tracking-widest text-white hover:text-[#FF3E00] transition-colors inline-flex items-center gap-2 select-none"
+            aria-label="DS Home"
+          >
+            <span>DS</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-[#FF3E00]" />
+          </Link>
+          <span className="hidden sm:inline-block text-white/20">/</span>
+          <span className="font-mono text-xs text-white/50">Surat, Gujarat, India</span>
+          <span className="hidden sm:inline-block text-white/20">/</span>
+          <a
+            href="mailto:darshilbhuva4322@gmail.com"
+            className="font-mono text-xs text-white/80 hover:text-[#FF3E00] transition-colors"
+          >
+            darshilbhuva4322@gmail.com
+          </a>
         </div>
 
-        {/* Links Navigation Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 py-16 border-b border-white/10">
-          {/* Personal Brand Info */}
-          <div className="col-span-2 space-y-4">
-            <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 rounded-sm bg-white text-black flex items-center justify-center font-bold text-xs tracking-wider select-none">
-                {siteConfig.initials}
-              </div>
-              <span className="font-extrabold text-2xl tracking-tight text-white flex items-center gap-1.5">
-                {siteConfig.initials}
-                <span className="w-1.5 h-1.5 rounded-full bg-[#FF3E00]" />
-              </span>
-            </div>
-            <p className="text-xs font-mono text-white/50 tracking-wider uppercase max-w-xs">
-              {siteConfig.role}
-            </p>
-            <p className="text-sm font-sans text-white/60 leading-relaxed max-w-xs">
-              "{siteConfig.tagline}"
-            </p>
-            <div className="pt-2 space-y-1 text-sm font-mono">
-              <div>
-                <a
-                  href={`mailto:${siteConfig.email}`}
-                  className="text-white/80 hover:text-[#FF3E00] transition-colors underline"
-                >
-                  {siteConfig.email}
-                </a>
-              </div>
-              <div>
-                <a
-                  href={siteConfig.phoneHref}
-                  className="text-white/60 hover:text-white transition-colors"
-                >
-                  {siteConfig.formattedPhone}
-                </a>
-              </div>
-            </div>
+        {/* Right: Navigation, Socials, Scroll To Top */}
+        <div className="flex flex-wrap items-center gap-6 sm:gap-8 font-mono text-xs">
+          {/* Main Links */}
+          <div className="flex items-center gap-5">
+            {navLinks.map((item) => (
+              <Link
+                key={item.href}
+                to={item.href}
+                className="tracking-widest uppercase text-white/60 hover:text-white transition-colors"
+              >
+                {item.label}
+              </Link>
+            ))}
           </div>
 
-          {/* Directory */}
-          <div className="space-y-4">
-            <h4 className="text-xs font-mono uppercase tracking-widest text-white/40">
-              DIRECTORY
-            </h4>
-            <ul className="space-y-2.5 text-sm">
-              {navLinks.map((item) => (
-                <li key={item.href}>
-                  <Link
-                    to={item.href}
-                    className="text-white/70 hover:text-[#FF3E00] transition-colors flex items-center space-x-2"
-                  >
-                    <span className="text-white/30 text-xs font-mono">{item.number}</span>
-                    <span>{item.label}</span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
+          <span className="hidden sm:inline-block text-white/20">/</span>
+
+          {/* Social Links */}
+          <div className="flex items-center gap-5">
+            {socialLinks.map((social) => (
+              <a
+                key={social.label}
+                href={social.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="tracking-widest uppercase text-white/50 hover:text-white transition-colors"
+              >
+                {social.label}
+              </a>
+            ))}
           </div>
 
-          {/* Project Disciplines */}
-          <div className="space-y-4">
-            <h4 className="text-xs font-mono uppercase tracking-widest text-white/40">
-              DISCIPLINES
-            </h4>
-            <ul className="space-y-2.5 text-sm">
-              {footerLinks.categories.map((cat) => (
-                <li key={cat.label}>
-                  <Link
-                    to={cat.href}
-                    className="text-white/70 hover:text-white transition-colors"
-                  >
-                    {cat.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Connect / Socials */}
-          <div className="space-y-4">
-            <h4 className="text-xs font-mono uppercase tracking-widest text-white/40">
-              CONNECT
-            </h4>
-            <ul className="space-y-2.5 text-sm">
-              {footerLinks.socials.map((soc) => (
-                <li key={soc.label}>
-                  <a
-                    href={soc.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-white/70 hover:text-[#FF3E00] transition-colors flex items-center justify-between group"
-                  >
-                    <span>{soc.label}</span>
-                    <ArrowUpRight size={12} className="opacity-40 group-hover:opacity-100 transition-opacity" />
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-
-        {/* Bottom Colophon & Scroll to Top */}
-        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono text-white/40">
-          <div>
-            © 2026 DS. ALL RIGHTS RESERVED.
-          </div>
-          
-          <div className="flex items-center space-x-6">
-            <button
-              onClick={scrollToTop}
-              className="flex items-center space-x-1 hover:text-white transition-colors"
-              aria-label="Back to top"
-            >
-              <span>BACK TO TOP</span>
-              <ArrowUp size={12} />
-            </button>
-          </div>
+          {/* Back to top button */}
+          <button
+            onClick={scrollToTop}
+            className="min-w-[36px] min-h-[36px] flex items-center justify-center rounded-full border border-white/10 hover:border-[#FF3E00] hover:text-[#FF3E00] text-white/60 transition-colors ml-auto sm:ml-2"
+            aria-label="Back to top"
+          >
+            <ArrowUp size={14} />
+          </button>
         </div>
       </div>
     </footer>

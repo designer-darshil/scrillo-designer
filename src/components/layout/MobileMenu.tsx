@@ -1,8 +1,6 @@
 import React, { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useLocation } from 'react-router-dom';
-import { navLinks } from '../../data/navigation';
-import { siteConfig } from '../../data/site';
 import { X, ArrowUpRight } from 'lucide-react';
 
 interface MobileMenuProps {
@@ -10,10 +8,15 @@ interface MobileMenuProps {
   onClose: () => void;
 }
 
+const mobileNavLinks = [
+  { label: 'WORK', href: '/work', number: '01' },
+  { label: 'ABOUT', href: '/about', number: '02' },
+  { label: 'CONTACT', href: '/contact', number: '03' }
+];
+
 export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose }) => {
   const location = useLocation();
 
-  // Lock body scroll and listen for Escape key
   useEffect(() => {
     if (!isOpen) return;
 
@@ -44,55 +47,55 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose }) => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.25 }}
-          className="fixed inset-0 z-[999] bg-[#050505]/98 backdrop-blur-xl flex flex-col justify-between p-6 sm:p-8 md:p-12 overflow-y-auto"
+          transition={{ duration: 0.2 }}
+          className="fixed inset-0 z-[999] bg-[#060606]/98 backdrop-blur-xl flex flex-col justify-between p-6 sm:p-8 overflow-y-auto"
         >
           {/* Top Bar */}
-          <div className="flex items-center justify-between border-b border-white/10 pb-6">
-            <Link to="/" onClick={onClose} className="flex items-center space-x-3" aria-label="Home">
-              <div className="w-8 h-8 rounded-sm bg-white text-black flex items-center justify-center font-bold text-xs tracking-wider select-none">
-                {siteConfig.initials}
-              </div>
-              <span className="font-bold tracking-tight text-base text-white">{siteConfig.name}</span>
+          <div className="flex items-center justify-between border-b border-white/[0.08] pb-5">
+            <Link to="/" onClick={onClose} className="flex items-center gap-2" aria-label="Home">
+              <span className="font-extrabold text-base tracking-widest text-white">DS</span>
+              <span className="w-1 h-1 rounded-full bg-[#FF3E00]" />
             </Link>
             <button
               onClick={onClose}
-              className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full border border-white/15 bg-white/5 text-white hover:bg-[#FF3E00] hover:border-[#FF3E00] transition-colors"
+              className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full border border-white/10 text-white/70 hover:text-white transition-colors"
               aria-label="Close menu"
             >
-              <X size={20} />
+              <X size={18} />
             </button>
           </div>
 
-          {/* Menu Links */}
-          <nav className="py-8 space-y-4 my-auto" aria-label="Mobile Navigation Links">
-            {navLinks.map((item, index) => {
+          {/* Nav Links */}
+          <nav className="py-12 space-y-6 my-auto" aria-label="Mobile Navigation">
+            {mobileNavLinks.map((item, index) => {
               const isActive = location.pathname === item.href;
               return (
                 <motion.div
                   key={item.href}
-                  initial={{ opacity: 0, x: -16 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.08 + index * 0.05, duration: 0.3 }}
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.05 + index * 0.05, duration: 0.25 }}
                 >
                   <Link
                     to={item.href}
                     onClick={onClose}
-                    className="group flex items-center space-x-4 py-3 min-h-[48px]"
+                    className="flex items-baseline justify-between py-2.5 group"
                   >
-                    <span className="font-mono text-xs text-[#FF3E00]">{item.number}</span>
-                    <span
-                      className={`text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight transition-colors ${
-                        isActive
-                          ? 'text-[#FF3E00]'
-                          : 'text-white/80 group-hover:text-white group-hover:translate-x-2'
-                      }`}
-                    >
-                      {item.label}
-                    </span>
+                    <div className="flex items-baseline gap-4">
+                      <span className="font-mono text-xs text-[#FF3E00]/80">{item.number}</span>
+                      <span
+                        className={`text-3xl sm:text-4xl font-extrabold tracking-tight transition-colors ${
+                          isActive
+                            ? 'text-[#FF3E00]'
+                            : 'text-white/80 group-hover:text-white'
+                        }`}
+                      >
+                        {item.label}
+                      </span>
+                    </div>
                     <ArrowUpRight
-                      size={20}
-                      className="opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 text-[#FF3E00] transition-all"
+                      size={18}
+                      className="text-white/30 group-hover:text-[#FF3E00] transition-colors"
                     />
                   </Link>
                 </motion.div>
@@ -100,25 +103,15 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose }) => {
             })}
           </nav>
 
-          {/* Bottom Editorial Tagline & Socials */}
-          <div className="border-t border-white/10 pt-6 space-y-4">
-            <p className="text-sm font-sans text-white/70 leading-relaxed">
-              "{siteConfig.tagline}"
-            </p>
-            <div className="flex flex-wrap items-center justify-between gap-4 text-xs font-mono text-white/60">
-              <a
-                href={`mailto:${siteConfig.email}`}
-                className="text-white hover:text-[#FF3E00] transition-colors underline min-h-[44px] flex items-center"
-              >
-                {siteConfig.email}
-              </a>
-              <a
-                href={siteConfig.phoneHref}
-                className="text-white/80 hover:text-[#FF3E00] transition-colors min-h-[44px] flex items-center"
-              >
-                {siteConfig.formattedPhone}
-              </a>
-            </div>
+          {/* Minimal Footer Details */}
+          <div className="border-t border-white/[0.08] pt-6 flex flex-col gap-2 font-mono text-xs text-white/50">
+            <a
+              href="mailto:darshilbhuva4322@gmail.com"
+              className="hover:text-white transition-colors py-1"
+            >
+              darshilbhuva4322@gmail.com
+            </a>
+            <span className="text-white/30">Surat, Gujarat, India</span>
           </div>
         </motion.div>
       )}

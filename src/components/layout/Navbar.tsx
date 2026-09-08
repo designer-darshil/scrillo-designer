@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { navLinks } from '../../data/navigation';
-import { siteConfig } from '../../data/site';
 import { MobileMenu } from './MobileMenu';
-import { Menu, ArrowRight } from 'lucide-react';
+import { Menu } from 'lucide-react';
 
 export const Navbar: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -12,9 +10,9 @@ export const Navbar: React.FC = () => {
   const location = useLocation();
 
   useEffect(() => {
-    let lastScrolled = window.scrollY > 40;
+    let lastScrolled = window.scrollY > 20;
     const handleScroll = () => {
-      const nowScrolled = window.scrollY > 40;
+      const nowScrolled = window.scrollY > 20;
       if (nowScrolled !== lastScrolled) {
         lastScrolled = nowScrolled;
         setIsScrolled(nowScrolled);
@@ -24,87 +22,75 @@ export const Navbar: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const navItems = [
+    { label: 'WORK', href: '/work' },
+    { label: 'ABOUT', href: '/about' },
+    { label: 'CONTACT', href: '/contact' }
+  ];
+
   return (
     <>
       <header
         className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
           isScrolled
-            ? 'py-2.5 sm:py-3 bg-[#050505]/85 backdrop-blur-md border-b border-white/10'
-            : 'py-4 sm:py-6 bg-transparent border-b border-transparent'
+            ? 'py-3.5 bg-[#060606]/85 backdrop-blur-md border-b border-white/[0.06]'
+            : 'py-5 sm:py-7 bg-transparent border-b border-transparent'
         }`}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-12 flex items-center justify-between">
-          {/* Logo / Personal Identity */}
-          <Link to="/" className="group flex items-center space-x-2.5 sm:space-x-3 shrink-0" aria-label="Home">
-            <motion.div
-              whileHover={{ rotateX: -6, rotateY: 8, translateZ: 8, scale: 1.05 }}
-              transition={{ type: 'spring', stiffness: 350, damping: 20 }}
-              className="w-8 h-8 rounded-sm bg-white text-black flex items-center justify-center font-bold text-xs tracking-wider group-hover:bg-[#FF3E00] group-hover:text-white transition-colors select-none shrink-0 shadow-md [transform-style:preserve-3d]"
-            >
-              {siteConfig.initials}
-            </motion.div>
-            <div className="flex flex-col">
-              <span className="font-extrabold tracking-tight text-sm text-white flex items-center gap-1.5">
-                {siteConfig.name}
-                <span className="w-1.5 h-1.5 rounded-full bg-[#FF3E00] inline-block animate-pulse" />
-              </span>
-              <span className="text-[10px] font-mono tracking-widest text-white/50 uppercase">
-                UI/UX · Web Designer
-              </span>
-            </div>
+        <div className="site-container flex items-center justify-between">
+          {/* Left: Minimal DS Mark */}
+          <Link
+            to="/"
+            className="group flex items-center gap-2 select-none"
+            aria-label="DS Portfolio Home"
+          >
+            <span className="font-extrabold text-sm sm:text-base tracking-widest text-white transition-colors group-hover:text-[#FF3E00]">
+              DS
+            </span>
+            <span className="w-1 h-1 rounded-full bg-[#FF3E00] opacity-80" />
           </Link>
 
-          {/* Desktop Navigation Links */}
-          <nav className="hidden lg:flex items-center space-x-1 border border-white/10 rounded-full px-4 py-1.5 bg-black/40 backdrop-blur-sm [perspective:800px]">
-            {navLinks.map((item) => {
-              const isActive = location.pathname === item.href || 
+          {/* Right: WORK / ABOUT / CONTACT */}
+          <nav className="hidden md:flex items-center gap-8 sm:gap-10" aria-label="Main Navigation">
+            {navItems.map((item) => {
+              const isActive = location.pathname === item.href ||
                 (item.href !== '/' && location.pathname.startsWith(item.href));
 
               return (
                 <Link
                   key={item.href}
                   to={item.href}
-                  className={`relative px-4 py-1.5 text-xs font-mono tracking-widest uppercase transition-all duration-200 rounded-full hover:translate-y-[-1px] ${
-                    isActive ? 'text-white font-semibold' : 'text-white/60 hover:text-white'
+                  className={`text-xs font-mono tracking-[0.2em] uppercase transition-colors relative py-1 ${
+                    isActive
+                      ? 'text-white font-medium'
+                      : 'text-white/60 hover:text-white'
                   }`}
                 >
+                  {item.label}
                   {isActive && (
                     <motion.span
-                      layoutId="activeNavIndicator"
-                      className="absolute inset-0 bg-white/10 rounded-full border border-white/20 shadow-sm"
-                      transition={{ type: 'spring', stiffness: 350, damping: 30 }}
+                      layoutId="activeEditorialNav"
+                      className="absolute bottom-0 left-0 right-0 h-[1.5px] bg-[#FF3E00]"
+                      transition={{ type: 'spring', stiffness: 380, damping: 30 }}
                     />
                   )}
-                  <span className="relative z-10">{item.label}</span>
                 </Link>
               );
             })}
           </nav>
 
-          {/* Desktop CTA Button & Mobile Menu Trigger */}
-          <div className="flex items-center space-x-3">
-            <Link
-              to="/contact"
-              data-cursor="cta"
-              className="hidden sm:inline-flex items-center space-x-2 text-xs font-mono uppercase tracking-widest px-4 py-2 rounded-full border border-white/20 bg-white/5 hover:bg-[#FF3E00] hover:border-[#FF3E00] hover:text-white text-white/90 transition-all duration-200"
-            >
-              <span>LET'S TALK</span>
-              <ArrowRight size={13} className="text-[#FF3E00] group-hover:text-white" />
-            </Link>
-
-            {/* Mobile Hamburger Button */}
-            <button
-              onClick={() => setMobileMenuOpen(true)}
-              className="lg:hidden min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full border border-white/15 bg-white/5 text-white hover:bg-white/10 transition-colors"
-              aria-label="Open navigation menu"
-            >
-              <Menu size={18} />
-            </button>
-          </div>
+          {/* Mobile Menu Trigger */}
+          <button
+            onClick={() => setMobileMenuOpen(true)}
+            className="md:hidden min-w-[44px] min-h-[44px] flex items-center justify-center text-white/80 hover:text-white transition-colors"
+            aria-label="Open mobile menu"
+          >
+            <Menu size={20} />
+          </button>
         </div>
       </header>
 
-      {/* Mobile Drawer */}
+      {/* Clean Compact Mobile Menu */}
       <MobileMenu
         isOpen={mobileMenuOpen}
         onClose={() => setMobileMenuOpen(false)}

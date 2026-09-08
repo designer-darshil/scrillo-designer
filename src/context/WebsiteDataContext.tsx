@@ -1,12 +1,16 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { WebsiteData, SectionSetting } from '../types';
+import { WebsiteData, HeroContent, AboutContent, MarqueeContent } from '../types';
 import { defaultWebsiteData } from '../data/defaultWebsiteData';
+import { websiteService } from '../admin/services/websiteService';
 
 interface WebsiteDataContextType {
   data: WebsiteData;
   loading: boolean;
   error: string | null;
   refreshData: () => Promise<void>;
+  updateHero: (hero: HeroContent) => Promise<boolean>;
+  updateAbout: (about: AboutContent) => Promise<boolean>;
+  updateMarquee: (marquee: MarqueeContent) => Promise<boolean>;
   updateSectionVisibility: (sectionId: string, visible: boolean) => void;
 }
 
@@ -15,6 +19,9 @@ const WebsiteDataContext = createContext<WebsiteDataContextType>({
   loading: false,
   error: null,
   refreshData: async () => {},
+  updateHero: async () => true,
+  updateAbout: async () => true,
+  updateMarquee: async () => true,
   updateSectionVisibility: () => {},
 });
 
@@ -24,15 +31,59 @@ export const WebsiteDataProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const [error, setError] = useState<string | null>(null);
 
   const refreshData = async () => {
-    // In future iterations, fetch from Supabase if connected
     try {
       setLoading(true);
-      // fallback to current local data
-      setData(defaultWebsiteData);
+      const remoteData = await websiteService.getWebsiteData();
+      setData((prev) => ({
+        ...prev,
+        hero: remoteData.hero || prev.hero,
+        about: remoteData.about || prev.about,
+        marquee: remoteData.marquee || prev.marquee,
+      }));
     } catch (err: any) {
       setError(err?.message || 'Failed to load website data');
     } finally {
       setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    refreshData();
+  }, []);
+
+  const updateHero = async (hero: HeroContent): Promise<boolean> => {
+    try {
+      const success = await websiteService.updateHeroContent(hero);
+      if (success) {
+        setData((prev) => ({ ...prev, hero }));
+      }
+      return success;
+    } catch {
+      return false;
+    }
+  };
+
+  const updateAbout = async (about: AboutContent): Promise<boolean> => {
+    try {
+      const success = await websiteService.updateAboutContent(about);
+      if (success) {
+        setData((prev) => ({ ...prev, about }));
+      }
+      return success;
+    } catch {
+      return false;
+    }
+  };
+
+  const updateMarquee = async (marquee: MarqueeContent): Promise<boolean> => {
+    try {
+      const success = await websiteService.updateMarqueeContent(marquee);
+      if (success) {
+        setData((prev) => ({ ...prev, marquee }));
+      }
+      return success;
+    } catch {
+      return false;
     }
   };
 
@@ -63,6 +114,9 @@ export const WebsiteDataProvider: React.FC<{ children: React.ReactNode }> = ({ c
         loading,
         error,
         refreshData,
+        updateHero,
+        updateAbout,
+        updateMarquee,
         updateSectionVisibility,
       }}
     >
@@ -79,6 +133,9 @@ export const useWebsiteData = () => {
       loading: false,
       error: null,
       refreshData: async () => {},
+      updateHero: async () => true,
+      updateAbout: async () => true,
+      updateMarquee: async () => true,
       updateSectionVisibility: () => {},
     };
   }
@@ -86,3 +143,4 @@ export const useWebsiteData = () => {
 };
 
 export default WebsiteDataContext;
+

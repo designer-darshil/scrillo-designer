@@ -29,11 +29,14 @@ import { useAuth } from '../hooks/useAuth';
 import { useWebsiteData } from '../../hooks/useWebsiteData';
 import { PublishReviewModal } from '../components/PublishReviewModal';
 
+import { Lock, ShieldCheck } from 'lucide-react';
+
 interface NavItem {
   path: string;
   label: string;
   icon: React.ComponentType<{ className?: string }>;
   badge?: string;
+  requiresAdmin?: boolean;
 }
 
 const navItems: NavItem[] = [
@@ -45,12 +48,12 @@ const navItems: NavItem[] = [
   { path: '/admin/skills', label: 'Skills', icon: Sparkles },
   { path: '/admin/services', label: 'Services', icon: Briefcase },
   { path: '/admin/media', label: 'Media', icon: ImageIcon, badge: '24' },
-  { path: '/admin/settings', label: 'Settings', icon: Settings },
+  { path: '/admin/settings', label: 'Settings', icon: Settings, requiresAdmin: true },
 ];
 
 export const AdminLayout: React.FC = () => {
   const { theme, toggleTheme } = useTheme();
-  const { user, signOut } = useAuth();
+  const { user, role, isAdmin, isEditor, canPublish, signOut } = useAuth();
   const { diffSummary, isDraftModified, publishDraft, revertToPublished } = useWebsiteData();
 
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
@@ -228,7 +231,14 @@ export const AdminLayout: React.FC = () => {
                 >
                   <Icon className="w-4 h-4 shrink-0" />
                   {!sidebarCollapsed && (
-                    <span className="flex-1 truncate">{item.label}</span>
+                    <span className="flex-1 truncate flex items-center justify-between gap-1">
+                      <span>{item.label}</span>
+                      {item.requiresAdmin && !isAdmin && (
+                        <span title="Admin Clearance Required">
+                          <Lock className="w-3 h-3 text-muted/60 shrink-0" />
+                        </span>
+                      )}
+                    </span>
                   )}
                   {!sidebarCollapsed && item.badge && (
                     <span
@@ -254,18 +264,24 @@ export const AdminLayout: React.FC = () => {
             <button
               type="button"
               onClick={() => {
+                if (!canPublish) {
+                  alert('Administrator privileges are required to publish changes live.');
+                  return;
+                }
                 setMobileDrawerOpen(false);
                 setIsPublishModalOpen(true);
               }}
               className={`w-full flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-xs font-bold uppercase tracking-wider transition-all shadow-xs ${
-                isDraftModified
+                !canPublish
+                  ? 'bg-surface border border-border text-muted opacity-60 cursor-not-allowed'
+                  : isDraftModified
                   ? 'bg-foreground text-background hover:opacity-90'
                   : 'bg-background border border-border text-muted opacity-60'
               }`}
             >
               <UploadCloud className="w-4 h-4" />
-              <span>Publish Changes</span>
-              {isDraftModified && (
+              <span>{canPublish ? 'Publish Changes' : 'Publish (Admin Only)'}</span>
+              {isDraftModified && canPublish && (
                 <span className="px-1.5 py-0.2 rounded-full bg-amber-400 text-black text-[10px] font-mono font-extrabold">
                   {diffSummary.totalChanges}
                 </span>
@@ -299,7 +315,18 @@ export const AdminLayout: React.FC = () => {
             </div>
             {!sidebarCollapsed && (
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-semibold text-foreground truncate">{userName}</p>
+                <div className="flex items-center gap-1.5">
+                  <p className="text-xs font-semibold text-foreground truncate">{userName}</p>
+                  <span
+                    className={`text-[9px] font-mono font-bold px-1.5 py-0.2 rounded-sm uppercase ${
+                      isAdmin
+                        ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20'
+                        : 'bg-blue-500/10 text-blue-500 border border-blue-500/20'
+                    }`}
+                  >
+                    {role || 'Viewer'}
+                  </span>
+                </div>
                 <p className="text-[11px] text-muted truncate">{userEmail}</p>
               </div>
             )}
@@ -395,16 +422,25 @@ export const AdminLayout: React.FC = () => {
             {/* Publish Changes Button */}
             <button
               type="button"
-              onClick={() => setIsPublishModalOpen(true)}
+              onClick={() => {
+                if (!canPublish) {
+                  alert('Administrator privileges are required to publish changes live.');
+                  return;
+                }
+                setIsPublishModalOpen(true);
+              }}
               className={`flex items-center gap-2 px-4 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all shadow-xs ${
-                isDraftModified
+                !canPublish
+                  ? 'bg-surface border border-border text-muted opacity-60 cursor-not-allowed'
+                  : isDraftModified
                   ? 'bg-foreground text-background hover:opacity-90 cursor-pointer animate-in fade-in'
                   : 'bg-surface border border-border text-muted opacity-60'
               }`}
+              title={!canPublish ? 'Administrator role required to publish changes' : 'Publish pending changes to live website'}
             >
               <UploadCloud className="w-3.5 h-3.5" />
-              <span>Publish Changes</span>
-              {isDraftModified && (
+              <span>{canPublish ? 'Publish Changes' : 'Publish (Admin Only)'}</span>
+              {isDraftModified && canPublish && (
                 <span className="px-1.5 py-0.2 rounded-full bg-amber-400 text-black text-[10px] font-mono font-extrabold">
                   {diffSummary.totalChanges}
                 </span>

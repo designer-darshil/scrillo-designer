@@ -17,6 +17,8 @@ import { ServicesManager } from './admin/pages/ServicesManager';
 import { MediaManager } from './admin/pages/MediaManager';
 import { SettingsManager } from './admin/pages/SettingsManager';
 
+import { AccessDenied } from './admin/pages/AccessDenied';
+
 export const App: React.FC = () => {
   return (
     <AuthProvider>
@@ -29,11 +31,14 @@ export const App: React.FC = () => {
             {/* Admin Login Route */}
             <Route path="/admin/login" element={<AdminLogin />} />
 
-            {/* Protected Admin Routes */}
+            {/* Explicit Access Denied Page */}
+            <Route path="/admin/access-denied" element={<AccessDenied />} />
+
+            {/* Protected Admin Routes (Requires 'editor' or 'admin' role) */}
             <Route
               path="/admin"
               element={
-                <ProtectedRoute>
+                <ProtectedRoute requiredRole="editor">
                   <AdminLayout />
                 </ProtectedRoute>
               }
@@ -49,7 +54,15 @@ export const App: React.FC = () => {
               <Route path="skills" element={<SkillsManager />} />
               <Route path="services" element={<ServicesManager />} />
               <Route path="media" element={<MediaManager />} />
-              <Route path="settings" element={<SettingsManager />} />
+              {/* Settings Route explicitly requires 'admin' role */}
+              <Route
+                path="settings"
+                element={
+                  <ProtectedRoute requiredRole="admin">
+                    <SettingsManager />
+                  </ProtectedRoute>
+                }
+              />
             </Route>
 
             {/* Fallback to Public Home */}

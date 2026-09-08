@@ -1,9 +1,10 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { WebsiteData, HeroContent, AboutContent, MarqueeContent, Project, SkillCategory, SkillItem } from '../types';
+import { WebsiteData, HeroContent, AboutContent, MarqueeContent, Project, SkillCategory, SkillItem, Service } from '../types';
 import { defaultWebsiteData } from '../data/defaultWebsiteData';
 import { websiteService } from '../admin/services/websiteService';
 import { projectService } from '../admin/services/projectService';
 import { skillService } from '../admin/services/skillService';
+import { servicesService } from '../admin/services/servicesService';
 
 interface WebsiteDataContextType {
   data: WebsiteData;
@@ -33,6 +34,13 @@ interface WebsiteDataContextType {
   deleteSkillItem: (categoryId: string, skillIndex: number) => Promise<boolean>;
   reorderSkillItems: (categoryId: string, newItems: SkillItem[]) => Promise<boolean>;
   toggleSkillVisibility: (categoryId: string, skillIndex: number) => Promise<boolean>;
+  // Service methods
+  createService: (service: Omit<Service, 'id'> & { id?: string }) => Promise<Service | null>;
+  updateService: (id: string, updates: Partial<Service>) => Promise<boolean>;
+  deleteService: (id: string) => Promise<boolean>;
+  duplicateService: (id: string) => Promise<Service | null>;
+  reorderServices: (orderedIds: string[]) => Promise<boolean>;
+  toggleServiceVisibility: (id: string) => Promise<boolean>;
 }
 
 const WebsiteDataContext = createContext<WebsiteDataContextType>({
@@ -62,6 +70,12 @@ const WebsiteDataContext = createContext<WebsiteDataContextType>({
   deleteSkillItem: async () => true,
   reorderSkillItems: async () => true,
   toggleSkillVisibility: async () => true,
+  createService: async () => null,
+  updateService: async () => true,
+  deleteService: async () => true,
+  duplicateService: async () => null,
+  reorderServices: async () => true,
+  toggleServiceVisibility: async () => true,
 });
 
 export const WebsiteDataProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -72,10 +86,11 @@ export const WebsiteDataProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const refreshData = useCallback(async () => {
     try {
       setLoading(true);
-      const [remoteData, projects, skills] = await Promise.all([
+      const [remoteData, projects, skills, services] = await Promise.all([
         websiteService.getWebsiteData(),
         projectService.getProjects(),
         skillService.getSkillCategories(),
+        servicesService.getServices(),
       ]);
 
       setData((prev) => ({
@@ -85,6 +100,7 @@ export const WebsiteDataProvider: React.FC<{ children: React.ReactNode }> = ({ c
         marquee: remoteData.marquee || prev.marquee,
         projects: projects && projects.length > 0 ? projects : prev.projects,
         skills: skills && skills.length > 0 ? skills : prev.skills,
+        services: services && services.length > 0 ? services : prev.services,
       }));
     } catch (err: any) {
       setError(err?.message || 'Failed to load website data');
@@ -432,6 +448,103 @@ export const WebsiteDataProvider: React.FC<{ children: React.ReactNode }> = ({ c
     }
   };
 
+  // --- Services Methods ---
+  const createService = async (serviceData: Omit<Service, 'id'> & { id?: string }): Promise<Service | null> => {
+    try {
+      const created = await servicesService.createService(serviceData);
+      if (created) {
+        setData((prev) => ({
+          ...prev,
+          services: [...prev.services, created].sort((a, b) => (a.order ?? 0) - (b.order ?? 0)),
+        }));
+      }
+      return created;
+    } catch {
+      return null;
+    }
+  };
+
+  const updateService = async (id: string, updates: Partial<Service>): Promise<boolean> => {
+    try {
+      const success = await servicesService.updateService(id, updates);
+      if (success) {
+        setData((prev) => ({
+          ...prev,
+          services: prev.services.map((s) => (s.id === id ? { ...s, ...updates } : s)),
+        }));
+      }
+      return success;
+    } catch {
+      return false;
+    }
+  };
+
+  const deleteService = async (id: string): Promise<boolean> => {
+    try {
+      const success = await servicesService.deleteService(id);
+      if (success) {
+        setData((prev) => ({
+          ...prev,
+          services: prev.services.filter((s) => s.id !== id),
+        }));
+      }
+      return success;
+    } catch {
+      return false;
+    }
+  };
+
+  const duplicateService = async (id: string): Promise<Service | null> => {
+    try {
+      const cloned = await servicesService.duplicateService(id);
+      if (cloned) {
+        setData((prev) => ({
+          ...prev,
+          services: [...prev.services, cloned].sort((a, b) => (a.order ?? 0) - (b.order ?? 0)),
+        }));
+      }
+      return cloned;
+    } catch {
+      return null;
+    }
+  };
+
+  const reorderServices = async (orderedIds: string[]): Promise<boolean> => {
+    try {
+      const success = await servicesService.reorderServices(orderedIds);
+      if (success) {
+        setData((prev) => {
+          const map = new Map(prev.services.map((s) => [s.id, s]));
+          const reordered: Service[] = [];
+          orderedIds.forEach((id, index) => {
+            const item = map.get(id);
+            if (item) {
+              reordered.push({ ...item, order: index + 1, number: String(index + 1).padStart(2, '0') });
+            }
+          });
+          return {
+            ...prev,
+            services: reordered,
+          };
+        });
+      }
+      return success;
+    } catch {
+      return false;
+    }
+  };
+
+  const toggleServiceVisibility = async (id: string): Promise<boolean> => {
+    try {
+      const target = data.services.find((s) => s.id === id);
+      if (!target) return false;
+      const nextVisible = !target.visible;
+      return updateService(id, { visible: nextVisible });
+    } catch {
+      return false;
+    }
+  };
+
   return (
     <WebsiteDataContext.Provider
       value={{
@@ -461,6 +574,12 @@ export const WebsiteDataProvider: React.FC<{ children: React.ReactNode }> = ({ c
         deleteSkillItem,
         reorderSkillItems,
         toggleSkillVisibility,
+        createService,
+        updateService,
+        deleteService,
+        duplicateService,
+        reorderServices,
+        toggleServiceVisibility,
       }}
     >
       {children}
@@ -498,6 +617,12 @@ export const useWebsiteData = () => {
       deleteSkillItem: async () => true,
       reorderSkillItems: async () => true,
       toggleSkillVisibility: async () => true,
+      createService: async () => null,
+      updateService: async () => true,
+      deleteService: async () => true,
+      duplicateService: async () => null,
+      reorderServices: async () => true,
+      toggleServiceVisibility: async () => true,
     };
   }
   return context;

@@ -12,7 +12,9 @@ interface ServicesProps {
 export const Services: React.FC<ServicesProps> = ({ services: propServices }) => {
   const { data } = useWebsiteData();
   const rawServices = propServices || data.services;
-  const services = rawServices.filter((s) => s.visible !== false);
+  const services = [...rawServices]
+    .filter((s) => s.visible !== false)
+    .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 
   const containerRef = useRef<HTMLElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);

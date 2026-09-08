@@ -46,7 +46,7 @@ function contactApiDevPlugin(): Plugin {
 export default defineConfig({
   plugins: [react(), contactApiDevPlugin()],
   server: {
-    port: 5173,
+    port: 5180,
     host: true
   }
 });

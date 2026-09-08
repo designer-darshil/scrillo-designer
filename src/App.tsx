@@ -1,71 +1,56 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { ScrilloLoader } from './components/layout/ScrilloLoader';
-import { FloatingSpatialNav } from './components/spatial/FloatingSpatialNav';
-import { Footer } from './components/layout/Footer';
-import { CustomCursor } from './components/layout/CustomCursor';
-import { ScrollProgress } from './components/layout/ScrollProgress';
-import { GrainOverlay } from './components/layout/GrainOverlay';
-import { ScrollToTopOnRoute } from './components/layout/ScrollToTopOnRoute';
-import { ErrorBoundary } from './components/layout/ErrorBoundary';
+import { useLenis } from './hooks/useLenis';
+import { useCustomCursor } from './hooks/useCustomCursor';
+import { CustomCursor } from './components/CustomCursor/CustomCursor';
+import { Header } from './components/Header/Header';
+import { Hero } from './sections/Hero/Hero';
+import { SelectedWorks } from './sections/SelectedWorks/SelectedWorks';
+import { Statement } from './sections/Statement/Statement';
+import { Skills } from './sections/Skills/Skills';
+import { Philosophy } from './sections/Philosophy/Philosophy';
+import { Services } from './sections/Services/Services';
+import { ExperimentalImage } from './sections/ExperimentalImage/ExperimentalImage';
+import { ContactCTA } from './sections/ContactCTA/ContactCTA';
+import { Footer } from './components/Footer/Footer';
 
-import { HomePage } from './pages/HomePage';
-import { WorkPage } from './pages/WorkPage';
-import { ProjectDetailPage } from './pages/ProjectDetailPage';
-import { AboutPage } from './pages/AboutPage';
-import { ContactPage } from './pages/ContactPage';
-import { NotFoundPage } from './pages/NotFoundPage';
+export const App: React.FC = () => {
+  // Initialize Lenis smooth scroll synchronized with GSAP ScrollTrigger
+  useLenis();
 
-export function App() {
+  // Initialize custom interactive cursor
+  const { cursorState, setHoverState } = useCustomCursor();
+
   return (
-    <Router>
-      {/* Accessible Skip to Content Link */}
-      <a
-        href="#main-content"
-        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[999999] focus:px-4 focus:py-2.5 focus:bg-[#FF3E00] focus:text-white focus:font-mono focus:text-xs focus:rounded-md focus:shadow-xl focus:outline-none"
-      >
-        Skip to main content
-      </a>
+    <div className="relative min-h-screen bg-dark-950 text-light-200 selection:bg-light-100 selection:text-dark-950">
+      {/* Subtle Grain Overlay for tactile texture */}
+      <div className="noise-overlay" aria-hidden="true" />
 
-      <div className="relative min-h-screen bg-[#050505] text-[#F5F5F5] selection:bg-[#FF3E00] selection:text-white overflow-x-hidden font-sans">
-        {/* Full-Screen Signature Entry Loader */}
-        <ScrilloLoader />
+      {/* Interactive Custom Cursor */}
+      <CustomCursor
+        cursorText={cursorState.cursorText}
+        isHovered={cursorState.isHovered}
+        hoverType={cursorState.hoverType}
+      />
 
-        {/* Ambient Film Grain Texture */}
-        <GrainOverlay />
+      {/* Global Header */}
+      <Header onHoverStateChange={setHoverState} />
 
-        {/* Top Scroll Progress Indicator */}
-        <ScrollProgress />
+      {/* Main Content Sections */}
+      <main className="relative z-10">
+        <Hero onHoverStateChange={setHoverState} />
+        <SelectedWorks onHoverStateChange={setHoverState} />
+        <Statement />
+        <Skills />
+        <Philosophy />
+        <Services />
+        <ExperimentalImage onHoverStateChange={setHoverState} />
+        <ContactCTA onHoverStateChange={setHoverState} />
+      </main>
 
-        {/* Desktop Dynamic Contextual Cursor */}
-        <CustomCursor />
-
-        {/* Auto Scroll to Top on Navigation */}
-        <ScrollToTopOnRoute />
-
-        {/* Reimagined Floating Spatial Navigation */}
-        <FloatingSpatialNav />
-
-        {/* Main Application Routes with Error Boundary Guard */}
-        <main id="main-content">
-          <ErrorBoundary>
-            <Routes>
-              <Route path="/" element={<HomePage />} />
-              <Route path="/work" element={<WorkPage />} />
-              <Route path="/work/:slug" element={<ProjectDetailPage />} />
-              <Route path="/about" element={<AboutPage />} />
-              <Route path="/contact" element={<ContactPage />} />
-              <Route path="/404" element={<NotFoundPage />} />
-              <Route path="*" element={<NotFoundPage />} />
-            </Routes>
-          </ErrorBoundary>
-        </main>
-
-        {/* Large Editorial Footer */}
-        <Footer />
-      </div>
-    </Router>
+      {/* Global Footer */}
+      <Footer onHoverStateChange={setHoverState} />
+    </div>
   );
-}
+};
 
 export default App;

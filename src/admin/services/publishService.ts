@@ -6,6 +6,7 @@ import { projectService } from './projectService';
 import { skillService } from './skillService';
 import { servicesService } from './servicesService';
 import { settingsService } from './settingsService';
+import { activityService } from './activityService';
 
 const PUBLISHED_STORAGE_KEY = 'portfolio-published-snapshot';
 const LAST_PUBLISHED_KEY = 'portfolio-last-published-date';
@@ -280,6 +281,15 @@ export const publishService = {
       }
     }
 
+    // Log published activity
+    activityService.logActivity({
+      action: 'Content published',
+      item: 'Live portfolio snapshot published',
+      section: 'Publish Engine',
+      user: 'admin@scrillo.design',
+      status: 'Published',
+    }).catch(() => {});
+
     return { success: true, publishedAt };
   },
 
@@ -288,6 +298,13 @@ export const publishService = {
    */
   async revertDraftToPublished(): Promise<WebsiteData> {
     const published = await this.getPublishedSnapshot();
+    activityService.logActivity({
+      action: 'Draft reverted',
+      item: 'Staging draft reverted to published version',
+      section: 'Publish Engine',
+      user: 'admin@scrillo.design',
+      status: 'Draft',
+    }).catch(() => {});
     return JSON.parse(JSON.stringify(published));
   },
 };

@@ -1,6 +1,7 @@
 import { supabase, isSupabaseConfigured } from '../../lib/supabase';
 import { Project } from '../../types';
 import { defaultWebsiteData } from '../../data/defaultWebsiteData';
+import { activityService } from './activityService';
 
 // In-memory store for projects initialized from defaultWebsiteData
 const memoryProjectsStore: Project[] = JSON.parse(JSON.stringify(defaultWebsiteData.projects));
@@ -71,6 +72,15 @@ export const projectService = {
 
     memoryProjectsStore.push(newProject);
 
+    // Track activity event
+    activityService.logActivity({
+      action: newProject.published ? 'Project published' : 'Project created',
+      item: newProject.title || 'Untitled Project',
+      section: 'Projects',
+      user: 'admin@scrillo.design',
+      status: newProject.published ? 'Published' : 'Draft',
+    }).catch(() => {});
+
     if (!isSupabaseConfigured) {
       return newProject;
     }
@@ -93,13 +103,29 @@ export const projectService = {
    */
   async updateProject(id: string, updates: Partial<Project>): Promise<boolean> {
     const index = memoryProjectsStore.findIndex((p) => p.id === id);
+    let targetTitle = 'Project';
     if (index !== -1) {
+      targetTitle = updates.title || memoryProjectsStore[index].title || 'Project';
       memoryProjectsStore[index] = {
         ...memoryProjectsStore[index],
         ...updates,
         updatedAt: new Date().toISOString(),
       };
     }
+
+    // Track activity
+    const isPublishToggle = updates.published !== undefined;
+    const actionName = isPublishToggle
+      ? (updates.published ? 'Project published' : 'Project updated')
+      : 'Project updated';
+
+    activityService.logActivity({
+      action: actionName,
+      item: targetTitle,
+      section: 'Projects',
+      user: 'admin@scrillo.design',
+      status: updates.published === false ? 'Draft' : 'Updated',
+    }).catch(() => {});
 
     if (!isSupabaseConfigured) {
       return true;
@@ -130,9 +156,20 @@ export const projectService = {
    */
   async deleteProject(id: string): Promise<boolean> {
     const index = memoryProjectsStore.findIndex((p) => p.id === id);
+    let deletedTitle = `Project (${id})`;
     if (index !== -1) {
+      deletedTitle = memoryProjectsStore[index].title || deletedTitle;
       memoryProjectsStore.splice(index, 1);
     }
+
+    // Track activity
+    activityService.logActivity({
+      action: 'Project deleted',
+      item: deletedTitle,
+      section: 'Projects',
+      user: 'admin@scrillo.design',
+      status: 'Deleted',
+    }).catch(() => {});
 
     if (!isSupabaseConfigured) {
       return true;

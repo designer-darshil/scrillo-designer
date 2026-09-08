@@ -1,6 +1,7 @@
 import { supabase, isSupabaseConfigured } from '../../lib/supabase';
 import { WebsiteData } from '../../types';
 import { defaultWebsiteData } from '../../data/defaultWebsiteData';
+import { activityService } from './activityService';
 
 export interface MediaAsset {
   id: string;
@@ -254,6 +255,13 @@ export const mediaService = {
             uploadedAt: new Date().toISOString(),
           };
           memoryMediaStore.unshift(newAsset);
+          activityService.logActivity({
+            action: 'Image uploaded',
+            item: `${newAsset.name} (${newAsset.sizeFormatted})`,
+            section: 'Media Library',
+            user: 'admin@scrillo.design',
+            status: 'Uploaded',
+          }).catch(() => {});
           return newAsset;
         }
       } catch (err) {
@@ -277,6 +285,13 @@ export const mediaService = {
     };
 
     memoryMediaStore.unshift(newAsset);
+    activityService.logActivity({
+      action: 'Image uploaded',
+      item: `${newAsset.name} (${newAsset.sizeFormatted})`,
+      section: 'Media Library',
+      user: 'admin@scrillo.design',
+      status: 'Uploaded',
+    }).catch(() => {});
     return newAsset;
   },
 
@@ -304,9 +319,19 @@ export const mediaService = {
    */
   async deleteAsset(id: string, url: string): Promise<boolean> {
     const index = memoryMediaStore.findIndex((a) => a.id === id || a.url === url);
+    let deletedName = 'Media Asset';
     if (index !== -1) {
+      deletedName = memoryMediaStore[index].name;
       memoryMediaStore.splice(index, 1);
     }
+
+    activityService.logActivity({
+      action: 'Media deleted',
+      item: deletedName,
+      section: 'Media Library',
+      user: 'admin@scrillo.design',
+      status: 'Deleted',
+    }).catch(() => {});
 
     if (!isSupabaseConfigured) return true;
 

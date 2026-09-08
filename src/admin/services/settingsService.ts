@@ -1,6 +1,7 @@
 import { supabase, isSupabaseConfigured } from '../../lib/supabase';
 import { WebsiteSettings } from '../../types';
 import { defaultWebsiteData } from '../../data/defaultWebsiteData';
+import { activityService } from './activityService';
 
 export const defaultSettings: WebsiteSettings = defaultWebsiteData.settings;
 
@@ -38,6 +39,15 @@ export const settingsService = {
    */
   async updateSettings(settings: WebsiteSettings): Promise<boolean> {
     memorySettingsStore = { ...settings };
+
+    activityService.logActivity({
+      action: 'Settings changed',
+      item: 'Theme, Colors & System Configuration',
+      section: 'Settings',
+      user: 'admin@scrillo.design',
+      status: 'Updated',
+    }).catch(() => {});
+
     if (!isSupabaseConfigured) return true;
     try {
       const { error } = await supabase.from('site_settings').upsert({ id: 1, settings, updated_at: new Date().toISOString() });

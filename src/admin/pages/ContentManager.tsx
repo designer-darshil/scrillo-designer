@@ -23,6 +23,7 @@ import {
 import { useWebsiteData } from '../../hooks/useWebsiteData';
 import { HeroContent, AboutContent, MarqueeContent, PhilosophyContent, ContactCTA } from '../../types';
 import { defaultWebsiteData } from '../../data/defaultWebsiteData';
+import { MediaPickerModal } from '../components/MediaPickerModal';
 
 const curatedHeroImages = [
   {
@@ -75,6 +76,7 @@ export const ContentManager: React.FC = () => {
   const [status, setStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isDirty, setIsDirty] = useState(false);
+  const [isMediaPickerOpen, setIsMediaPickerOpen] = useState(false);
 
   // Sync initial state when remote data loads
   useEffect(() => {
@@ -554,9 +556,19 @@ export const ContentManager: React.FC = () => {
               </div>
 
               <div className="space-y-3">
-                <label htmlFor="hero-image-url" className="block text-xs font-semibold text-foreground">
-                  Image URL / Asset CDN Link
-                </label>
+                <div className="flex items-center justify-between">
+                  <label htmlFor="hero-image-url" className="block text-xs font-semibold text-foreground">
+                    Image URL / Asset CDN Link
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => setIsMediaPickerOpen(true)}
+                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg border border-border bg-surface hover:bg-background text-xs font-medium text-foreground transition-colors"
+                  >
+                    <ImageIcon className="w-3.5 h-3.5" />
+                    <span>Choose from Media Library</span>
+                  </button>
+                </div>
                 <input
                   id="hero-image-url"
                   type="text"
@@ -1222,6 +1234,14 @@ export const ContentManager: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Media Picker Modal */}
+      <MediaPickerModal
+        isOpen={isMediaPickerOpen}
+        onClose={() => setIsMediaPickerOpen(false)}
+        onSelect={(url) => handleHeroChange('heroImage', url)}
+        title="Select Hero Specimen Asset"
+      />
     </div>
   );
 };

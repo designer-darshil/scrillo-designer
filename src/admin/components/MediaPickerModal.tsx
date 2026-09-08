@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { X, Image as ImageIcon, Upload, Check, Link } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { X, Image as ImageIcon, Upload, Check, Link, Search, Loader2, Sparkles } from 'lucide-react';
+import { mediaService, MediaAsset } from '../services/mediaService';
 
 interface MediaPickerModalProps {
   isOpen: boolean;
@@ -57,22 +58,82 @@ export const MediaPickerModal: React.FC<MediaPickerModalProps> = ({
   onSelect,
   title = 'Select Media Asset',
 }) => {
+  const [assets, setAssets] = useState<MediaAsset[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedUrl, setSelectedUrl] = useState<string>('');
   const [customUrl, setCustomUrl] = useState<string>('');
-  const [activeTab, setActiveTab] = useState<'presets' | 'upload' | 'url'>('presets');
+  const [activeTab, setActiveTab] = useState<'library' | 'upload' | 'url'>('library');
+  const [uploading, setUploading] = useState<boolean>(false);
+  const [uploadProgress, setUploadProgress] = useState<number>(0);
+  const [uploadStatus, setUploadStatus] = useState<string>('');
+
+  const loadAssets = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await mediaService.getAssets();
+      setAssets(data);
+    } catch {
+      // Fallback
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (isOpen) {
+      loadAssets();
+    }
+  }, [isOpen, loadAssets]);
 
   if (!isOpen) return null;
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        if (typeof reader.result === 'string') {
-          setSelectedUrl(reader.result);
-        }
-      };
-      reader.readAsDataURL(file);
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    setUploading(true);
+    setUploadProgress(20);
+    setUploadStatus(`Uploading ${files[0].name}...`);
+
+    try {
+      const asset = await mediaService.uploadAsset(files[0]);
+      setUploadProgress(100);
+      if (asset) {
+        setSelectedUrl(asset.url);
+        setUploadStatus('Upload successful!');
+        await loadAssets();
+        setActiveTab('library');
+      }
+    } catch (err: any) {
+      setUploadStatus(`Upload failed: ${err?.message || 'Unknown error'}`);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleDrop = async (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    const files = e.dataTransfer.files;
+    if (!files || files.length === 0) return;
+
+    setUploading(true);
+    setUploadProgress(30);
+    setUploadStatus(`Uploading ${files[0].name}...`);
+
+    try {
+      const asset = await mediaService.uploadAsset(files[0]);
+      setUploadProgress(100);
+      if (asset) {
+        setSelectedUrl(asset.url);
+        setUploadStatus('Upload successful!');
+        await loadAssets();
+        setActiveTab('library');
+      }
+    } catch (err: any) {
+      setUploadStatus(`Upload failed: ${err?.message || 'Unknown error'}`);
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -84,9 +145,19 @@ export const MediaPickerModal: React.FC<MediaPickerModalProps> = ({
     }
   };
 
+  const filteredAssets = assets.filter((asset) => {
+    if (!searchQuery.trim()) return true;
+    const query = searchQuery.toLowerCase();
+    return (
+      asset.name.toLowerCase().includes(query) ||
+      asset.format.toLowerCase().includes(query) ||
+      asset.type.toLowerCase().includes(query)
+    );
+  });
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="w-full max-w-2xl rounded-2xl border border-border bg-surface shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
+      <div className="w-full max-w-3xl rounded-2xl border border-border bg-surface shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-border">
           <div className="flex items-center gap-2">
@@ -102,95 +173,163 @@ export const MediaPickerModal: React.FC<MediaPickerModalProps> = ({
           </button>
         </div>
 
-        {/* Tab Controls */}
-        <div className="flex items-center gap-2 px-6 pt-4 border-b border-border pb-3 bg-surface">
-          <button
-            type="button"
-            onClick={() => setActiveTab('presets')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-              activeTab === 'presets'
-                ? 'bg-foreground text-background shadow-xs'
-                : 'text-muted hover:text-foreground hover:bg-background'
-            }`}
-          >
-            Curated Presets
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab('upload')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-              activeTab === 'upload'
-                ? 'bg-foreground text-background shadow-xs'
-                : 'text-muted hover:text-foreground hover:bg-background'
-            }`}
-          >
-            Upload File
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab('url')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-              activeTab === 'url'
-                ? 'bg-foreground text-background shadow-xs'
-                : 'text-muted hover:text-foreground hover:bg-background'
-            }`}
-          >
-            Direct URL
-          </button>
+        {/* Tab Controls & Search */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-6 pt-4 border-b border-border pb-3 bg-surface">
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setActiveTab('library')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
+                activeTab === 'library'
+                  ? 'bg-foreground text-background shadow-xs'
+                  : 'text-muted hover:text-foreground hover:bg-background'
+              }`}
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Media Library ({assets.length})</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab('upload')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
+                activeTab === 'upload'
+                  ? 'bg-foreground text-background shadow-xs'
+                  : 'text-muted hover:text-foreground hover:bg-background'
+              }`}
+            >
+              <Upload className="w-3.5 h-3.5" />
+              <span>Upload New</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab('url')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
+                activeTab === 'url'
+                  ? 'bg-foreground text-background shadow-xs'
+                  : 'text-muted hover:text-foreground hover:bg-background'
+              }`}
+            >
+              <Link className="w-3.5 h-3.5" />
+              <span>Direct Link</span>
+            </button>
+          </div>
+
+          {activeTab === 'library' && (
+            <div className="relative w-full sm:w-56">
+              <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-muted" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search assets..."
+                className="w-full pl-8 pr-3 py-1.5 rounded-lg border border-border bg-background text-xs text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
+              />
+            </div>
+          )}
         </div>
 
         {/* Content Body */}
         <div className="p-6 overflow-y-auto flex-1 space-y-4">
-          {activeTab === 'presets' && (
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              {curatedLibraryImages.map((item) => (
-                <button
-                  key={item.url}
-                  type="button"
-                  onClick={() => setSelectedUrl(item.url)}
-                  className={`group relative rounded-xl border p-1 text-left transition-all overflow-hidden ${
-                    selectedUrl === item.url
-                      ? 'border-foreground ring-2 ring-foreground/20 bg-background'
-                      : 'border-border hover:border-foreground/50 bg-background/50'
-                  }`}
-                >
-                  <div className="aspect-[16/10] rounded-lg overflow-hidden bg-surface mb-1.5">
-                    <img
-                      src={item.url}
-                      alt={item.title}
-                      className="w-full h-full object-cover grayscale contrast-125 group-hover:grayscale-0 transition-all duration-300"
-                    />
-                  </div>
-                  <p className="text-[10px] font-semibold text-foreground truncate px-1">{item.title}</p>
-                  <p className="text-[9px] text-muted truncate px-1">{item.category}</p>
+          {activeTab === 'library' && (
+            <>
+              {loading ? (
+                <div className="py-16 text-center space-y-2">
+                  <Loader2 className="w-6 h-6 animate-spin mx-auto text-muted" />
+                  <p className="text-xs text-muted">Loading media library...</p>
+                </div>
+              ) : filteredAssets.length === 0 ? (
+                <div className="py-16 text-center space-y-2">
+                  <ImageIcon className="w-8 h-8 mx-auto text-muted opacity-50" />
+                  <p className="text-xs font-semibold text-foreground">No media assets found</p>
+                  <p className="text-[11px] text-muted">Upload a new image or search with another keyword</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                  {filteredAssets.map((item) => (
+                    <button
+                      key={item.id}
+                      type="button"
+                      onClick={() => setSelectedUrl(item.url)}
+                      className={`group relative rounded-xl border p-2 text-left transition-all overflow-hidden flex flex-col ${
+                        selectedUrl === item.url
+                          ? 'border-foreground ring-2 ring-foreground/20 bg-background'
+                          : 'border-border hover:border-foreground/50 bg-background/50'
+                      }`}
+                    >
+                      <div className="aspect-[16/10] rounded-lg overflow-hidden bg-surface mb-2 relative">
+                        <img
+                          src={item.url}
+                          alt={item.name}
+                          className="w-full h-full object-cover grayscale contrast-125 group-hover:grayscale-0 transition-all duration-300"
+                        />
+                        <span className="absolute bottom-1 right-1 px-1.5 py-0.5 rounded-sm bg-background/80 backdrop-blur-xs font-mono text-[9px] text-foreground font-semibold uppercase">
+                          {item.format}
+                        </span>
+                      </div>
+                      <p className="text-[11px] font-semibold text-foreground truncate">{item.name}</p>
+                      <div className="flex items-center justify-between text-[9px] text-muted mt-0.5 font-mono">
+                        <span>{item.dimensions}</span>
+                        <span>{item.sizeFormatted}</span>
+                      </div>
 
-                  {selectedUrl === item.url && (
-                    <div className="absolute top-2 right-2 p-1 rounded-full bg-foreground text-background shadow-xs">
-                      <Check className="w-3 h-3" />
-                    </div>
-                  )}
-                </button>
-              ))}
-            </div>
+                      {selectedUrl === item.url && (
+                        <div className="absolute top-3 right-3 p-1 rounded-full bg-foreground text-background shadow-xs">
+                          <Check className="w-3 h-3" />
+                        </div>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </>
           )}
 
           {activeTab === 'upload' && (
-            <div className="border-2 border-dashed border-border rounded-xl p-8 text-center space-y-3 bg-background/40">
+            <div
+              onDragOver={(e) => e.preventDefault()}
+              onDrop={handleDrop}
+              className="border-2 border-dashed border-border rounded-xl p-8 text-center space-y-3 bg-background/40"
+            >
               <Upload className="w-8 h-8 mx-auto text-muted" />
               <div className="space-y-1">
                 <p className="text-xs font-semibold text-foreground">Click to upload or drag & drop</p>
-                <p className="text-[11px] text-muted">Supports PNG, JPG, WEBP, or SVG</p>
+                <p className="text-[11px] text-muted">Supports PNG, JPG, JPEG, WEBP, or SVG</p>
               </div>
-              <label className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-foreground text-background text-xs font-semibold cursor-pointer hover:opacity-90 transition-opacity">
-                <span>Browse Local Files</span>
-                <input type="file" accept="image/*" onChange={handleFileUpload} className="hidden" />
-              </label>
 
-              {selectedUrl && selectedUrl.startsWith('data:') && (
+              {uploading ? (
+                <div className="max-w-xs mx-auto space-y-2 pt-2">
+                  <div className="flex items-center justify-between text-[11px] text-muted font-mono">
+                    <span>{uploadStatus}</span>
+                    <span>{uploadProgress}%</span>
+                  </div>
+                  <div className="w-full h-1.5 rounded-full bg-border overflow-hidden">
+                    <div
+                      className="h-full bg-foreground transition-all duration-300"
+                      style={{ width: `${uploadProgress}%` }}
+                    />
+                  </div>
+                </div>
+              ) : (
+                <label className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-foreground text-background text-xs font-semibold cursor-pointer hover:opacity-90 transition-opacity">
+                  <span>Browse Local Files</span>
+                  <input
+                    type="file"
+                    accept="image/png,image/jpeg,image/webp,image/svg+xml"
+                    onChange={handleFileUpload}
+                    className="hidden"
+                  />
+                </label>
+              )}
+
+              {uploadStatus && !uploading && (
+                <p className="text-[11px] text-emerald-500 font-medium pt-2">{uploadStatus}</p>
+              )}
+
+              {selectedUrl && (
                 <div className="pt-4 max-w-xs mx-auto">
-                  <p className="text-xs text-muted mb-2 font-medium">Uploaded Preview:</p>
+                  <p className="text-xs text-muted mb-2 font-medium">Selected Asset Preview:</p>
                   <div className="aspect-[16/10] rounded-lg overflow-hidden border border-border">
-                    <img src={selectedUrl} alt="Uploaded preview" className="w-full h-full object-cover" />
+                    <img src={selectedUrl} alt="Preview" className="w-full h-full object-cover" />
                   </div>
                 </div>
               )}
@@ -235,22 +374,27 @@ export const MediaPickerModal: React.FC<MediaPickerModalProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-end gap-2 px-6 py-4 border-t border-border bg-surface">
-          <button
-            type="button"
-            onClick={onClose}
-            className="px-4 py-2 rounded-xl border border-border text-xs font-medium text-muted hover:text-foreground hover:bg-background transition-colors"
-          >
-            Cancel
-          </button>
-          <button
-            type="button"
-            onClick={handleConfirm}
-            disabled={activeTab === 'url' ? !customUrl.trim() : !selectedUrl}
-            className="px-5 py-2 rounded-xl bg-foreground text-background text-xs font-semibold hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
-          >
-            Apply Asset
-          </button>
+        <div className="flex items-center justify-between px-6 py-4 border-t border-border bg-surface">
+          <div className="text-xs text-muted truncate max-w-xs font-mono">
+            {activeTab === 'url' ? customUrl : selectedUrl ? 'Asset selected' : 'No asset chosen'}
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 rounded-xl border border-border text-xs font-medium text-muted hover:text-foreground hover:bg-background transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={handleConfirm}
+              disabled={activeTab === 'url' ? !customUrl.trim() : !selectedUrl}
+              className="px-5 py-2 rounded-xl bg-foreground text-background text-xs font-semibold hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              Apply Asset
+            </button>
+          </div>
         </div>
       </div>
     </div>

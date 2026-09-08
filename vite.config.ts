@@ -47,6 +47,20 @@ export default defineConfig({
   plugins: [react(), contactApiDevPlugin()],
   server: {
     port: 5180,
-    host: true
-  }
+    host: true,
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+          'vendor-animations': ['gsap', 'framer-motion', 'lenis'],
+          'vendor-dnd': ['@dnd-kit/core', '@dnd-kit/sortable', '@dnd-kit/utilities'],
+          'vendor-icons': ['lucide-react'],
+          'vendor-supabase': ['@supabase/supabase-js'],
+        },
+      },
+    },
+    chunkSizeWarningLimit: 600,
+  },
 });

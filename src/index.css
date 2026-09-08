@@ -152,37 +152,40 @@
 
   /* TYPOGRAPHY UTILITY CLASSES */
 
-  /* Display: clamp(4rem, 8vw, 9rem) line-height: 0.88-0.95 letter-spacing: -0.05em */
+  /* Display: clamp(2.5rem, 7.5vw, 9rem) line-height: 0.88-0.95 letter-spacing: -0.05em */
   .text-display {
     font-family: 'General Sans', 'Inter', sans-serif;
-    font-size: clamp(4rem, 8vw, 9rem);
+    font-size: clamp(2.5rem, 7.5vw, 9rem);
     line-height: 0.90;
     letter-spacing: -0.05em;
     font-weight: 700;
     text-transform: uppercase;
     color: var(--foreground);
+    word-break: break-word;
   }
 
-  /* Section Headings: clamp(3rem, 6vw, 7rem) */
+  /* Section Headings: clamp(2.25rem, 6vw, 7rem) */
   .text-heading-section {
     font-family: 'General Sans', 'Inter', sans-serif;
-    font-size: clamp(3rem, 6vw, 7rem);
+    font-size: clamp(2.25rem, 6vw, 7rem);
     line-height: 0.92;
     letter-spacing: -0.04em;
     font-weight: 700;
     text-transform: uppercase;
     color: var(--foreground);
+    word-break: break-word;
   }
 
-  /* Project Headings: clamp(2rem, 4vw, 5rem) */
+  /* Project Headings: clamp(1.75rem, 4.5vw, 5rem) */
   .text-heading-project {
     font-family: 'General Sans', 'Inter', sans-serif;
-    font-size: clamp(2rem, 4vw, 5rem);
+    font-size: clamp(1.75rem, 4.5vw, 5rem);
     line-height: 0.95;
     letter-spacing: -0.03em;
     font-weight: 600;
     text-transform: uppercase;
     color: var(--foreground);
+    word-break: break-word;
   }
 
   /* Body text: 18-24px */

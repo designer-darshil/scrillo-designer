@@ -190,8 +190,8 @@ export const Hero: React.FC<HeroProps> = ({ onHoverStateChange }) => {
             </div>
 
             {/* Primary CTA (View Selected Works) */}
-            <div ref={ctaRef} className="lg:col-span-5 xl:col-span-6 flex items-center lg:justify-end">
-              <MagneticButton onClick={scrollToWorks} strength={0.3}>
+            <div ref={ctaRef} className="lg:col-span-5 xl:col-span-6 flex items-center lg:justify-end w-full sm:w-auto">
+              <MagneticButton onClick={scrollToWorks} strength={0.3} className="w-full sm:w-auto">
                 <button
                   type="button"
                   onClick={scrollToWorks}
@@ -199,7 +199,7 @@ export const Hero: React.FC<HeroProps> = ({ onHoverStateChange }) => {
                   data-cursor-text="OPEN →"
                   onMouseEnter={() => onHoverStateChange?.(true, 'link')}
                   onMouseLeave={() => onHoverStateChange?.(false)}
-                  className="group flex items-center gap-4 px-6 sm:px-8 py-4 sm:py-5 bg-foreground text-background font-mono text-xs sm:text-sm font-semibold uppercase tracking-widest hover:bg-[#E0E0DC] transition-colors focus-visible:outline focus-visible:outline-1 focus-visible:outline-foreground"
+                  className="group w-full sm:w-auto min-h-[48px] flex items-center justify-between sm:justify-center gap-4 px-6 sm:px-8 py-4 sm:py-5 bg-foreground text-background font-mono text-xs sm:text-sm font-semibold uppercase tracking-widest hover:bg-[#E0E0DC] transition-colors focus-visible:outline focus-visible:outline-1 focus-visible:outline-foreground"
                 >
                   <span>VIEW SELECTED WORKS</span>
                   <div className="w-5 h-5 flex items-center justify-center bg-background text-foreground group-hover:rotate-45 transition-transform duration-300">

@@ -176,12 +176,12 @@ export const Header: React.FC<HeaderProps> = ({
               })}
             </nav>
 
-            {/* Mobile Menu Trigger */}
+            {/* Mobile Menu Trigger (44px touch target) */}
             <div className="md:hidden pointer-events-auto">
               <button
                 type="button"
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="flex items-center gap-2 py-1 px-2 text-xs font-mono uppercase tracking-widest text-white/90 hover:text-white focus-visible:outline focus-visible:outline-1 focus-visible:outline-white"
+                className="min-h-[44px] min-w-[44px] flex items-center justify-end gap-2 py-2 px-1 text-xs font-mono uppercase tracking-widest text-white/90 hover:text-white focus-visible:outline focus-visible:outline-1 focus-visible:outline-white"
                 aria-label={isMobileMenuOpen ? 'Close Menu' : 'Open Menu'}
                 aria-expanded={isMobileMenuOpen}
               >

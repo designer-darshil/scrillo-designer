@@ -161,16 +161,16 @@ export const ContactCTA: React.FC = () => {
           </p>
 
           {/* Primary CTA Button with Magnetic Pull & Inverted Color Hover */}
-          <div ref={ctaBtnRef} className="pt-4 sm:pt-6">
-            <MagneticButton strength={0.35} href={`mailto:${email}?subject=Project%20Inquiry`}>
+          <div ref={ctaBtnRef} className="pt-4 sm:pt-6 w-full sm:w-auto">
+            <MagneticButton strength={0.35} href={`mailto:${email}?subject=Project%20Inquiry`} className="w-full sm:w-auto">
               <a
                 href={`mailto:${email}?subject=Project%20Inquiry`}
                 data-cursor="cta"
                 data-cursor-text="OPEN →"
-                className="group inline-flex items-center gap-4 sm:gap-6 px-8 sm:px-12 py-5 sm:py-7 bg-foreground text-background border border-foreground font-mono text-sm sm:text-base font-bold uppercase tracking-widest hover:bg-transparent hover:text-foreground transition-all duration-300 focus-visible:outline focus-visible:outline-1 focus-visible:outline-foreground"
+                className="group w-full sm:w-auto min-h-[52px] inline-flex items-center justify-between sm:justify-center gap-4 sm:gap-6 px-8 sm:px-12 py-5 sm:py-7 bg-foreground text-background border border-foreground font-mono text-xs sm:text-base font-bold uppercase tracking-widest hover:bg-transparent hover:text-foreground transition-all duration-300 focus-visible:outline focus-visible:outline-1 focus-visible:outline-foreground"
               >
                 <span>START A PROJECT</span>
-                <div className="w-6 h-6 flex items-center justify-center text-background group-hover:text-foreground group-hover:translate-x-2 transition-all duration-300">
+                <div className="w-6 h-6 flex items-center justify-center text-background group-hover:text-foreground group-hover:translate-x-2 transition-all duration-300 shrink-0">
                   <ArrowRight className="w-5 h-5" />
                 </div>
               </a>

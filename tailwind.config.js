@@ -20,14 +20,14 @@ export default {
         mono: ['"JetBrains Mono"', 'monospace'],
       },
       fontSize: {
-        // Display: clamp(4rem, 8vw, 9rem) line-height: 0.88-0.95, letter-spacing: -0.05em
-        display: ['clamp(4rem, 8vw, 9rem)', { lineHeight: '0.9', letterSpacing: '-0.05em' }],
+        // Display: clamp(2.5rem, 7.5vw, 9rem) line-height: 0.88-0.95, letter-spacing: -0.05em
+        display: ['clamp(2.5rem, 7.5vw, 9rem)', { lineHeight: '0.9', letterSpacing: '-0.05em' }],
         
-        // Section headings: clamp(3rem, 6vw, 7rem)
-        'heading-section': ['clamp(3rem, 6vw, 7rem)', { lineHeight: '0.92', letterSpacing: '-0.04em' }],
+        // Section headings: clamp(2.25rem, 6vw, 7rem)
+        'heading-section': ['clamp(2.25rem, 6vw, 7rem)', { lineHeight: '0.92', letterSpacing: '-0.04em' }],
         
-        // Project headings: clamp(2rem, 4vw, 5rem)
-        'heading-project': ['clamp(2rem, 4vw, 5rem)', { lineHeight: '0.95', letterSpacing: '-0.03em' }],
+        // Project headings: clamp(1.75rem, 4.5vw, 5rem)
+        'heading-project': ['clamp(1.75rem, 4.5vw, 5rem)', { lineHeight: '0.95', letterSpacing: '-0.03em' }],
         
         // Body: 18-24px
         'body-editorial': ['clamp(1.125rem, 1.25vw, 1.5rem)', { lineHeight: '1.5', letterSpacing: '-0.01em' }],

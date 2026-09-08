@@ -171,7 +171,7 @@ export const Services: React.FC = () => {
                   {svc.deliverables.map((item, idx) => (
                     <span
                       key={idx}
-                      className="font-mono text-[11px] uppercase tracking-wider text-muted/80 bg-white/5 border border-border px-2.5 py-1"
+                      className="font-mono text-[11px] uppercase tracking-wider text-muted hover:text-foreground bg-surface border border-border/80 px-2.5 py-1 transition-colors"
                     >
                       {item}
                     </span>

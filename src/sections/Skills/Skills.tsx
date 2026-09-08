@@ -229,10 +229,10 @@ export const Skills: React.FC = () => {
                     data-cursor="link"
                     onMouseEnter={() => handleSkillHoverStart(skill)}
                     onMouseLeave={handleSkillHoverEnd}
-                    className="skill-row-item group relative py-3.5 border-b border-border/50 flex items-center justify-between cursor-pointer transition-all duration-300"
+                    className="skill-row-item group relative py-3.5 border-b border-border/70 flex items-center justify-between cursor-pointer transition-all duration-300"
                   >
                     <div className="flex items-center gap-4 group-hover:translate-x-2 transition-transform duration-300 ease-out">
-                      <span className="font-mono text-xs text-muted/60 group-hover:text-foreground transition-colors shrink-0">
+                      <span className="font-mono text-xs text-muted group-hover:text-foreground transition-colors shrink-0">
                         {skill.index}
                       </span>
                       <span className="font-sans text-base sm:text-lg text-foreground/90 group-hover:text-foreground font-medium tracking-tight">

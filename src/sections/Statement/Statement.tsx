@@ -126,7 +126,7 @@ export const Statement: React.FC = () => {
                 CURIOUS.
               </span>
             </span>
-            <span aria-hidden="true" className="statement-symbol font-mono text-2xl sm:text-4xl text-muted opacity-60 align-super select-none">
+            <span aria-hidden="true" className="statement-symbol font-mono text-2xl sm:text-4xl text-muted opacity-80 align-super select-none">
               *
             </span>
           </div>
@@ -143,7 +143,7 @@ export const Statement: React.FC = () => {
                 BOLD.
               </span>
             </span>
-            <span aria-hidden="true" className="statement-symbol font-mono text-2xl sm:text-4xl text-muted opacity-60 align-super select-none">
+            <span aria-hidden="true" className="statement-symbol font-mono text-2xl sm:text-4xl text-muted opacity-80 align-super select-none">
               +
             </span>
           </div>
@@ -160,7 +160,7 @@ export const Statement: React.FC = () => {
                 USEFUL.
               </span>
             </span>
-            <div aria-hidden="true" className="inline-flex items-center gap-1.5 text-muted opacity-60 align-super select-none">
+            <div aria-hidden="true" className="inline-flex items-center gap-1.5 text-muted opacity-80 align-super select-none">
               <span className="statement-symbol font-mono text-xl sm:text-3xl">°</span>
               <span className="statement-symbol font-mono text-xs sm:text-sm tracking-widest uppercase">™</span>
             </div>

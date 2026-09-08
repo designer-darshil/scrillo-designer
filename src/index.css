@@ -152,12 +152,12 @@
 
   /* TYPOGRAPHY UTILITY CLASSES */
 
-  /* Display: clamp(2.5rem, 7.5vw, 9rem) line-height: 0.88-0.95 letter-spacing: -0.05em */
+  /* Display: clamp(2.5rem, 7.5vw, 9rem) line-height: 0.88 letter-spacing: -0.055em */
   .text-display {
     font-family: 'General Sans', 'Inter', sans-serif;
     font-size: clamp(2.5rem, 7.5vw, 9rem);
-    line-height: 0.90;
-    letter-spacing: -0.05em;
+    line-height: 0.88;
+    letter-spacing: -0.055em;
     font-weight: 700;
     text-transform: uppercase;
     color: var(--foreground);
@@ -168,8 +168,8 @@
   .text-heading-section {
     font-family: 'General Sans', 'Inter', sans-serif;
     font-size: clamp(2.25rem, 6vw, 7rem);
-    line-height: 0.92;
-    letter-spacing: -0.04em;
+    line-height: 0.90;
+    letter-spacing: -0.045em;
     font-weight: 700;
     text-transform: uppercase;
     color: var(--foreground);
@@ -180,8 +180,8 @@
   .text-heading-project {
     font-family: 'General Sans', 'Inter', sans-serif;
     font-size: clamp(1.75rem, 4.5vw, 5rem);
-    line-height: 0.95;
-    letter-spacing: -0.03em;
+    line-height: 0.92;
+    letter-spacing: -0.035em;
     font-weight: 600;
     text-transform: uppercase;
     color: var(--foreground);
@@ -192,8 +192,8 @@
   .text-body-editorial {
     font-family: 'General Sans', 'Inter', sans-serif;
     font-size: clamp(1.125rem, 1.25vw, 1.5rem);
-    line-height: 1.5;
-    letter-spacing: -0.01em;
+    line-height: 1.55;
+    letter-spacing: -0.015em;
     font-weight: 400;
     color: var(--muted);
   }
@@ -204,7 +204,7 @@
     font-family: 'JetBrains Mono', monospace;
     font-size: clamp(0.6875rem, 0.8vw, 0.875rem);
     line-height: 1.4;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.12em;
     font-weight: 400;
     text-transform: uppercase;
     color: var(--muted);
@@ -221,7 +221,7 @@
     border-bottom: 1px solid var(--border);
     font-family: 'JetBrains Mono', monospace;
     font-size: clamp(0.6875rem, 0.8vw, 0.875rem);
-    letter-spacing: 0.12em;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--muted);
   }

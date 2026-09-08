@@ -15,7 +15,9 @@ import { ProjectEditor } from './admin/pages/ProjectEditor';
 import { SkillsManager } from './admin/pages/SkillsManager';
 import { ServicesManager } from './admin/pages/ServicesManager';
 import { MediaManager } from './admin/pages/MediaManager';
+import { CategoriesManager } from './admin/pages/CategoriesManager';
 import { SettingsManager } from './admin/pages/SettingsManager';
+import { ProfileOverview } from './admin/pages/ProfileOverview';
 
 import { AccessDenied } from './admin/pages/AccessDenied';
 
@@ -45,9 +47,11 @@ export const App: React.FC = () => {
             >
               <Route index element={<AdminDashboard />} />
               <Route path="dashboard" element={<AdminDashboard />} />
+              <Route path="profile" element={<ProfileOverview />} />
               <Route path="content" element={<ContentManager />} />
               <Route path="content/sections" element={<SectionsManager />} />
               <Route path="content/footer" element={<FooterContactManager />} />
+              <Route path="categories" element={<CategoriesManager />} />
               <Route path="projects" element={<ProjectsManager />} />
               <Route path="projects/new" element={<ProjectEditor mode="create" />} />
               <Route path="projects/:id/edit" element={<ProjectEditor mode="edit" />} />

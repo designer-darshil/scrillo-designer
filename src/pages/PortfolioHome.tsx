@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useLenis } from '../hooks/useLenis';
 import { Header } from '../components/Header/Header';
@@ -19,7 +19,25 @@ import { PublishReviewModal } from '../admin/components/PublishReviewModal';
 import { useWebsiteData } from '../hooks/useWebsiteData';
 import { useAuth } from '../admin/hooks/useAuth';
 import { useTheme } from '../hooks/useTheme';
+import { Experience } from '../sections/Experience';
 import { SectionId } from '../types';
+import { ScrollTrigger } from '../animations/gsapConfig';
+
+// Canonical list of all main-body section keys (excludes footer).
+// This is the SINGLE SOURCE OF TRUTH for which sections exist.
+// Order here is irrelevant — runtime order comes from settings.sections[id].order.
+const ALL_MAIN_SECTION_IDS: SectionId[] = [
+  'hero',
+  'marquee',
+  'projects',
+  'statement',
+  'experience',
+  'skills',
+  'philosophy',
+  'services',
+  'image',
+  'contact',
+];
 
 export const PortfolioHome: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -69,7 +87,7 @@ export const PortfolioHome: React.FC = () => {
   // Sync Metadata & Custom CSS Variables to DOM
   useEffect(() => {
     // 1. Title & SEO Metadata
-    const siteTitle = seo?.metaTitle || settings.siteTitle || 'DARSHIL BHUVA — Principal Creative Technologist';
+    const siteTitle = seo?.metaTitle || settings.siteTitle || 'DARSHIL S. BHUVA — UI/UX Designer & Web Designer';
     document.title = isPreviewActive ? `[PREVIEW] ${siteTitle}` : siteTitle;
 
     const metaDescription = seo?.metaDescription || settings.siteDescription;
@@ -175,6 +193,13 @@ export const PortfolioHome: React.FC = () => {
       ) : null,
     projects: () => <SelectedWorks key="projects" projects={activeData.projects} />,
     statement: () => <Statement key="statement" content={activeData.about} />,
+    experience: () => (
+      <Experience
+        key="experience"
+        experience={activeData.experience}
+        education={activeData.education}
+      />
+    ),
     skills: () => <Skills key="skills" categories={activeData.skills} />,
     philosophy: () => <Philosophy key="philosophy" content={activeData.philosophy} />,
     services: () => <Services key="services" services={activeData.services} />,
@@ -183,11 +208,23 @@ export const PortfolioHome: React.FC = () => {
     footer: () => null, // Rendered as root terminal section
   };
 
-  // Sort and filter active main body sections
-  const mainSectionKeys = (Object.keys(sections || {}) as SectionId[])
-    .filter((id) => id !== 'footer')
-    .filter((id) => sections[id]?.visible !== false)
-    .sort((a, b) => (sections[a]?.order ?? 0) - (sections[b]?.order ?? 0));
+  // Data-driven rendering: use canonical section list, filter by visibility, sort by order.
+  // Never use Object.keys(sections) — it can lose keys if settings are incomplete.
+  const mainSectionKeys = useMemo(() =>
+    ALL_MAIN_SECTION_IDS
+      .filter((id) => sections[id]?.visible !== false)
+      .sort((a, b) => (sections[a]?.order ?? 99) - (sections[b]?.order ?? 99)),
+    [sections]
+  );
+
+  // Refresh GSAP ScrollTrigger positions after sections mount or reorder
+  const sectionOrderKey = mainSectionKeys.join(',');
+  useEffect(() => {
+    const rafId = requestAnimationFrame(() => {
+      ScrollTrigger.refresh();
+    });
+    return () => cancelAnimationFrame(rafId);
+  }, [sectionOrderKey]);
 
   const handleExitPreview = () => {
     searchParams.delete('preview');
@@ -199,8 +236,8 @@ export const PortfolioHome: React.FC = () => {
       {/* Full-Screen Editorial Preloader */}
       {!isPreloaderComplete && shouldShowPreloader && (
         <Preloader
-          brandText={activeData.footer?.brandText || settings.siteTitle || 'DARSHIL BHUVA'}
-          brandSubtitle={activeData.hero?.subEyebrow || settings.siteDescription || 'DIGITAL PRODUCT DESIGNER'}
+          brandText={activeData.profile?.name || activeData.footer?.brandText || settings.siteTitle || 'DARSHIL S. BHUVA'}
+          brandSubtitle={activeData.profile?.title || activeData.hero?.subEyebrow || settings.siteDescription || 'UI/UX DESIGNER / WEB DESIGNER'}
           onExitComplete={onPreloaderExitComplete}
         />
       )}
@@ -238,7 +275,16 @@ export const PortfolioHome: React.FC = () => {
 
       {/* Main Dynamic Content in Configured Order */}
       <main id="main-content" tabIndex={-1} className="relative z-10 focus:outline-none">
-        {mainSectionKeys.map((sectionId) => sectionRenderMap[sectionId]?.())}
+        {mainSectionKeys.map((sectionId) => {
+          const renderFn = sectionRenderMap[sectionId];
+          if (!renderFn) {
+            if (process.env.NODE_ENV === 'development') {
+              console.warn(`[PortfolioHome] Unknown sectionKey: "${sectionId}" — skipping`);
+            }
+            return null;
+          }
+          return <React.Fragment key={sectionId}>{renderFn()}</React.Fragment>;
+        })}
       </main>
 
       {/* Large Structural Editorial Footer */}

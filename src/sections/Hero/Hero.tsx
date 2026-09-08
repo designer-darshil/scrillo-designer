@@ -156,10 +156,20 @@ export const Hero: React.FC<HeroProps> = ({
       : content.title
       ? content.title.split('\n')
       : [
-          'Building digital',
-          'experiences that',
-          'feel inevitable.',
+          'Designing useful',
+          'digital experiences.',
         ];
+
+  const eyebrow = content.eyebrow || data.profile?.title || 'UI/UX DESIGNER · WEB DESIGNER';
+  const secondaryMeta =
+    content.subEyebrow ||
+    (data.profile?.city
+      ? `BASED IN ${data.profile.city.toUpperCase()} // WORKING GLOBALLY`
+      : 'BASED IN SURAT // WORKING GLOBALLY');
+  const description =
+    content.description ||
+    data.profile?.primaryDescription ||
+    'As a UI/UX and Web Designer, I transform ideas into dynamic digital experiences with a focus on usability, interaction and visual design.';
 
   return (
     <section
@@ -185,16 +195,12 @@ export const Hero: React.FC<HeroProps> = ({
       <div className="page-container relative z-10 flex items-center justify-between font-mono text-meta text-muted">
         <div ref={labelRef} className="flex items-center gap-2">
           <span className="w-1.5 h-1.5 bg-foreground inline-block" />
-          <span className="text-foreground/90 font-medium">{content.eyebrow}</span>
+          <span className="text-foreground/90 font-medium uppercase tracking-widest">{eyebrow}</span>
         </div>
 
-        {content.subEyebrow && (
-          <div ref={parallaxRef} className="hidden sm:flex items-center gap-6 text-muted uppercase">
-            <span>{content.subEyebrow.split('/')[0]?.trim()}</span>
-            {content.subEyebrow.includes('/') && <span>/</span>}
-            {content.subEyebrow.includes('/') && (
-              <span>{content.subEyebrow.split('/')[1]?.trim()}</span>
-            )}
+        {secondaryMeta && (
+          <div ref={parallaxRef} className="hidden sm:flex items-center gap-3 text-muted uppercase tracking-widest text-xs font-mono">
+            <span>{secondaryMeta}</span>
           </div>
         )}
       </div>
@@ -225,7 +231,7 @@ export const Hero: React.FC<HeroProps> = ({
             {/* Supporting Description */}
             <div ref={supportingRef} className="lg:col-span-7 xl:col-span-6">
               <p className="text-body-editorial text-muted leading-relaxed font-light text-pretty">
-                {content.description}
+                {description}
               </p>
             </div>
 

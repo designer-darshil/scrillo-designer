@@ -122,10 +122,10 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   const sections = data.settings?.sections || ({} as any);
-  const brandText = data.footer?.brandText || data.settings?.siteTitle || 'DARSHIL BHUVA';
-  const headerTagline = data.hero?.subEyebrow || data.settings?.siteDescription || 'DIGITAL PRODUCT DESIGNER';
-  const email = data.contact?.email || data.footer?.email || 'contact@darshilbhuva.com';
-  const availability = data.contact?.availabilityStatus || 'AVAILABLE Q2/Q3';
+  const brandText = data.profile?.name || data.footer?.brandText || data.settings?.siteTitle || 'DARSHIL S. BHUVA';
+  const headerTagline = data.profile?.title || data.hero?.subEyebrow || data.settings?.siteDescription || 'UI/UX DESIGNER / WEB DESIGNER';
+  const email = data.profile?.email || data.contact?.email || data.footer?.email || 'darshilbhuva4322@gmail.com';
+  const availability = data.contact?.availabilityStatus || 'AVAILABLE FOR COMMISSIONS';
   const socialList = (data.footer?.socialLinks || [])
     .filter((s) => s.visible !== false)
     .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
@@ -134,9 +134,10 @@ export const Header: React.FC<HeaderProps> = ({
     { id: 'home', label: 'Home', href: '#home', number: '01', visible: sections.hero?.visible !== false },
     { id: 'about', label: 'About', href: '#about', number: '02', visible: sections.statement?.visible !== false },
     { id: 'works', label: 'Works', href: '#works', number: '03', visible: sections.projects?.visible !== false },
-    { id: 'skills', label: 'Skills', href: '#skills', number: '04', visible: sections.skills?.visible !== false },
-    { id: 'services', label: 'Services', href: '#services', number: '05', visible: sections.services?.visible !== false },
-    { id: 'contact', label: "Let's Talk", href: '#contact', number: '06', visible: sections.contact?.visible !== false },
+    { id: 'experience', label: 'Experience', href: '#experience', number: '04', visible: sections.experience?.visible !== false },
+    { id: 'skills', label: 'Skills', href: '#skills', number: '05', visible: sections.skills?.visible !== false },
+    { id: 'services', label: 'Services', href: '#services', number: '06', visible: sections.services?.visible !== false },
+    { id: 'contact', label: "Let's Talk", href: '#contact', number: '07', visible: sections.contact?.visible !== false },
   ];
 
   const navigationItems = allNav.filter((n) => n.visible);

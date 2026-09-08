@@ -102,7 +102,7 @@ export const AdminLogin: React.FC = () => {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="admin@darshilbhuva.com"
+              placeholder="darshilbhuva4322@gmail.com"
               disabled={isSubmitting}
               className="w-full px-4 py-3 bg-background border border-border text-foreground focus:border-foreground focus:outline-none transition-colors rounded-none placeholder:text-muted/40"
             />

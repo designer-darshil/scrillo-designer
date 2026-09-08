@@ -11,6 +11,11 @@ import {
   PhilosophyContent,
   ContactCTA,
   FooterContent,
+  ProfileContent,
+  ExperienceItem,
+  EducationItem,
+  ToolItem,
+  PortfolioCategory,
   WebsiteSettings,
   ContentDiffSummary,
 } from '../types';
@@ -32,12 +37,17 @@ interface WebsiteDataContextType {
   refreshData: () => Promise<void>;
   publishDraft: () => Promise<boolean>;
   revertToPublished: () => Promise<boolean>;
+  updateProfile: (profile: ProfileContent) => Promise<boolean>;
   updateHero: (hero: HeroContent) => Promise<boolean>;
   updateAbout: (about: AboutContent) => Promise<boolean>;
   updateMarquee: (marquee: MarqueeContent) => Promise<boolean>;
   updatePhilosophy: (philosophy: PhilosophyContent) => Promise<boolean>;
   updateContactCTA: (contact: ContactCTA) => Promise<boolean>;
   updateFooter: (footer: FooterContent) => Promise<boolean>;
+  updateExperience: (experience: ExperienceItem[]) => Promise<boolean>;
+  updateEducation: (education: EducationItem[]) => Promise<boolean>;
+  updateTools: (tools: ToolItem[]) => Promise<boolean>;
+  updateCategories: (categories: PortfolioCategory[]) => Promise<boolean>;
   updateSettings: (settings: WebsiteSettings) => Promise<boolean>;
   updateSectionVisibility: (sectionId: string, visible: boolean) => void;
   // Project methods
@@ -85,12 +95,17 @@ const WebsiteDataContext = createContext<WebsiteDataContextType>({
   refreshData: async () => {},
   publishDraft: async () => true,
   revertToPublished: async () => true,
+  updateProfile: async () => true,
   updateHero: async () => true,
   updateAbout: async () => true,
   updateMarquee: async () => true,
   updatePhilosophy: async () => true,
   updateContactCTA: async () => true,
   updateFooter: async () => true,
+  updateExperience: async () => true,
+  updateEducation: async () => true,
+  updateTools: async () => true,
+  updateCategories: async () => true,
   updateSettings: async () => true,
   updateSectionVisibility: () => {},
   createProject: async () => null,
@@ -140,11 +155,17 @@ export const WebsiteDataProvider: React.FC<{ children: React.ReactNode }> = ({ c
       setData((prev) => ({
         ...prev,
         settings: settings || prev.settings,
+        profile: remoteData.profile || prev.profile,
         hero: remoteData.hero || prev.hero,
         about: remoteData.about || prev.about,
         marquee: remoteData.marquee || prev.marquee,
         philosophy: remoteData.philosophy || prev.philosophy,
         contact: remoteData.contact || prev.contact,
+        footer: remoteData.footer || prev.footer,
+        experience: remoteData.experience || prev.experience,
+        education: remoteData.education || prev.education,
+        tools: remoteData.tools || prev.tools,
+        categories: remoteData.categories && remoteData.categories.length > 0 ? remoteData.categories : prev.categories || defaultWebsiteData.categories,
         projects: projects && projects.length > 0 ? projects : prev.projects,
         skills: skills && skills.length > 0 ? skills : prev.skills,
         services: services && services.length > 0 ? services : prev.services,
@@ -253,6 +274,66 @@ export const WebsiteDataProvider: React.FC<{ children: React.ReactNode }> = ({ c
       const success = await websiteService.updateContactCTAContent(contact);
       if (success) {
         setData((prev) => ({ ...prev, contact }));
+      }
+      return success;
+    } catch {
+      return false;
+    }
+  };
+
+  const updateProfile = async (profile: ProfileContent): Promise<boolean> => {
+    try {
+      const success = await websiteService.updateProfileContent(profile);
+      if (success) {
+        setData((prev) => ({ ...prev, profile }));
+      }
+      return success;
+    } catch {
+      return false;
+    }
+  };
+
+  const updateExperience = async (experience: ExperienceItem[]): Promise<boolean> => {
+    try {
+      const success = await websiteService.updateExperience(experience);
+      if (success) {
+        setData((prev) => ({ ...prev, experience }));
+      }
+      return success;
+    } catch {
+      return false;
+    }
+  };
+
+  const updateEducation = async (education: EducationItem[]): Promise<boolean> => {
+    try {
+      const success = await websiteService.updateEducation(education);
+      if (success) {
+        setData((prev) => ({ ...prev, education }));
+      }
+      return success;
+    } catch {
+      return false;
+    }
+  };
+
+  const updateTools = async (tools: ToolItem[]): Promise<boolean> => {
+    try {
+      const success = await websiteService.updateTools(tools);
+      if (success) {
+        setData((prev) => ({ ...prev, tools }));
+      }
+      return success;
+    } catch {
+      return false;
+    }
+  };
+
+  const updateCategories = async (categories: PortfolioCategory[]): Promise<boolean> => {
+    try {
+      const success = await websiteService.updateCategories(categories);
+      if (success) {
+        setData((prev) => ({ ...prev, categories }));
       }
       return success;
     } catch {
@@ -692,12 +773,17 @@ export const WebsiteDataProvider: React.FC<{ children: React.ReactNode }> = ({ c
         refreshData,
         publishDraft,
         revertToPublished,
+        updateProfile,
         updateHero,
         updateAbout,
         updateMarquee,
         updatePhilosophy,
         updateContactCTA,
         updateFooter,
+        updateExperience,
+        updateEducation,
+        updateTools,
+        updateCategories,
         updateSettings,
         updateSectionVisibility,
         createProject,
@@ -744,12 +830,17 @@ export const useWebsiteData = () => {
       refreshData: async () => {},
       publishDraft: async () => true,
       revertToPublished: async () => true,
+      updateProfile: async () => true,
       updateHero: async () => true,
       updateAbout: async () => true,
       updateMarquee: async () => true,
       updatePhilosophy: async () => true,
       updateContactCTA: async () => true,
       updateFooter: async () => true,
+      updateExperience: async () => true,
+      updateEducation: async () => true,
+      updateTools: async () => true,
+      updateCategories: async () => true,
       updateSettings: async () => true,
       updateSectionVisibility: () => {},
       createProject: async () => null,

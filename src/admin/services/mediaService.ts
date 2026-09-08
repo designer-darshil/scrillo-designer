@@ -8,6 +8,9 @@ export interface MediaAsset {
   name: string;
   url: string;
   type: string;
+  category?: 'profile' | 'cover' | 'project' | 'general' | string;
+  source?: 'Resume' | 'Upload' | 'Unsplash' | string;
+  status?: 'active' | 'archived' | string;
   format: 'PNG' | 'JPG' | 'JPEG' | 'WEBP' | 'SVG';
   size: number;
   sizeFormatted: string;
@@ -25,13 +28,47 @@ const formatBytes = (bytes: number): string => {
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(1))} ${sizes[i]}`;
 };
 
-// Initial default media assets from portfolio spec
 const initialMediaAssets: MediaAsset[] = [
+  {
+    id: 'media-darshil-profile',
+    name: 'darshil-profile.jpg',
+    url: '/images/darshil-profile.jpg',
+    type: 'image/jpeg',
+    category: 'profile',
+    source: 'Resume',
+    status: 'active',
+    format: 'JPG',
+    size: 411111,
+    sizeFormatted: '401 KB',
+    dimensions: '1200 × 1200',
+    width: 1200,
+    height: 1200,
+    uploadedAt: '2026-03-01T10:00:00Z',
+  },
+  {
+    id: 'media-darshil-cover',
+    name: 'darshil-cover.png',
+    url: '/images/darshil-cover.png',
+    type: 'image/png',
+    category: 'cover',
+    source: 'Resume',
+    status: 'active',
+    format: 'PNG',
+    size: 688000,
+    sizeFormatted: '672 KB',
+    dimensions: '4032 × 2268',
+    width: 4032,
+    height: 2268,
+    uploadedAt: '2026-03-01T10:05:00Z',
+  },
   {
     id: 'media-1',
     name: 'abstract-minimal-fluid.webp',
     url: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1200&q=80',
     type: 'image/webp',
+    category: 'project',
+    source: 'Unsplash',
+    status: 'active',
     format: 'WEBP',
     size: 1420000,
     sizeFormatted: '1.4 MB',
@@ -312,6 +349,34 @@ export const mediaService = {
       if (asset) uploaded.push(asset);
     }
     return uploaded;
+  },
+
+  /**
+   * Replace an existing asset with a new file
+   */
+  async replaceAsset(id: string, newFile: File): Promise<MediaAsset | null> {
+    const existingIndex = memoryMediaStore.findIndex((a) => a.id === id);
+    const newAsset = await this.uploadAsset(newFile);
+    if (!newAsset) return null;
+
+    if (existingIndex !== -1) {
+      const existing = memoryMediaStore[existingIndex];
+      // Keep identity & category metadata if existing
+      newAsset.category = existing.category;
+      newAsset.source = existing.source;
+      newAsset.status = existing.status;
+      memoryMediaStore[existingIndex] = newAsset;
+    }
+
+    activityService.logActivity({
+      action: 'Media replaced',
+      item: `${newAsset.name}`,
+      section: 'Media Library',
+      user: 'admin@scrillo.design',
+      status: 'Updated',
+    }).catch(() => {});
+
+    return newAsset;
   },
 
   /**

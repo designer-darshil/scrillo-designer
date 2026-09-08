@@ -53,11 +53,14 @@ export const ProjectsManager: React.FC = () => {
   // Distinct categories
   const categories = useMemo(() => {
     const set = new Set<string>();
+    (data.categories || []).forEach((c) => {
+      if (c.visible !== false) set.add(c.name);
+    });
     data.projects.forEach((p) => {
       if (p.category) set.add(p.category);
     });
     return Array.from(set);
-  }, [data.projects]);
+  }, [data.categories, data.projects]);
 
   // Filtered project list
   const filteredProjects = useMemo(() => {
@@ -261,6 +264,19 @@ export const ProjectsManager: React.FC = () => {
         </div>
       </div>
 
+      {/* Resume Data Source Integrity Notice */}
+      <div className="rounded-2xl border border-blue-500/20 bg-blue-500/5 p-4 sm:p-5 flex items-start gap-3.5 text-xs text-foreground">
+        <div className="p-2 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 shrink-0">
+          <FolderGit2 className="w-4 h-4" />
+        </div>
+        <div className="space-y-1">
+          <p className="font-bold text-foreground">Editable Default / Placeholder Projects</p>
+          <p className="text-muted leading-relaxed">
+            The provided Resume does not include a detailed client portfolio case study list. The projects listed below are <span className="font-semibold text-foreground">default editable templates</span> with neutral placeholder imagery. You can edit any project, rename it, replace assets with real verified work, or create new case studies at any time.
+          </p>
+        </div>
+      </div>
+
       {/* Stats & Quick Summary Pill Row */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <div className="p-4 rounded-xl border border-border bg-surface flex flex-col justify-between">
@@ -434,6 +450,11 @@ export const ProjectsManager: React.FC = () => {
                     {project.category || 'General'}
                   </span>
                   <span className="font-mono">{project.year || '2026'}</span>
+                  {project.placeholder && (
+                    <span className="px-2 py-0.5 rounded-md border border-amber-500/30 bg-amber-500/10 text-amber-500 font-semibold">
+                      Placeholder Template
+                    </span>
+                  )}
                 </div>
 
                 {/* Mobile Actions Toolbar */}
@@ -575,8 +596,15 @@ export const ProjectsManager: React.FC = () => {
                         {/* Title & Slug */}
                         <td className="py-3.5 px-4">
                           <div className="space-y-0.5">
-                            <div className="font-bold text-foreground text-sm uppercase tracking-tight group-hover:text-foreground">
-                              {project.title}
+                            <div className="flex items-center gap-2">
+                              <span className="font-bold text-foreground text-sm uppercase tracking-tight group-hover:text-foreground">
+                                {project.title}
+                              </span>
+                              {project.placeholder && (
+                                <span className="px-1.5 py-0.5 rounded text-[9px] font-semibold uppercase tracking-wider border border-amber-500/30 bg-amber-500/10 text-amber-500">
+                                  Placeholder Template
+                                </span>
+                              )}
                             </div>
                             <div className="font-mono text-[10px] text-muted flex items-center gap-2">
                               <span>/{project.slug}</span>

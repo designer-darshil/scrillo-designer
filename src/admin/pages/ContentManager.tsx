@@ -1,281 +1,554 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import {
+  User,
+  Phone,
+  Briefcase,
+  GraduationCap,
   Sparkles,
+  Wrench,
+  Share2,
+  Image as ImageIcon,
   Save,
   RotateCcw,
-  Undo2,
-  CheckCircle2,
-  AlertCircle,
   Plus,
   Trash2,
   ArrowUp,
   ArrowDown,
-  Image as ImageIcon,
+  CheckCircle2,
+  AlertCircle,
+  Upload,
   ExternalLink,
-  Layers,
-  FileText,
-  Repeat,
-  Compass,
-  Mail,
   Eye,
   EyeOff,
-  Globe,
+  Layers,
+  FileText,
+  MapPin,
+  Mail,
+  Linkedin,
+  Dribbble,
+  Instagram,
+  Check,
+  Compass,
+  Repeat,
 } from 'lucide-react';
 import { useWebsiteData } from '../../hooks/useWebsiteData';
-import { HeroContent, AboutContent, MarqueeContent, PhilosophyContent, ContactCTA } from '../../types';
-import { defaultWebsiteData } from '../../data/defaultWebsiteData';
+import {
+  ProfileContent,
+  ContactCTA,
+  ExperienceItem,
+  EducationItem,
+  SkillCategory,
+  SkillItem,
+  ToolItem,
+  SocialLink,
+  FooterContent,
+  HeroContent,
+  PhilosophyContent,
+  MarqueeContent,
+} from '../../types';
 import { MediaPickerModal } from '../components/MediaPickerModal';
 import { validators } from '../utils/validators';
 import { useUnsavedChanges } from '../hooks/useUnsavedChanges';
 
-const curatedHeroImages = [
-  {
-    label: 'Abstract Minimal Geometric',
-    url: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1200&q=80',
-  },
-  {
-    label: 'Monochrome Spatial Architecture',
-    url: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=2400&q=85',
-  },
-  {
-    label: 'Dark Kinetic Fluidics',
-    url: 'https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?auto=format&fit=crop&w=1200&q=80',
-  },
-  {
-    label: 'Brutalist Monolith',
-    url: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80',
-  },
-  {
-    label: 'Clean Studio Specimen',
-    url: 'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?auto=format&fit=crop&w=1200&q=80',
-  },
-];
-
-type TabSection = 'hero' | 'statement' | 'marquee' | 'philosophy' | 'contact';
+type ContentSubSection =
+  | 'profile'
+  | 'contact'
+  | 'experience'
+  | 'education'
+  | 'skills'
+  | 'tools'
+  | 'social'
+  | 'image'
+  | 'philosophy'
+  | 'marquee';
 
 export const ContentManager: React.FC = () => {
   const {
     data,
+    updateProfile,
     updateHero,
-    updateAbout,
-    updateMarquee,
-    updatePhilosophy,
     updateContactCTA,
+    updateFooter,
+    updateExperience,
+    updateEducation,
+    updateTools,
+    updatePhilosophy,
+    updateMarquee,
+    updateSkillCategory,
+    createSkillCategory,
   } = useWebsiteData();
 
-  const [activeTab, setActiveTab] = useState<TabSection>('hero');
+  const [activeTab, setActiveTab] = useState<ContentSubSection>('profile');
 
   // Local working state
-  const [heroForm, setHeroForm] = useState<HeroContent>(data.hero);
-  const [aboutForm, setAboutForm] = useState<AboutContent>(data.about);
-  const [marqueeForm, setMarqueeForm] = useState<MarqueeContent>(data.marquee);
-  const [philosophyForm, setPhilosophyForm] = useState<PhilosophyContent>(data.philosophy);
+  const [profileForm, setProfileForm] = useState<ProfileContent>(
+    data.profile || {
+      name: 'Darshil S. Bhuva',
+      title: 'UI/UX Designer / Web Designer',
+      primaryDescription:
+        'As a UI/UX and Web Designer, I transform your ideas into dynamic digital experiences. Consider me your all-in-one expert for diverse business solutions.',
+      objective:
+        'Improve user experience through the utility, ease of use, and pleasure provided in the design and interaction with a product.',
+      email: 'darshilbhuva4322@gmail.com',
+      phone: '+91 8866 90 2600',
+      location: 'Surat, Gujarat, India',
+      address: '21 - Laxminagar Soc., Sarthana Jakatnaka, Surat. 06',
+      profileImage: '/images/darshil-profile.jpg',
+      coverImage: '/images/darshil-cover.png',
+      linkedinUrl: 'https://linkedin.com/in/dsbhuva',
+      dribbbleUrl: 'https://dribbble.com',
+      behanceUrl: 'https://behance.net',
+      instagramUrl: 'https://instagram.com',
+    }
+  );
+
   const [contactForm, setContactForm] = useState<ContactCTA>(data.contact);
+  const [footerForm, setFooterForm] = useState<FooterContent>(data.footer);
+  const [experienceList, setExperienceList] = useState<ExperienceItem[]>(data.experience || []);
+  const [educationList, setEducationList] = useState<EducationItem[]>(data.education || []);
+  const [skillsList, setSkillsList] = useState<SkillCategory[]>(data.skills || []);
+  const [toolsList, setToolsList] = useState<ToolItem[]>(data.tools || []);
+  const [socialLinks, setSocialLinks] = useState<SocialLink[]>(data.footer.socialLinks || []);
+  const [philosophyForm, setPhilosophyForm] = useState<PhilosophyContent>(data.philosophy);
+  const [marqueeForm, setMarqueeForm] = useState<MarqueeContent>(data.marquee);
 
-  // New marquee item buffer
-  const [newMarqueeItem, setNewMarqueeItem] = useState('');
-
-  // Status & feedback
+  // UI state
   const [status, setStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isDirty, setIsDirty] = useState(false);
   const [isMediaPickerOpen, setIsMediaPickerOpen] = useState(false);
+  const [mediaTarget, setMediaTarget] = useState<'profile' | 'cover'>('profile');
+
+  // Buffer states for adding new items
+  const [newSkillName, setNewSkillName] = useState('');
+  const [newToolName, setNewToolName] = useState('');
+  const [newToolCategory, setNewToolCategory] = useState<'Design Tools' | 'Technical'>('Design Tools');
+  const [newSocialPlatform, setNewSocialPlatform] = useState('LinkedIn');
+  const [newSocialLabel, setNewSocialLabel] = useState('');
+  const [newSocialUrl, setNewSocialUrl] = useState('');
+  const [newMarqueeItem, setNewMarqueeItem] = useState('');
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Prevent accidental loss of unsaved changes
   useUnsavedChanges(isDirty);
 
   // Sync initial state when remote data loads
   useEffect(() => {
-    setHeroForm(data.hero);
-    setAboutForm(data.about);
-    setMarqueeForm(data.marquee);
-    setPhilosophyForm(data.philosophy);
+    if (data.profile) setProfileForm(data.profile);
     setContactForm(data.contact);
+    setFooterForm(data.footer);
+    setExperienceList(data.experience || []);
+    setEducationList(data.education || []);
+    setSkillsList(data.skills || []);
+    setToolsList(data.tools || []);
+    setSocialLinks(data.footer.socialLinks || []);
+    setPhilosophyForm(data.philosophy);
+    setMarqueeForm(data.marquee);
     setIsDirty(false);
   }, [data]);
 
-  // Check dirty state
   const markDirty = () => {
     if (!isDirty) setIsDirty(true);
     if (status === 'saved' || status === 'error') setStatus('idle');
   };
 
-  // Field change handlers
-  const handleHeroChange = (field: keyof HeroContent, value: any) => {
+  // Profile Form Handler
+  const handleProfileChange = (field: keyof ProfileContent, value: string) => {
     markDirty();
-    setHeroForm((prev) => {
-      const updated = { ...prev, [field]: value };
-      if (field === 'title' && typeof value === 'string') {
-        const lines = value.split('\n').filter(Boolean);
-        if (lines.length > 0) {
-          updated.headlineLines = lines;
-        }
-      }
-      return updated;
-    });
+    setProfileForm((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleAboutChange = (field: keyof AboutContent, value: any) => {
+  // Experience Handlers
+  const handleExperienceChange = (id: string, field: keyof ExperienceItem, value: any) => {
     markDirty();
-    setAboutForm((prev) => ({
-      ...prev,
-      [field]: value,
-      ...(field === 'supportingText' ? { corePrinciples: value, subtext: value } : {}),
-      ...(field === 'corePrinciples' ? { supportingText: value, subtext: value } : {}),
-    }));
+    setExperienceList((prev) =>
+      prev.map((item) => (item.id === id ? { ...item, [field]: value } : item))
+    );
   };
 
-  const handlePhilosophyChange = (field: keyof PhilosophyContent, value: any) => {
+  const handleAddExperience = () => {
     markDirty();
-    setPhilosophyForm((prev) => ({
-      ...prev,
-      [field]: value,
-      ...(field === 'author' || field === 'attribution' ? { yearMeta: value } : {}),
-    }));
+    const newId = `exp-${Date.now()}`;
+    const newExp: ExperienceItem = {
+      id: newId,
+      company: 'New Company',
+      role: 'UI/UX Designer',
+      period: '2024 - Present',
+      description: 'Describe role achievements, design deliverables, and technologies used.',
+      order: experienceList.length + 1,
+      visible: true,
+    };
+    setExperienceList((prev) => [...prev, newExp]);
   };
 
-  const handleContactChange = (field: keyof ContactCTA, value: any) => {
+  const handleDeleteExperience = (id: string) => {
     markDirty();
-    setContactForm((prev) => ({
-      ...prev,
-      [field]: value,
-      ...(field === 'buttonText' ? { ctaText: value } : {}),
-      ...(field === 'ctaText' ? { buttonText: value } : {}),
-      ...(field === 'buttonLink' ? { ctaLink: value } : {}),
-      ...(field === 'ctaLink' ? { buttonLink: value } : {}),
-      ...(field === 'secondaryText' ? { secondaryLine: value } : {}),
-      ...(field === 'secondaryLine' ? { secondaryText: value } : {}),
-    }));
+    setExperienceList((prev) => prev.filter((item) => item.id !== id));
   };
 
-  // Marquee handlers
-  const handleAddMarqueeItem = () => {
-    const trimmed = newMarqueeItem.trim();
-    if (!trimmed) return;
+  const handleMoveExperience = (index: number, direction: 'up' | 'down') => {
+    if (
+      (direction === 'up' && index === 0) ||
+      (direction === 'down' && index === experienceList.length - 1)
+    )
+      return;
     markDirty();
-    setMarqueeForm((prev) => ({
-      ...prev,
-      items: [...prev.items, trimmed.toUpperCase()],
-    }));
-    setNewMarqueeItem('');
-  };
-
-  const handleEditMarqueeItem = (index: number, value: string) => {
-    markDirty();
-    setMarqueeForm((prev) => {
-      const updated = [...prev.items];
-      updated[index] = value;
-      return { ...prev, items: updated };
-    });
-  };
-
-  const handleDeleteMarqueeItem = (index: number) => {
-    markDirty();
-    setMarqueeForm((prev) => ({
-      ...prev,
-      items: prev.items.filter((_, i) => i !== index),
-    }));
-  };
-
-  const handleMoveMarqueeItem = (index: number, direction: 'up' | 'down') => {
+    const newList = [...experienceList];
     const targetIndex = direction === 'up' ? index - 1 : index + 1;
-    if (targetIndex < 0 || targetIndex >= marqueeForm.items.length) return;
-    markDirty();
-    setMarqueeForm((prev) => {
-      const updated = [...prev.items];
-      const temp = updated[index];
-      updated[index] = updated[targetIndex];
-      updated[targetIndex] = temp;
-      return { ...prev, items: updated };
+    const temp = newList[index];
+    newList[index] = newList[targetIndex];
+    newList[targetIndex] = temp;
+    newList.forEach((item, idx) => {
+      item.order = idx + 1;
     });
+    setExperienceList(newList);
   };
 
-  // Save all sections concurrently with rigorous validation
-  const handleSave = async () => {
-    if (status === 'saving') return;
+  // Education Handlers
+  const handleEducationChange = (id: string, field: keyof EducationItem, value: any) => {
+    markDirty();
+    setEducationList((prev) =>
+      prev.map((item) => (item.id === id ? { ...item, [field]: value } : item))
+    );
+  };
 
-    // 1. Hero validation
-    const heroTitleCheck = validators.required(heroForm.title, 'Hero Main Headline');
-    if (!heroTitleCheck.isValid) {
+  const handleAddEducation = () => {
+    markDirty();
+    const newId = `edu-${Date.now()}`;
+    const newEdu: EducationItem = {
+      id: newId,
+      institution: 'New Institution',
+      degree: 'Design / Computer Science',
+      location: 'Gujarat, India',
+      period: '2022 - 2026',
+      description: 'Key academic foundations, specialization areas, and practical training.',
+      order: educationList.length + 1,
+      visible: true,
+    };
+    setEducationList((prev) => [...prev, newEdu]);
+  };
+
+  const handleDeleteEducation = (id: string) => {
+    markDirty();
+    setEducationList((prev) => prev.filter((item) => item.id !== id));
+  };
+
+  const handleMoveEducation = (index: number, direction: 'up' | 'down') => {
+    if (
+      (direction === 'up' && index === 0) ||
+      (direction === 'down' && index === educationList.length - 1)
+    )
+      return;
+    markDirty();
+    const newList = [...educationList];
+    const targetIndex = direction === 'up' ? index - 1 : index + 1;
+    const temp = newList[index];
+    newList[index] = newList[targetIndex];
+    newList[targetIndex] = temp;
+    newList.forEach((item, idx) => {
+      item.order = idx + 1;
+    });
+    setEducationList(newList);
+  };
+
+  // Design Skills Handlers
+  const designCategory = skillsList.find((c) => c.id === 'design') || skillsList[0];
+
+  const handleAddDesignSkill = () => {
+    if (!newSkillName.trim()) return;
+    markDirty();
+    const skillName = newSkillName.trim();
+    setSkillsList((prev) =>
+      prev.map((cat) => {
+        if (cat.id === (designCategory?.id || 'design')) {
+          const rawItems = cat.items || cat.skills || [];
+          const nextIndex = String(rawItems.length + 1).padStart(2, '0');
+          const newItem: SkillItem = {
+            index: nextIndex,
+            name: skillName,
+            visible: true,
+            order: rawItems.length + 1,
+          };
+          const updatedItems = [...rawItems, newItem];
+          return {
+            ...cat,
+            count: String(updatedItems.length).padStart(2, '0'),
+            items: updatedItems,
+            skills: updatedItems,
+          };
+        }
+        return cat;
+      })
+    );
+    setNewSkillName('');
+  };
+
+  const handleDeleteDesignSkill = (skillName: string) => {
+    markDirty();
+    setSkillsList((prev) =>
+      prev.map((cat) => {
+        if (cat.id === (designCategory?.id || 'design')) {
+          const rawItems = (cat.items || cat.skills || []).filter((s) => s.name !== skillName);
+          const renumbered = rawItems.map((s, idx) => ({
+            ...s,
+            index: String(idx + 1).padStart(2, '0'),
+            order: idx + 1,
+          }));
+          return {
+            ...cat,
+            count: String(renumbered.length).padStart(2, '0'),
+            items: renumbered,
+            skills: renumbered,
+          };
+        }
+        return cat;
+      })
+    );
+  };
+
+  const handleToggleSkillVisibility = (skillName: string) => {
+    markDirty();
+    setSkillsList((prev) =>
+      prev.map((cat) => {
+        if (cat.id === (designCategory?.id || 'design')) {
+          const rawItems = (cat.items || cat.skills || []).map((s) =>
+            s.name === skillName ? { ...s, visible: s.visible === false } : s
+          );
+          return { ...cat, items: rawItems, skills: rawItems };
+        }
+        return cat;
+      })
+    );
+  };
+
+  const handleMoveDesignSkill = (index: number, direction: 'up' | 'down') => {
+    const rawItems = [...(designCategory?.items || designCategory?.skills || [])];
+    if (
+      (direction === 'up' && index === 0) ||
+      (direction === 'down' && index === rawItems.length - 1)
+    )
+      return;
+    markDirty();
+    const targetIndex = direction === 'up' ? index - 1 : index + 1;
+    const temp = rawItems[index];
+    rawItems[index] = rawItems[targetIndex];
+    rawItems[targetIndex] = temp;
+    const renumbered = rawItems.map((s, idx) => ({
+      ...s,
+      index: String(idx + 1).padStart(2, '0'),
+      order: idx + 1,
+    }));
+    setSkillsList((prev) =>
+      prev.map((cat) =>
+        cat.id === (designCategory?.id || 'design')
+          ? { ...cat, items: renumbered, skills: renumbered }
+          : cat
+      )
+    );
+  };
+
+  // Tools Handlers
+  const handleAddTool = () => {
+    if (!newToolName.trim()) return;
+    markDirty();
+    const newTool: ToolItem = {
+      id: `tool-${Date.now()}`,
+      name: newToolName.trim(),
+      category: newToolCategory,
+      order: toolsList.length + 1,
+    };
+    setToolsList((prev) => [...prev, newTool]);
+    setNewToolName('');
+  };
+
+  const handleDeleteTool = (id: string) => {
+    markDirty();
+    setToolsList((prev) => prev.filter((t) => t.id !== id));
+  };
+
+  const handleMoveTool = (index: number, direction: 'up' | 'down') => {
+    if (
+      (direction === 'up' && index === 0) ||
+      (direction === 'down' && index === toolsList.length - 1)
+    )
+      return;
+    markDirty();
+    const newList = [...toolsList];
+    const targetIndex = direction === 'up' ? index - 1 : index + 1;
+    const temp = newList[index];
+    newList[index] = newList[targetIndex];
+    newList[targetIndex] = temp;
+    newList.forEach((t, idx) => {
+      t.order = idx + 1;
+    });
+    setToolsList(newList);
+  };
+
+  // Social Link Handlers
+  const handleAddSocialLink = () => {
+    if (!newSocialUrl.trim()) return;
+    const urlValidation = validators.url(newSocialUrl, false, 'Social Link URL');
+    if (!urlValidation.isValid) {
+      setErrorMessage(urlValidation.error || 'Invalid URL format');
       setStatus('error');
-      setErrorMessage(heroTitleCheck.error || 'Hero headline is required.');
+      return;
+    }
+    markDirty();
+    const newSoc: SocialLink = {
+      id: `soc-${Date.now()}`,
+      platform: newSocialPlatform,
+      label: newSocialLabel.trim() || newSocialPlatform,
+      href: newSocialUrl.trim(),
+      url: newSocialUrl.trim(),
+      visible: true,
+      order: socialLinks.length + 1,
+    };
+    setSocialLinks((prev) => [...prev, newSoc]);
+    setNewSocialLabel('');
+    setNewSocialUrl('');
+    setErrorMessage(null);
+  };
+
+  const handleDeleteSocialLink = (index: number) => {
+    markDirty();
+    setSocialLinks((prev) => prev.filter((_, idx) => idx !== index));
+  };
+
+  const handleToggleSocialVisibility = (index: number) => {
+    markDirty();
+    setSocialLinks((prev) =>
+      prev.map((item, idx) => (idx === index ? { ...item, visible: item.visible === false } : item))
+    );
+  };
+
+  const handleMoveSocialLink = (index: number, direction: 'up' | 'down') => {
+    if (
+      (direction === 'up' && index === 0) ||
+      (direction === 'down' && index === socialLinks.length - 1)
+    )
+      return;
+    markDirty();
+    const newList = [...socialLinks];
+    const targetIndex = direction === 'up' ? index - 1 : index + 1;
+    const temp = newList[index];
+    newList[index] = newList[targetIndex];
+    newList[targetIndex] = temp;
+    newList.forEach((item, idx) => {
+      item.order = idx + 1;
+    });
+    setSocialLinks(newList);
+  };
+
+  // Image Upload / Replace / Remove
+  const handleImageFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const fileValidation = validators.imageFile(file);
+    if (!fileValidation.isValid) {
+      setErrorMessage(fileValidation.error || 'Invalid image file');
+      setStatus('error');
       return;
     }
 
-    if (heroForm.heroImage) {
-      const heroImgCheck = validators.url(heroForm.heroImage, true, 'Hero Specimen Image URL');
-      if (!heroImgCheck.isValid) {
-        setStatus('error');
-        setErrorMessage(heroImgCheck.error || 'Unsafe Hero image URL.');
-        return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUrl = reader.result as string;
+      markDirty();
+      if (mediaTarget === 'profile') {
+        setProfileForm((prev) => ({ ...prev, profileImage: dataUrl }));
+      } else {
+        setProfileForm((prev) => ({ ...prev, coverImage: dataUrl }));
       }
-    }
+      setStatus('idle');
+      setErrorMessage(null);
+    };
+    reader.readAsDataURL(file);
+  };
 
-    if (heroForm.ctaLink) {
-      const heroCtaCheck = validators.url(heroForm.ctaLink, true, 'Hero CTA Link');
-      if (!heroCtaCheck.isValid) {
-        setStatus('error');
-        setErrorMessage(heroCtaCheck.error || 'Invalid Hero CTA link.');
-        return;
-      }
+  const handleMediaModalSelect = (url: string) => {
+    markDirty();
+    if (mediaTarget === 'profile') {
+      setProfileForm((prev) => ({ ...prev, profileImage: url }));
+    } else {
+      setProfileForm((prev) => ({ ...prev, coverImage: url }));
     }
+    setIsMediaPickerOpen(false);
+  };
 
-    // 2. Creative Statement validation
-    const statementCheck = validators.required(aboutForm.label, 'Creative Statement Label');
-    if (!statementCheck.isValid) {
+  // Master Save Handler
+  const handleSaveAll = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setStatus('saving');
+    setErrorMessage(null);
+
+    // Validate email
+    const emailValidation = validators.email(profileForm.email, false, 'Email');
+    if (!emailValidation.isValid) {
       setStatus('error');
-      setErrorMessage(statementCheck.error || 'Statement label is required.');
+      setErrorMessage(emailValidation.error || 'Invalid email address');
       return;
-    }
-
-    // 3. Design Philosophy validation
-    const philCheck = validators.required(philosophyForm.label, 'Design Philosophy Label');
-    if (!philCheck.isValid) {
-      setStatus('error');
-      setErrorMessage(philCheck.error || 'Philosophy label is required.');
-      return;
-    }
-
-    // 4. Contact CTA validation
-    if (contactForm.email) {
-      const emailCheck = validators.email(contactForm.email, true, 'Contact Email');
-      if (!emailCheck.isValid) {
-        setStatus('error');
-        setErrorMessage(emailCheck.error || 'Invalid contact email format.');
-        return;
-      }
-    }
-
-    const contactLink = contactForm.buttonLink || contactForm.ctaLink;
-    if (contactLink) {
-      const contactLinkCheck = validators.url(contactLink, true, 'Contact Action Link');
-      if (!contactLinkCheck.isValid) {
-        setStatus('error');
-        setErrorMessage(contactLinkCheck.error || 'Invalid or unsafe Contact Action link.');
-        return;
-      }
     }
 
     try {
-      setStatus('saving');
-      setErrorMessage(null);
+      // 1. Update Profile & Sync with Hero & Contact
+      const profilePromise = updateProfile(profileForm);
+
+      // 2. Synchronize Hero & Footer with Profile
+      const heroSync: HeroContent = {
+        ...data.hero,
+        subEyebrow: profileForm.title,
+        description: profileForm.primaryDescription,
+        heroImage: profileForm.profileImage,
+      };
+      const heroPromise = updateHero(heroSync);
+
+      // 3. Update Contact CTA
+      const contactSync: ContactCTA = {
+        ...contactForm,
+        email: profileForm.email,
+        coordinates: profileForm.location,
+      };
+      const contactPromise = updateContactCTA(contactSync);
+
+      // 4. Update Footer with brand name, location, email, and social links
+      const footerSync: FooterContent = {
+        ...footerForm,
+        brandText: profileForm.name.toUpperCase(),
+        location: profileForm.location.toUpperCase(),
+        email: profileForm.email,
+        socialLinks,
+      };
+      const footerPromise = updateFooter(footerSync);
+
+      // 5. Update Experience, Education, Tools, Philosophy, Marquee
+      const expPromise = updateExperience(experienceList);
+      const eduPromise = updateEducation(educationList);
+      const toolsPromise = updateTools(toolsList);
+      const philPromise = updatePhilosophy(philosophyForm);
+      const marqPromise = updateMarquee(marqueeForm);
 
       const results = await Promise.all([
-        updateHero(heroForm),
-        updateAbout(aboutForm),
-        updateMarquee(marqueeForm),
-        updatePhilosophy(philosophyForm),
-        updateContactCTA(contactForm),
+        profilePromise,
+        heroPromise,
+        contactPromise,
+        footerPromise,
+        expPromise,
+        eduPromise,
+        toolsPromise,
+        philPromise,
+        marqPromise,
       ]);
 
       if (results.every(Boolean)) {
         setStatus('saved');
         setIsDirty(false);
-        setTimeout(() => setStatus('idle'), 3500);
+        setTimeout(() => setStatus('idle'), 3000);
       } else {
         setStatus('error');
-        setErrorMessage('Failed to persist some updates to database. Changes saved to working state.');
+        setErrorMessage('Failed to save some sections to persistent storage.');
       }
     } catch (err: any) {
       setStatus('error');
@@ -283,1051 +556,1490 @@ export const ContentManager: React.FC = () => {
     }
   };
 
-  // Cancel / revert
-  const handleCancel = () => {
-    if (isDirty) {
-      if (!window.confirm('Discard unsaved modifications and revert to last saved state?')) {
-        return;
-      }
-    }
-    setHeroForm(data.hero);
-    setAboutForm(data.about);
-    setMarqueeForm(data.marquee);
-    setPhilosophyForm(data.philosophy);
-    setContactForm(data.contact);
-    setIsDirty(false);
-    setStatus('idle');
-  };
-
-  // Reset to default baseline data
-  const handleResetToDefault = () => {
-    if (window.confirm('Reset all section copy to specimen baseline defaults? This will overwrite working changes.')) {
-      setHeroForm(defaultWebsiteData.hero);
-      setAboutForm(defaultWebsiteData.about);
-      setMarqueeForm(defaultWebsiteData.marquee);
-      setPhilosophyForm(defaultWebsiteData.philosophy);
-      setContactForm(defaultWebsiteData.contact);
-      markDirty();
-    }
-  };
+  const navTabs: { id: ContentSubSection; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
+    { id: 'profile', label: '1. Profile', icon: User },
+    { id: 'contact', label: '2. Contact', icon: Phone },
+    { id: 'experience', label: '3. Experience', icon: Briefcase },
+    { id: 'education', label: '4. Education', icon: GraduationCap },
+    { id: 'skills', label: '5. Skills', icon: Sparkles },
+    { id: 'tools', label: '6. Design Tools', icon: Wrench },
+    { id: 'social', label: '7. Social Links', icon: Share2 },
+    { id: 'image', label: '8. Profile Image', icon: ImageIcon },
+    { id: 'philosophy', label: '9. Philosophy', icon: Compass },
+    { id: 'marquee', label: '10. Marquee Strip', icon: Repeat },
+  ];
 
   return (
-    <div className="max-w-6xl mx-auto space-y-8 pb-16">
-      {/* Header Bar with Action Controls */}
-      <div className="rounded-2xl border border-border bg-surface p-6 sm:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-xs">
-        <div className="space-y-1">
-          <div className="flex items-center gap-2">
-            <span className="font-mono text-xs font-semibold uppercase tracking-wider text-muted flex items-center gap-1.5">
-              <FileText className="w-3.5 h-3.5" />
-              Website CMS / Editorial Content Editor
-            </span>
-            {isDirty && (
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 animate-pulse">
-                Unsaved Changes
-              </span>
-            )}
-          </div>
-          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
-            Section Copy & Typography CMS
-          </h2>
-          <p className="text-xs sm:text-sm text-muted max-w-xl">
-            Manage copy, manifesto lines, philosophy thesis, marquee items, and contact call-to-actions across the public portfolio.
+    <div className="space-y-6 max-w-7xl mx-auto pb-24">
+      {/* Top Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-6">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground font-sans uppercase">
+            Resume & Profile Manager
+          </h1>
+          <p className="text-xs sm:text-sm text-muted font-mono mt-1">
+            Single Source of Truth backed by Resume.pdf (Darshil S. Bhuva)
           </p>
         </div>
 
-        {/* Global Action Buttons */}
-        <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+        {/* Global Save Button with State Feedback */}
+        <div className="flex items-center gap-3">
           <button
             type="button"
-            onClick={handleCancel}
-            disabled={!isDirty || status === 'saving'}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-border text-xs font-medium text-muted hover:text-foreground hover:bg-background transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-          >
-            <Undo2 className="w-3.5 h-3.5" />
-            <span>Cancel</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={handleResetToDefault}
+            onClick={handleSaveAll}
             disabled={status === 'saving'}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-border text-xs font-medium text-muted hover:text-foreground hover:bg-background transition-colors"
-            title="Reset content to initial specimen defaults"
+            className={`min-h-[44px] px-6 py-2.5 rounded-xl font-mono text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all shadow-xs ${
+              status === 'saved'
+                ? 'bg-emerald-600 text-white'
+                : status === 'error'
+                ? 'bg-red-600 text-white'
+                : 'bg-foreground text-background hover:opacity-90'
+            }`}
           >
-            <RotateCcw className="w-3.5 h-3.5" />
-            <span>Reset</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={handleSave}
-            disabled={status === 'saving'}
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-foreground text-background font-semibold text-xs hover:opacity-90 transition-opacity shadow-xs disabled:opacity-50"
-          >
-            <Save className="w-4 h-4" />
-            <span>{status === 'saving' ? 'Saving...' : 'Save All Changes'}</span>
+            {status === 'saving' ? (
+              <>
+                <div className="w-4 h-4 border-2 border-background/30 border-t-background rounded-full animate-spin" />
+                <span>Saving...</span>
+              </>
+            ) : status === 'saved' ? (
+              <>
+                <CheckCircle2 className="w-4 h-4" />
+                <span>Saved Live</span>
+              </>
+            ) : status === 'error' ? (
+              <>
+                <AlertCircle className="w-4 h-4" />
+                <span>Retry Save</span>
+              </>
+            ) : (
+              <>
+                <Save className="w-4 h-4" />
+                <span>Save Changes {isDirty && '•'}</span>
+              </>
+            )}
           </button>
         </div>
       </div>
 
-      {/* Status Feedback Banners */}
-      {status === 'saved' && (
-        <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-4 flex items-center gap-3 text-xs text-emerald-600 dark:text-emerald-400 animate-in fade-in slide-in-from-top-1 duration-200">
-          <CheckCircle2 className="w-4 h-4 shrink-0" />
-          <div className="flex-1 font-medium">
-            All section content saved successfully to database! Changes are live.
+      {/* Error Alert Banner */}
+      {errorMessage && (
+        <div className="p-4 rounded-xl border border-red-500/30 bg-red-500/10 text-red-400 text-xs font-mono flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 shrink-0" />
+            <span>{errorMessage}</span>
           </div>
-          <a
-            href="/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="underline inline-flex items-center gap-1 font-semibold hover:opacity-80"
+          <button
+            type="button"
+            onClick={() => setErrorMessage(null)}
+            className="text-red-400 hover:text-red-300 font-bold"
           >
-            <span>View Public Site</span>
-            <ExternalLink className="w-3 h-3" />
-          </a>
+            [Dismiss]
+          </button>
         </div>
       )}
 
-      {status === 'error' && (
-        <div className="rounded-xl border border-red-500/30 bg-red-500/10 p-4 flex items-center gap-3 text-xs text-red-500 animate-in fade-in slide-in-from-top-1 duration-200">
-          <AlertCircle className="w-4 h-4 shrink-0" />
-          <div className="flex-1 font-medium">
-            {errorMessage || 'Failed to save updates to the database.'}
-          </div>
-        </div>
-      )}
-
-      {/* Navigation Tabs */}
-      <div className="flex items-center gap-2 border-b border-border pb-2 overflow-x-auto no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap">
-        <button
-          type="button"
-          onClick={() => setActiveTab('hero')}
-          className={`flex items-center gap-2 px-4 py-2.5 text-xs font-semibold rounded-xl whitespace-nowrap shrink-0 transition-all ${
-            activeTab === 'hero'
-              ? 'bg-foreground text-background shadow-xs'
-              : 'text-muted hover:text-foreground hover:bg-surface'
-          }`}
-        >
-          <Sparkles className="w-3.5 h-3.5" />
-          <span>Hero Section</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setActiveTab('statement')}
-          className={`flex items-center gap-2 px-4 py-2.5 text-xs font-semibold rounded-xl whitespace-nowrap shrink-0 transition-all ${
-            activeTab === 'statement'
-              ? 'bg-foreground text-background shadow-xs'
-              : 'text-muted hover:text-foreground hover:bg-surface'
-          }`}
-        >
-          <Layers className="w-3.5 h-3.5" />
-          <span>Creative Statement</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setActiveTab('marquee')}
-          className={`flex items-center gap-2 px-4 py-2.5 text-xs font-semibold rounded-xl whitespace-nowrap shrink-0 transition-all ${
-            activeTab === 'marquee'
-              ? 'bg-foreground text-background shadow-xs'
-              : 'text-muted hover:text-foreground hover:bg-surface'
-          }`}
-        >
-          <Repeat className="w-3.5 h-3.5" />
-          <span>Marquee Strip</span>
-          <span className="text-[10px] px-1.5 py-0.2 bg-background/20 rounded-full font-mono">
-            {marqueeForm.items.length}
-          </span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setActiveTab('philosophy')}
-          className={`flex items-center gap-2 px-4 py-2.5 text-xs font-semibold rounded-xl whitespace-nowrap shrink-0 transition-all ${
-            activeTab === 'philosophy'
-              ? 'bg-foreground text-background shadow-xs'
-              : 'text-muted hover:text-foreground hover:bg-surface'
-          }`}
-        >
-          <Compass className="w-3.5 h-3.5" />
-          <span>Design Philosophy</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setActiveTab('contact')}
-          className={`flex items-center gap-2 px-4 py-2.5 text-xs font-semibold rounded-xl whitespace-nowrap shrink-0 transition-all ${
-            activeTab === 'contact'
-              ? 'bg-foreground text-background shadow-xs'
-              : 'text-muted hover:text-foreground hover:bg-surface'
-          }`}
-        >
-          <Mail className="w-3.5 h-3.5" />
-          <span>Contact CTA</span>
-        </button>
-
-        <Link
-          to="/admin/content/sections"
-          className="flex items-center gap-2 px-4 py-2.5 text-xs font-semibold rounded-xl whitespace-nowrap shrink-0 transition-all text-muted hover:text-foreground hover:bg-surface border border-dashed border-border"
-        >
-          <Layers className="w-3.5 h-3.5" />
-          <span>Reorder Sections →</span>
-        </Link>
-
-        <Link
-          to="/admin/content/footer"
-          className="flex items-center gap-2 px-4 py-2.5 text-xs font-semibold rounded-lg transition-all text-muted hover:text-foreground hover:bg-surface border border-dashed border-border whitespace-nowrap shrink-0"
-        >
-          <Globe className="w-3.5 h-3.5" />
-          <span>Footer & Social →</span>
-        </Link>
+      {/* Navigation Subsections (8 Tabs) */}
+      <div className="flex items-center gap-1.5 p-1.5 rounded-2xl bg-surface border border-border overflow-x-auto no-scrollbar">
+        {navTabs.map((tab) => {
+          const Icon = tab.icon;
+          const isActive = activeTab === tab.id;
+          return (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-mono text-xs uppercase tracking-wider transition-all whitespace-nowrap min-h-[44px] ${
+                isActive
+                  ? 'bg-background text-foreground font-bold shadow-xs border border-border/80'
+                  : 'text-muted hover:text-foreground hover:bg-background/40'
+              }`}
+            >
+              <Icon className="w-3.5 h-3.5" />
+              <span>{tab.label}</span>
+            </button>
+          );
+        })}
       </div>
 
-      {/* ================================================== */}
-      {/* 1. HERO EDITOR TAB */}
-      {/* ================================================== */}
-      {activeTab === 'hero' && (
-        <div className="space-y-6">
-          <div className="rounded-xl border border-border bg-surface p-6 sm:p-8 space-y-6 shadow-xs">
-            <div className="border-b border-border pb-4 flex items-center justify-between">
-              <div>
-                <h3 className="font-bold text-base text-foreground">Hero Section Configuration</h3>
-                <p className="text-xs text-muted">Primary viewport copy, call-to-action button, and hero specimen media</p>
-              </div>
-              <span className="text-[11px] font-mono px-2.5 py-1 rounded-md bg-background border border-border text-muted">
-                Section ID: hero
-              </span>
+      {/* SUBSECTION 1: PROFILE EDITOR */}
+      {activeTab === 'profile' && (
+        <div className="p-6 sm:p-8 rounded-2xl border border-border bg-surface/30 space-y-6">
+          <div className="border-b border-border pb-4">
+            <h2 className="text-lg font-bold uppercase tracking-tight text-foreground flex items-center gap-2">
+              <User className="w-4 h-4 text-foreground" />
+              <span>Profile Information</span>
+            </h2>
+            <p className="text-xs text-muted font-mono mt-0.5">
+              Core identity, professional title, and design philosophy.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Full Name */}
+            <div className="space-y-2">
+              <label htmlFor="profile-name" className="block text-xs font-semibold text-foreground">
+                Full Name
+              </label>
+              <input
+                id="profile-name"
+                type="text"
+                value={profileForm.name}
+                onChange={(e) => handleProfileChange('name', e.target.value)}
+                placeholder="Darshil S. Bhuva"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-xs font-bold text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
+              />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Eyebrow */}
-              <div className="space-y-2">
-                <label htmlFor="hero-eyebrow" className="block text-xs font-semibold text-foreground">
-                  Eyebrow Badge / Pre-title
-                </label>
-                <input
-                  id="hero-eyebrow"
-                  type="text"
-                  value={heroForm.eyebrow}
-                  onChange={(e) => handleHeroChange('eyebrow', e.target.value)}
-                  placeholder="e.g. (About me)"
-                  className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-background text-xs text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
-                />
-              </div>
-
-              {/* Sub Eyebrow */}
-              <div className="space-y-2">
-                <label htmlFor="hero-subeyebrow" className="block text-xs font-semibold text-foreground">
-                  Top Header Tagline (Desktop)
-                </label>
-                <input
-                  id="hero-subeyebrow"
-                  type="text"
-                  value={heroForm.subEyebrow || ''}
-                  onChange={(e) => handleHeroChange('subEyebrow', e.target.value)}
-                  placeholder="e.g. PORTFOLIO SPECIMEN / AVAILABLE FOR SELECT COMMISSIONS"
-                  className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-background text-xs text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
-                />
-              </div>
-
-              {/* Main Heading */}
-              <div className="space-y-2 md:col-span-2">
-                <label htmlFor="hero-title" className="block text-xs font-semibold text-foreground">
-                  Main Headline (Line by Line)
-                </label>
-                <textarea
-                  id="hero-title"
-                  rows={3}
-                  value={heroForm.headlineLines ? heroForm.headlineLines.join('\n') : heroForm.title}
-                  onChange={(e) => {
-                    const lines = e.target.value.split('\n');
-                    markDirty();
-                    setHeroForm((prev) => ({
-                      ...prev,
-                      title: lines.join(' '),
-                      headlineLines: lines,
-                    }));
-                  }}
-                  placeholder="Line 1&#10;Line 2&#10;Line 3"
-                  className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-background text-xs text-foreground font-mono leading-relaxed placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
-                />
-                <p className="text-[11px] text-muted">Each line in the textarea will animate as an independent typographic mask reveal.</p>
-              </div>
-
-              {/* Description */}
-              <div className="space-y-2 md:col-span-2">
-                <label htmlFor="hero-description" className="block text-xs font-semibold text-foreground">
-                  Supporting Editorial Bio
-                </label>
-                <textarea
-                  id="hero-description"
-                  rows={3}
-                  value={heroForm.description}
-                  onChange={(e) => handleHeroChange('description', e.target.value)}
-                  placeholder="Digital product designer & creative developer focused on thoughtful interfaces..."
-                  className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-background text-xs text-foreground leading-relaxed placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
-                />
-              </div>
-
-              {/* CTA Text */}
-              <div className="space-y-2">
-                <label htmlFor="hero-cta-text" className="block text-xs font-semibold text-foreground">
-                  CTA Button Label
-                </label>
-                <input
-                  id="hero-cta-text"
-                  type="text"
-                  value={heroForm.ctaText}
-                  onChange={(e) => handleHeroChange('ctaText', e.target.value)}
-                  placeholder="e.g. VIEW SELECTED WORKS"
-                  className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-background text-xs text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
-                />
-              </div>
-
-              {/* CTA Link Target */}
-              <div className="space-y-2">
-                <label htmlFor="hero-cta-link" className="block text-xs font-semibold text-foreground">
-                  CTA Action Target / Anchor
-                </label>
-                <input
-                  id="hero-cta-link"
-                  type="text"
-                  value={heroForm.ctaLink}
-                  onChange={(e) => handleHeroChange('ctaLink', e.target.value)}
-                  placeholder="e.g. #works"
-                  className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-background text-xs text-foreground font-mono placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
-                />
-              </div>
-
-              {/* Year */}
-              <div className="space-y-2">
-                <label htmlFor="hero-year" className="block text-xs font-semibold text-foreground">
-                  Year Metadata
-                </label>
-                <input
-                  id="hero-year"
-                  type="text"
-                  value={heroForm.year}
-                  onChange={(e) => handleHeroChange('year', e.target.value)}
-                  placeholder="e.g. 2026"
-                  className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-background text-xs text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
-                />
-              </div>
-
-              {/* Scroll Label */}
-              <div className="space-y-2">
-                <label htmlFor="hero-scroll" className="block text-xs font-semibold text-foreground">
-                  Scroll Indicator Text
-                </label>
-                <input
-                  id="hero-scroll"
-                  type="text"
-                  value={heroForm.scrollLabel}
-                  onChange={(e) => handleHeroChange('scrollLabel', e.target.value)}
-                  placeholder="e.g. SCROLL"
-                  className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-background text-xs text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
-                />
-              </div>
+            {/* Professional Title */}
+            <div className="space-y-2">
+              <label htmlFor="profile-title" className="block text-xs font-semibold text-foreground">
+                Professional Title
+              </label>
+              <input
+                id="profile-title"
+                type="text"
+                value={profileForm.title}
+                onChange={(e) => handleProfileChange('title', e.target.value)}
+                placeholder="UI/UX Designer / Web Designer"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-xs text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
+              />
             </div>
 
-            {/* Hero Image Selection */}
-            <div className="border-t border-border pt-6 space-y-4">
-              <div className="space-y-1">
-                <h4 className="font-semibold text-sm text-foreground flex items-center gap-2">
-                  <ImageIcon className="w-4 h-4" />
-                  <span>Hero Specimen Asset & Media</span>
-                </h4>
-                <p className="text-xs text-muted">Primary visual associated with the hero showcase</p>
-              </div>
+            {/* Location */}
+            <div className="space-y-2">
+              <label htmlFor="profile-location" className="block text-xs font-semibold text-foreground">
+                Location
+              </label>
+              <input
+                id="profile-location"
+                type="text"
+                value={profileForm.location}
+                onChange={(e) => handleProfileChange('location', e.target.value)}
+                placeholder="Surat, Gujarat, India"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-xs text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
+              />
+            </div>
 
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <label htmlFor="hero-image-url" className="block text-xs font-semibold text-foreground">
-                    Image URL / Asset CDN Link
-                  </label>
-                  <button
-                    type="button"
-                    onClick={() => setIsMediaPickerOpen(true)}
-                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg border border-border bg-surface hover:bg-background text-xs font-medium text-foreground transition-colors"
-                  >
-                    <ImageIcon className="w-3.5 h-3.5" />
-                    <span>Choose from Media Library</span>
-                  </button>
-                </div>
-                <input
-                  id="hero-image-url"
-                  type="text"
-                  value={heroForm.heroImage || ''}
-                  onChange={(e) => handleHeroChange('heroImage', e.target.value)}
-                  placeholder="https://images.unsplash.com/..."
-                  className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-background text-xs text-foreground font-mono placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
-                />
-              </div>
+            {/* Availability */}
+            <div className="space-y-2">
+              <label htmlFor="profile-avail" className="block text-xs font-semibold text-foreground">
+                Availability Status
+              </label>
+              <input
+                id="profile-avail"
+                type="text"
+                value={contactForm.availabilityStatus || 'AVAILABLE FOR COMMISSIONS // +91 8866 90 2600'}
+                onChange={(e) => {
+                  markDirty();
+                  setContactForm((prev) => ({ ...prev, availabilityStatus: e.target.value }));
+                }}
+                placeholder="AVAILABLE FOR COMMISSIONS // +91 8866 90 2600"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-xs font-mono text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
+              />
+            </div>
 
-              {/* Presets */}
-              <div className="space-y-2">
-                <label className="block text-xs font-semibold text-muted">
-                  Or pick from curated architectural presets:
-                </label>
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-                  {curatedHeroImages.map((preset) => (
-                    <button
-                      key={preset.url}
-                      type="button"
-                      onClick={() => handleHeroChange('heroImage', preset.url)}
-                      className={`group rounded-lg border p-1.5 text-left transition-all ${
-                        heroForm.heroImage === preset.url
-                          ? 'border-foreground ring-2 ring-foreground/20 bg-background'
-                          : 'border-border hover:border-foreground/50 bg-background/50'
-                      }`}
-                    >
-                      <div className="aspect-[16/10] rounded-md overflow-hidden bg-surface mb-1.5">
-                        <img
-                          src={preset.url}
-                          alt={preset.label}
-                          className="w-full h-full object-cover grayscale contrast-125 group-hover:grayscale-0 transition-all duration-300"
-                        />
-                      </div>
-                      <p className="text-[10px] text-muted truncate group-hover:text-foreground">
-                        {preset.label}
-                      </p>
-                    </button>
-                  ))}
-                </div>
-              </div>
+            {/* Short Introduction */}
+            <div className="space-y-2 md:col-span-2">
+              <label htmlFor="profile-short-intro" className="block text-xs font-semibold text-foreground">
+                Short Introduction (Hero Tagline)
+              </label>
+              <input
+                id="profile-short-intro"
+                type="text"
+                value={data.hero.title}
+                onChange={(e) => {
+                  markDirty();
+                  updateHero({ ...data.hero, title: e.target.value, headlineLines: e.target.value.split('\n') });
+                }}
+                placeholder="Transforming ideas into dynamic digital experiences."
+                className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-xs text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
+              />
+            </div>
 
-              {/* Live Preview */}
-              {heroForm.heroImage && (
-                <div className="p-4 rounded-xl bg-background border border-border space-y-2">
-                  <div className="flex items-center justify-between text-xs text-muted">
-                    <span>Live Image Preview</span>
-                    <a
-                      href={heroForm.heroImage}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-[11px] underline hover:text-foreground"
-                    >
-                      <span>Open full asset</span>
-                      <ExternalLink className="w-3 h-3" />
-                    </a>
+            {/* Long Introduction */}
+            <div className="space-y-2 md:col-span-2">
+              <label htmlFor="profile-primary-desc" className="block text-xs font-semibold text-foreground">
+                Primary Description (Resume Biography)
+              </label>
+              <textarea
+                id="profile-primary-desc"
+                rows={3}
+                value={profileForm.primaryDescription}
+                onChange={(e) => handleProfileChange('primaryDescription', e.target.value)}
+                placeholder="As a UI/UX and Web Designer, I transform your ideas into dynamic digital experiences. Consider me your all-in-one expert for diverse business solutions."
+                className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-xs text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
+              />
+            </div>
+
+            {/* Design Philosophy / Objective */}
+            <div className="space-y-2 md:col-span-2">
+              <label htmlFor="profile-objective" className="block text-xs font-semibold text-foreground">
+                Design Objective & Philosophy
+              </label>
+              <textarea
+                id="profile-objective"
+                rows={2}
+                value={profileForm.objective}
+                onChange={(e) => handleProfileChange('objective', e.target.value)}
+                placeholder="Improve user experience through the utility, ease of use, and pleasure provided in the design and interaction with a product."
+                className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-xs text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* SUBSECTION 2: CONTACT EDITOR */}
+      {activeTab === 'contact' && (
+        <div className="p-6 sm:p-8 rounded-2xl border border-border bg-surface/30 space-y-6">
+          <div className="border-b border-border pb-4">
+            <h2 className="text-lg font-bold uppercase tracking-tight text-foreground flex items-center gap-2">
+              <Phone className="w-4 h-4 text-foreground" />
+              <span>Contact & Outreach</span>
+            </h2>
+            <p className="text-xs text-muted font-mono mt-0.5">
+              Official email, phone number, and physical coordinates.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Email */}
+            <div className="space-y-2">
+              <label htmlFor="contact-email" className="block text-xs font-semibold text-foreground">
+                Email Address
+              </label>
+              <input
+                id="contact-email"
+                type="email"
+                value={profileForm.email}
+                onChange={(e) => handleProfileChange('email', e.target.value)}
+                placeholder="darshilbhuva4322@gmail.com"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-xs font-mono text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
+              />
+            </div>
+
+            {/* Phone */}
+            <div className="space-y-2">
+              <label htmlFor="contact-phone" className="block text-xs font-semibold text-foreground">
+                Phone Number
+              </label>
+              <input
+                id="contact-phone"
+                type="text"
+                value={profileForm.phone}
+                onChange={(e) => handleProfileChange('phone', e.target.value)}
+                placeholder="+91 8866 90 2600"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-xs font-mono text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
+              />
+            </div>
+
+            {/* Address */}
+            <div className="space-y-2 md:col-span-2">
+              <label htmlFor="contact-address" className="block text-xs font-semibold text-foreground">
+                Full Address
+              </label>
+              <input
+                id="contact-address"
+                type="text"
+                value={profileForm.address || '21 - Laxminagar Soc., Sarthana Jakatnaka, Surat. 06'}
+                onChange={(e) => handleProfileChange('address', e.target.value)}
+                placeholder="21 - Laxminagar Soc., Sarthana Jakatnaka, Surat. 06"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-xs text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
+              />
+            </div>
+
+            {/* City */}
+            <div className="space-y-2">
+              <label htmlFor="contact-city" className="block text-xs font-semibold text-foreground">
+                City
+              </label>
+              <input
+                id="contact-city"
+                type="text"
+                value={profileForm.city || 'Surat'}
+                onChange={(e) => handleProfileChange('city', e.target.value)}
+                placeholder="Surat"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-xs text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
+              />
+            </div>
+
+            {/* Country/Region */}
+            <div className="space-y-2">
+              <label htmlFor="contact-country" className="block text-xs font-semibold text-foreground">
+                Country / Region
+              </label>
+              <input
+                id="contact-country"
+                type="text"
+                value={profileForm.country || 'Gujarat, India'}
+                onChange={(e) => handleProfileChange('country', e.target.value)}
+                placeholder="Gujarat, India"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-xs text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
+              />
+            </div>
+
+            {/* Social Direct Fields */}
+            <div className="space-y-2">
+              <label htmlFor="contact-linkedin" className="block text-xs font-semibold text-foreground flex items-center gap-1.5">
+                <Linkedin className="w-3.5 h-3.5 text-foreground" />
+                <span>LinkedIn Profile URL</span>
+              </label>
+              <input
+                id="contact-linkedin"
+                type="url"
+                value={profileForm.linkedinUrl || 'https://linkedin.com/in/dsbhuva'}
+                onChange={(e) => handleProfileChange('linkedinUrl', e.target.value)}
+                placeholder="https://linkedin.com/in/dsbhuva"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-xs font-mono text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label htmlFor="contact-dribbble" className="block text-xs font-semibold text-foreground flex items-center gap-1.5">
+                <Dribbble className="w-3.5 h-3.5 text-foreground" />
+                <span>Dribbble Profile URL</span>
+              </label>
+              <input
+                id="contact-dribbble"
+                type="url"
+                value={profileForm.dribbbleUrl || 'https://dribbble.com'}
+                onChange={(e) => handleProfileChange('dribbbleUrl', e.target.value)}
+                placeholder="https://dribbble.com"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-xs font-mono text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label htmlFor="contact-behance" className="block text-xs font-semibold text-foreground flex items-center gap-1.5">
+                <ExternalLink className="w-3.5 h-3.5 text-foreground" />
+                <span>Behance Profile URL</span>
+              </label>
+              <input
+                id="contact-behance"
+                type="url"
+                value={profileForm.behanceUrl || 'https://behance.net'}
+                onChange={(e) => handleProfileChange('behanceUrl', e.target.value)}
+                placeholder="https://behance.net"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-xs font-mono text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label htmlFor="contact-instagram" className="block text-xs font-semibold text-foreground flex items-center gap-1.5">
+                <Instagram className="w-3.5 h-3.5 text-foreground" />
+                <span>Instagram Profile URL</span>
+              </label>
+              <input
+                id="contact-instagram"
+                type="url"
+                value={profileForm.instagramUrl || 'https://instagram.com'}
+                onChange={(e) => handleProfileChange('instagramUrl', e.target.value)}
+                placeholder="https://instagram.com"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-xs font-mono text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* SUBSECTION 3: EXPERIENCE EDITOR */}
+      {activeTab === 'experience' && (
+        <div className="p-6 sm:p-8 rounded-2xl border border-border bg-surface/30 space-y-6">
+          <div className="flex items-center justify-between border-b border-border pb-4">
+            <div>
+              <h2 className="text-lg font-bold uppercase tracking-tight text-foreground flex items-center gap-2">
+                <Briefcase className="w-4 h-4 text-foreground" />
+                <span>Professional Experience</span>
+              </h2>
+              <p className="text-xs text-muted font-mono mt-0.5">
+                Manage companies, job titles, start/end dates, current status, and achievements.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={handleAddExperience}
+              className="min-h-[40px] px-4 py-2 rounded-xl bg-foreground text-background font-mono text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 hover:opacity-90 transition-opacity"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>Add Experience</span>
+            </button>
+          </div>
+
+          <div className="space-y-4">
+            {experienceList.map((exp, index) => (
+              <div
+                key={exp.id}
+                className="p-5 rounded-xl border border-border bg-background space-y-4 transition-all"
+              >
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-border/50 pb-3">
+                  <div className="flex items-center gap-3">
+                    <span className="font-mono text-xs font-bold text-muted">
+                      [0{index + 1}]
+                    </span>
+                    <span className="font-bold text-sm text-foreground uppercase">
+                      {exp.company || 'Unnamed Company'}
+                    </span>
+                    <span className="text-xs text-muted font-mono">
+                      — {exp.role || 'UI/UX Designer'}
+                    </span>
                   </div>
-                  <div className="w-full max-w-md aspect-[16/9] rounded-lg overflow-hidden border border-border bg-surface shadow-inner">
-                    <img
-                      src={heroForm.heroImage}
-                      alt="Hero Live Preview"
-                      className="w-full h-full object-cover filter grayscale contrast-125"
+
+                  <div className="flex items-center gap-1.5 self-end sm:self-auto">
+                    <button
+                      type="button"
+                      onClick={() => handleMoveExperience(index, 'up')}
+                      disabled={index === 0}
+                      className="p-1.5 rounded-lg border border-border text-muted hover:text-foreground disabled:opacity-30"
+                      title="Move Up"
+                    >
+                      <ArrowUp className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleMoveExperience(index, 'down')}
+                      disabled={index === experienceList.length - 1}
+                      className="p-1.5 rounded-lg border border-border text-muted hover:text-foreground disabled:opacity-30"
+                      title="Move Down"
+                    >
+                      <ArrowDown className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleExperienceChange(exp.id, 'visible', !exp.visible)}
+                      className={`p-1.5 rounded-lg border text-xs ${
+                        exp.visible !== false
+                          ? 'border-border text-emerald-500'
+                          : 'border-border text-muted opacity-50'
+                      }`}
+                      title={exp.visible !== false ? 'Visible' : 'Hidden'}
+                    >
+                      {exp.visible !== false ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteExperience(exp.id)}
+                      className="p-1.5 rounded-lg border border-red-500/30 text-red-400 hover:bg-red-500/10"
+                      title="Delete"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-[11px] font-semibold text-muted uppercase mb-1">
+                      Company
+                    </label>
+                    <input
+                      type="text"
+                      value={exp.company}
+                      onChange={(e) => handleExperienceChange(exp.id, 'company', e.target.value)}
+                      className="w-full px-3 py-2 rounded-lg border border-border bg-surface text-xs text-foreground font-semibold"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-semibold text-muted uppercase mb-1">
+                      Job Title
+                    </label>
+                    <input
+                      type="text"
+                      value={exp.role}
+                      onChange={(e) => handleExperienceChange(exp.id, 'role', e.target.value)}
+                      className="w-full px-3 py-2 rounded-lg border border-border bg-surface text-xs text-foreground"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-semibold text-muted uppercase mb-1">
+                      Period (Display Range)
+                    </label>
+                    <input
+                      type="text"
+                      value={exp.period}
+                      onChange={(e) => handleExperienceChange(exp.id, 'period', e.target.value)}
+                      placeholder="e.g. Mar 2022 - Present"
+                      className="w-full px-3 py-2 rounded-lg border border-border bg-surface text-xs font-mono text-foreground"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-semibold text-muted uppercase mb-1">
+                      Start Date
+                    </label>
+                    <input
+                      type="text"
+                      value={exp.startDate || ''}
+                      onChange={(e) => handleExperienceChange(exp.id, 'startDate', e.target.value)}
+                      placeholder="e.g. Mar 2022"
+                      className="w-full px-3 py-2 rounded-lg border border-border bg-surface text-xs font-mono text-foreground"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-semibold text-muted uppercase mb-1">
+                      End Date
+                    </label>
+                    <input
+                      type="text"
+                      value={exp.endDate || ''}
+                      disabled={exp.currentlyWorking}
+                      onChange={(e) => handleExperienceChange(exp.id, 'endDate', e.target.value)}
+                      placeholder="e.g. Present / Nov 2023"
+                      className="w-full px-3 py-2 rounded-lg border border-border bg-surface text-xs font-mono text-foreground disabled:opacity-40"
+                    />
+                  </div>
+
+                  <div className="flex items-center gap-2 pt-5">
+                    <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-foreground select-none">
+                      <input
+                        type="checkbox"
+                        checked={exp.currentlyWorking || exp.period?.toLowerCase().includes('present')}
+                        onChange={(e) => {
+                          const isCurrent = e.target.checked;
+                          handleExperienceChange(exp.id, 'currentlyWorking', isCurrent);
+                          if (isCurrent) {
+                            handleExperienceChange(exp.id, 'endDate', 'Present');
+                          }
+                        }}
+                        className="rounded border-border"
+                      />
+                      <span>Currently Working Here</span>
+                    </label>
+                  </div>
+
+                  <div className="md:col-span-3">
+                    <label className="block text-[11px] font-semibold text-muted uppercase mb-1">
+                      Description & Deliverables
+                    </label>
+                    <textarea
+                      rows={3}
+                      value={exp.description}
+                      onChange={(e) => handleExperienceChange(exp.id, 'description', e.target.value)}
+                      className="w-full px-3 py-2 rounded-lg border border-border bg-surface text-xs text-foreground leading-relaxed"
                     />
                   </div>
                 </div>
-              )}
-            </div>
+              </div>
+            ))}
           </div>
         </div>
       )}
 
-      {/* ================================================== */}
-      {/* 2. CREATIVE STATEMENT TAB */}
-      {/* ================================================== */}
-      {activeTab === 'statement' && (
-        <div className="space-y-6">
-          <div className="rounded-xl border border-border bg-surface p-6 sm:p-8 space-y-6 shadow-xs">
-            <div className="border-b border-border pb-4 flex items-center justify-between">
-              <div>
-                <h3 className="font-bold text-base text-foreground">Creative Statement & Manifesto</h3>
-                <p className="text-xs text-muted">Section 02 large display typography and supporting discipline principles</p>
-              </div>
-              <div className="flex items-center gap-3">
-                <label className="flex items-center gap-2 text-xs font-semibold text-foreground cursor-pointer select-none">
-                  <input
-                    type="checkbox"
-                    checked={aboutForm.visible !== false}
-                    onChange={(e) => handleAboutChange('visible', e.target.checked)}
-                    className="w-4 h-4 rounded border-border text-foreground accent-foreground"
-                  />
-                  <span>Visible on Site</span>
-                </label>
-                <span className="text-[11px] font-mono px-2.5 py-1 rounded-md bg-background border border-border text-muted">
-                  Section ID: statement
-                </span>
-              </div>
+      {/* SUBSECTION 4: EDUCATION EDITOR */}
+      {activeTab === 'education' && (
+        <div className="p-6 sm:p-8 rounded-2xl border border-border bg-surface/30 space-y-6">
+          <div className="flex items-center justify-between border-b border-border pb-4">
+            <div>
+              <h2 className="text-lg font-bold uppercase tracking-tight text-foreground flex items-center gap-2">
+                <GraduationCap className="w-4 h-4 text-foreground" />
+                <span>Education Foundation</span>
+              </h2>
+              <p className="text-xs text-muted font-mono mt-0.5">
+                Academic institutions, education types, locations, and tenures.
+              </p>
             </div>
+            <button
+              type="button"
+              onClick={handleAddEducation}
+              className="min-h-[40px] px-4 py-2 rounded-xl bg-foreground text-background font-mono text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 hover:opacity-90 transition-opacity"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>Add Education</span>
+            </button>
+          </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Label */}
-              <div className="space-y-2">
-                <label htmlFor="about-label" className="block text-xs font-semibold text-foreground">
-                  Section Label / Badge
-                </label>
-                <input
-                  id="about-label"
-                  type="text"
-                  value={aboutForm.label}
-                  onChange={(e) => handleAboutChange('label', e.target.value)}
-                  placeholder="e.g. CREATIVE MANIFESTO"
-                  className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-background text-xs font-bold uppercase text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
-                />
-              </div>
+          <div className="space-y-4">
+            {educationList.map((edu, index) => (
+              <div
+                key={edu.id}
+                className="p-5 rounded-xl border border-border bg-background space-y-4 transition-all"
+              >
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-border/50 pb-3">
+                  <div className="flex items-center gap-3">
+                    <span className="font-mono text-xs font-bold text-muted">
+                      [0{index + 1}]
+                    </span>
+                    <span className="font-bold text-sm text-foreground uppercase">
+                      {edu.institution || 'Institution'}
+                    </span>
+                    <span className="text-xs text-muted font-mono">
+                      — {edu.educationType || edu.degree || 'Degree / Diploma'}
+                    </span>
+                  </div>
 
-              {/* Number */}
-              <div className="space-y-2">
-                <label htmlFor="about-number" className="block text-xs font-semibold text-foreground">
-                  Section Index Number
-                </label>
-                <input
-                  id="about-number"
-                  type="text"
-                  value={aboutForm.number || '02'}
-                  onChange={(e) => handleAboutChange('number', e.target.value)}
-                  placeholder="e.g. 02"
-                  className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-background text-xs text-foreground font-mono placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
-                />
-              </div>
+                  <div className="flex items-center gap-1.5 self-end sm:self-auto">
+                    <button
+                      type="button"
+                      onClick={() => handleMoveEducation(index, 'up')}
+                      disabled={index === 0}
+                      className="p-1.5 rounded-lg border border-border text-muted hover:text-foreground disabled:opacity-30"
+                      title="Move Up"
+                    >
+                      <ArrowUp className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleMoveEducation(index, 'down')}
+                      disabled={index === educationList.length - 1}
+                      className="p-1.5 rounded-lg border border-border text-muted hover:text-foreground disabled:opacity-30"
+                      title="Move Down"
+                    >
+                      <ArrowDown className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleEducationChange(edu.id, 'visible', !edu.visible)}
+                      className={`p-1.5 rounded-lg border text-xs ${
+                        edu.visible !== false
+                          ? 'border-border text-emerald-500'
+                          : 'border-border text-muted opacity-50'
+                      }`}
+                      title={edu.visible !== false ? 'Visible' : 'Hidden'}
+                    >
+                      {edu.visible !== false ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteEducation(edu.id)}
+                      className="p-1.5 rounded-lg border border-red-500/30 text-red-400 hover:bg-red-500/10"
+                      title="Delete"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
 
-              {/* Line 1 */}
-              <div className="space-y-2">
-                <label htmlFor="about-line1" className="block text-xs font-semibold text-foreground">
-                  Manifesto Line 1
-                </label>
-                <input
-                  id="about-line1"
-                  type="text"
-                  value={aboutForm.line1 || 'BE CURIOUS.'}
-                  onChange={(e) => handleAboutChange('line1', e.target.value)}
-                  placeholder="e.g. BE CURIOUS."
-                  className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-background text-xs text-foreground font-mono font-bold uppercase placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
-                />
-              </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-[11px] font-semibold text-muted uppercase mb-1">
+                      Institution
+                    </label>
+                    <input
+                      type="text"
+                      value={edu.institution}
+                      onChange={(e) => handleEducationChange(edu.id, 'institution', e.target.value)}
+                      className="w-full px-3 py-2 rounded-lg border border-border bg-surface text-xs text-foreground font-semibold"
+                    />
+                  </div>
 
-              {/* Line 2 */}
-              <div className="space-y-2">
-                <label htmlFor="about-line2" className="block text-xs font-semibold text-foreground">
-                  Manifesto Line 2
-                </label>
-                <input
-                  id="about-line2"
-                  type="text"
-                  value={aboutForm.line2 || 'BE BOLD.'}
-                  onChange={(e) => handleAboutChange('line2', e.target.value)}
-                  placeholder="e.g. BE BOLD."
-                  className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-background text-xs text-foreground font-mono font-bold uppercase placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
-                />
-              </div>
+                  <div>
+                    <label className="block text-[11px] font-semibold text-muted uppercase mb-1">
+                      Education Type / Degree
+                    </label>
+                    <input
+                      type="text"
+                      value={edu.educationType || edu.degree || ''}
+                      onChange={(e) => {
+                        handleEducationChange(edu.id, 'educationType', e.target.value);
+                        handleEducationChange(edu.id, 'degree', e.target.value);
+                      }}
+                      placeholder="e.g. Higher Secondary / Diploma"
+                      className="w-full px-3 py-2 rounded-lg border border-border bg-surface text-xs text-foreground"
+                    />
+                  </div>
 
-              {/* Line 3 */}
-              <div className="space-y-2 md:col-span-2">
-                <label htmlFor="about-line3" className="block text-xs font-semibold text-foreground">
-                  Manifesto Line 3
-                </label>
-                <input
-                  id="about-line3"
-                  type="text"
-                  value={aboutForm.line3 || 'BE USEFUL.'}
-                  onChange={(e) => handleAboutChange('line3', e.target.value)}
-                  placeholder="e.g. BE USEFUL."
-                  className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-background text-xs text-foreground font-mono font-bold uppercase placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
-                />
-              </div>
+                  <div>
+                    <label className="block text-[11px] font-semibold text-muted uppercase mb-1">
+                      Location
+                    </label>
+                    <input
+                      type="text"
+                      value={edu.location || 'Surat, Gujarat'}
+                      onChange={(e) => handleEducationChange(edu.id, 'location', e.target.value)}
+                      placeholder="e.g. Surat, Gujarat"
+                      className="w-full px-3 py-2 rounded-lg border border-border bg-surface text-xs text-foreground"
+                    />
+                  </div>
 
-              {/* Supporting text / Core Principles */}
-              <div className="space-y-2 md:col-span-2">
-                <label htmlFor="about-principles" className="block text-xs font-semibold text-foreground">
-                  Supporting Text / Core Discipline Principles
-                </label>
-                <textarea
-                  id="about-principles"
-                  rows={2}
-                  value={aboutForm.supportingText || aboutForm.corePrinciples || 'FORM AS CONSEQUENCE OF FUNCTION AND RESTRAINT'}
-                  onChange={(e) => handleAboutChange('supportingText', e.target.value)}
-                  placeholder="e.g. FORM AS CONSEQUENCE OF FUNCTION AND RESTRAINT"
-                  className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-background text-xs text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
-                />
-              </div>
+                  <div>
+                    <label className="block text-[11px] font-semibold text-muted uppercase mb-1">
+                      Period (Display Range)
+                    </label>
+                    <input
+                      type="text"
+                      value={edu.period}
+                      onChange={(e) => handleEducationChange(edu.id, 'period', e.target.value)}
+                      placeholder="e.g. 2017 - 2018"
+                      className="w-full px-3 py-2 rounded-lg border border-border bg-surface text-xs font-mono text-foreground"
+                    />
+                  </div>
 
-              {/* Year Stamp */}
-              <div className="space-y-2">
-                <label htmlFor="about-year" className="block text-xs font-semibold text-foreground">
-                  Established Year Stamp
-                </label>
-                <input
-                  id="about-year"
-                  type="text"
-                  value={aboutForm.yearMeta || 'EST. 2026'}
-                  onChange={(e) => handleAboutChange('yearMeta', e.target.value)}
-                  placeholder="e.g. EST. 2026"
-                  className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-background text-xs text-foreground font-mono placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
-                />
+                  <div>
+                    <label className="block text-[11px] font-semibold text-muted uppercase mb-1">
+                      Start Date
+                    </label>
+                    <input
+                      type="text"
+                      value={edu.startDate || ''}
+                      onChange={(e) => handleEducationChange(edu.id, 'startDate', e.target.value)}
+                      placeholder="e.g. 2017"
+                      className="w-full px-3 py-2 rounded-lg border border-border bg-surface text-xs font-mono text-foreground"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-semibold text-muted uppercase mb-1">
+                      End Date
+                    </label>
+                    <input
+                      type="text"
+                      value={edu.endDate || ''}
+                      onChange={(e) => handleEducationChange(edu.id, 'endDate', e.target.value)}
+                      placeholder="e.g. 2018"
+                      className="w-full px-3 py-2 rounded-lg border border-border bg-surface text-xs font-mono text-foreground"
+                    />
+                  </div>
+
+                  <div className="md:col-span-3">
+                    <label className="block text-[11px] font-semibold text-muted uppercase mb-1">
+                      Description & Scope
+                    </label>
+                    <textarea
+                      rows={2}
+                      value={edu.description}
+                      onChange={(e) => handleEducationChange(edu.id, 'description', e.target.value)}
+                      className="w-full px-3 py-2 rounded-lg border border-border bg-surface text-xs text-foreground leading-relaxed"
+                    />
+                  </div>
+                </div>
               </div>
-            </div>
+            ))}
           </div>
         </div>
       )}
 
-      {/* ================================================== */}
-      {/* 3. MARQUEE STRIP TAB */}
-      {/* ================================================== */}
-      {activeTab === 'marquee' && (
-        <div className="space-y-6">
-          <div className="rounded-xl border border-border bg-surface p-6 sm:p-8 space-y-6 shadow-xs">
-            <div className="border-b border-border pb-4 flex items-center justify-between">
-              <div>
-                <h3 className="font-bold text-base text-foreground">Marquee Infinite Strip</h3>
-                <p className="text-xs text-muted">Manage items, ordering, animation speed, and glyph separators</p>
-              </div>
-              <span className="text-[11px] font-mono px-2.5 py-1 rounded-md bg-background border border-border text-muted">
-                Section ID: marquee
-              </span>
-            </div>
+      {/* SUBSECTION 5: SKILLS EDITOR (DESIGN) */}
+      {activeTab === 'skills' && (
+        <div className="p-6 sm:p-8 rounded-2xl border border-border bg-surface/30 space-y-6">
+          <div className="border-b border-border pb-4">
+            <h2 className="text-lg font-bold uppercase tracking-tight text-foreground flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-foreground" />
+              <span>Design Disciplines & Capabilities</span>
+            </h2>
+            <p className="text-xs text-muted font-mono mt-0.5">
+              Core design specializations (Wireframes & Flows, Prototyping, UI, Interaction Design).
+            </p>
+          </div>
 
-            {/* Add New Phrase Input */}
-            <div className="flex items-center gap-3">
+          <div className="space-y-4">
+            {/* Input to Add New Skill */}
+            <div className="flex gap-2">
               <input
                 type="text"
-                value={newMarqueeItem}
-                onChange={(e) => setNewMarqueeItem(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    handleAddMarqueeItem();
-                  }
-                }}
-                placeholder="Type new phrase (e.g. SPATIAL PROTOTYPER)..."
-                className="flex-1 px-4 py-2.5 rounded-xl border border-border bg-background text-xs text-foreground uppercase placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
+                value={newSkillName}
+                onChange={(e) => setNewSkillName(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddDesignSkill())}
+                placeholder="e.g. Wireframes & Flows, Interaction Design..."
+                className="flex-1 px-4 py-2.5 rounded-xl border border-border bg-background text-xs font-mono text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
               />
               <button
                 type="button"
-                onClick={handleAddMarqueeItem}
-                disabled={!newMarqueeItem.trim()}
-                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-foreground text-background text-xs font-semibold hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
+                onClick={handleAddDesignSkill}
+                disabled={!newSkillName.trim()}
+                className="min-h-[44px] px-5 py-2.5 rounded-xl bg-foreground text-background font-mono text-xs font-bold uppercase tracking-wider disabled:opacity-40"
               >
-                <Plus className="w-4 h-4" />
-                <span>Add Phrase</span>
+                Add Skill
               </button>
             </div>
 
-            {/* Editable & Reorderable List */}
-            <div className="space-y-2.5">
-              <label className="block text-xs font-semibold text-muted">
-                Active Marquee Items ({marqueeForm.items.length})
-              </label>
+            {/* List of current design skills */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+              {(designCategory?.items || designCategory?.skills || []).map((skill, index) => (
+                <div
+                  key={skill.name}
+                  className="p-3.5 rounded-xl border border-border bg-background flex items-center justify-between gap-3 group"
+                >
+                  <div className="flex items-center gap-2.5 truncate">
+                    <span className="font-mono text-xs text-muted font-semibold">
+                      [{String(index + 1).padStart(2, '0')}]
+                    </span>
+                    <span className="font-semibold text-xs text-foreground truncate">
+                      {skill.name}
+                    </span>
+                  </div>
 
-              {marqueeForm.items.length === 0 ? (
-                <div className="p-8 text-center rounded-xl border border-dashed border-border text-xs text-muted">
-                  No marquee items configured. Add phrases above.
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  {marqueeForm.items.map((item, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center gap-3 p-3 rounded-xl border border-border bg-background hover:border-foreground/30 transition-colors"
+                  <div className="flex items-center gap-1 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => handleMoveDesignSkill(index, 'up')}
+                      disabled={index === 0}
+                      className="p-1 text-muted hover:text-foreground disabled:opacity-20"
+                      title="Move Up"
                     >
-                      <span className="w-6 text-center font-mono text-xs text-muted shrink-0">
-                        {String(index + 1).padStart(2, '0')}
-                      </span>
-
-                      {/* Editable Text Input */}
-                      <input
-                        type="text"
-                        value={item}
-                        onChange={(e) => handleEditMarqueeItem(index, e.target.value.toUpperCase())}
-                        className="flex-1 px-3 py-1.5 rounded-lg border border-border/60 bg-surface text-xs font-semibold uppercase tracking-wider text-foreground focus:outline-hidden focus:ring-1 focus:ring-foreground"
-                      />
-
-                      {/* Reorder Buttons */}
-                      <div className="flex items-center gap-1 shrink-0">
-                        <button
-                          type="button"
-                          onClick={() => handleMoveMarqueeItem(index, 'up')}
-                          disabled={index === 0}
-                          className="p-1.5 rounded-md border border-border text-muted hover:text-foreground hover:bg-surface disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-                          title="Move Up"
-                        >
-                          <ArrowUp className="w-3.5 h-3.5" />
-                        </button>
-
-                        <button
-                          type="button"
-                          onClick={() => handleMoveMarqueeItem(index, 'down')}
-                          disabled={index === marqueeForm.items.length - 1}
-                          className="p-1.5 rounded-md border border-border text-muted hover:text-foreground hover:bg-surface disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-                          title="Move Down"
-                        >
-                          <ArrowDown className="w-3.5 h-3.5" />
-                        </button>
-
-                        <button
-                          type="button"
-                          onClick={() => handleDeleteMarqueeItem(index)}
-                          className="p-1.5 rounded-md border border-red-500/20 text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors"
-                          title="Delete Item"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                    </div>
-                  ))}
+                      <ArrowUp className="w-3 h-3" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleMoveDesignSkill(index, 'down')}
+                      disabled={index === (designCategory?.items || designCategory?.skills || []).length - 1}
+                      className="p-1 text-muted hover:text-foreground disabled:opacity-20"
+                      title="Move Down"
+                    >
+                      <ArrowDown className="w-3 h-3" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleToggleSkillVisibility(skill.name)}
+                      className={`p-1 text-xs ${
+                        skill.visible !== false ? 'text-emerald-500' : 'text-muted opacity-40'
+                      }`}
+                      title={skill.visible !== false ? 'Visible' : 'Hidden'}
+                    >
+                      {skill.visible !== false ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteDesignSkill(skill.name)}
+                      className="p-1 text-muted hover:text-red-400 opacity-60 group-hover:opacity-100 transition-opacity"
+                      title="Remove"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 </div>
-              )}
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* SUBSECTION 6: DESIGN TOOLS EDITOR */}
+      {activeTab === 'tools' && (
+        <div className="p-6 sm:p-8 rounded-2xl border border-border bg-surface/30 space-y-6">
+          <div className="border-b border-border pb-4">
+            <h2 className="text-lg font-bold uppercase tracking-tight text-foreground flex items-center gap-2">
+              <Wrench className="w-4 h-4 text-foreground" />
+              <span>Design Tools & Technical Stack</span>
+            </h2>
+            <p className="text-xs text-muted font-mono mt-0.5">
+              Tools and technologies (Figma, Adobe XD, Photoshop, Illustrator, HTML/CSS, JavaScript, Bootstrap, GitHub).
+            </p>
+          </div>
+
+          <div className="space-y-4">
+            {/* Input to Add New Tool */}
+            <div className="flex flex-col sm:flex-row gap-2">
+              <input
+                type="text"
+                value={newToolName}
+                onChange={(e) => setNewToolName(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddTool())}
+                placeholder="e.g. Figma, Adobe Illustrator, GitHub..."
+                className="flex-1 px-4 py-2.5 rounded-xl border border-border bg-background text-xs font-mono text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
+              />
+              <select
+                value={newToolCategory}
+                onChange={(e: any) => setNewToolCategory(e.target.value)}
+                className="px-3 py-2.5 rounded-xl border border-border bg-background text-xs font-mono text-foreground"
+              >
+                <option value="Design Tools">Design Tools</option>
+                <option value="Technical">Technical</option>
+              </select>
+              <button
+                type="button"
+                onClick={handleAddTool}
+                disabled={!newToolName.trim()}
+                className="min-h-[44px] px-5 py-2.5 rounded-xl bg-foreground text-background font-mono text-xs font-bold uppercase tracking-wider disabled:opacity-40"
+              >
+                Add Tool
+              </button>
             </div>
 
-            {/* Marquee Configuration Controls */}
-            <div className="border-t border-border pt-6 grid grid-cols-1 sm:grid-cols-3 gap-6">
-              <div className="space-y-2">
-                <label htmlFor="marquee-speed" className="block text-xs font-semibold text-foreground">
-                  Scroll Duration / Speed ({marqueeForm.speed}s)
-                </label>
-                <input
-                  id="marquee-speed"
-                  type="range"
-                  min={10}
-                  max={60}
-                  step={2}
-                  value={marqueeForm.speed}
-                  onChange={(e) => {
-                    markDirty();
-                    setMarqueeForm((prev) => ({ ...prev, speed: Number(e.target.value) }));
-                  }}
-                  className="w-full accent-foreground"
-                />
-              </div>
+            {/* List of current tools */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+              {toolsList.map((tool, idx) => (
+                <div
+                  key={tool.id || idx}
+                  className="p-3.5 rounded-xl border border-border bg-background flex items-center justify-between gap-3 group"
+                >
+                  <div className="truncate">
+                    <p className="font-bold text-xs text-foreground truncate">{tool.name}</p>
+                    <span className="font-mono text-[10px] text-muted">{tool.category}</span>
+                  </div>
 
-              <div className="space-y-2">
-                <label htmlFor="marquee-separator" className="block text-xs font-semibold text-foreground">
-                  Separator Glyph
-                </label>
-                <input
-                  id="marquee-separator"
-                  type="text"
-                  value={marqueeForm.separator}
-                  onChange={(e) => {
-                    markDirty();
-                    setMarqueeForm((prev) => ({ ...prev, separator: e.target.value }));
-                  }}
-                  placeholder="e.g. ✦"
-                  className="w-full px-3.5 py-2 rounded-lg border border-border bg-background text-xs text-foreground font-mono focus:outline-hidden focus:ring-1 focus:ring-foreground"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label htmlFor="marquee-velocity" className="block text-xs font-semibold text-foreground">
-                  Scroll Velocity Multiplier
-                </label>
-                <div className="flex items-center gap-2 pt-1">
-                  <input
-                    id="marquee-velocity"
-                    type="checkbox"
-                    checked={marqueeForm.enableVelocity ?? true}
-                    onChange={(e) => {
-                      markDirty();
-                      setMarqueeForm((prev) => ({ ...prev, enableVelocity: e.target.checked }));
-                    }}
-                    className="w-4 h-4 rounded border-border text-foreground accent-foreground"
-                  />
-                  <span className="text-xs text-muted">Accelerate with scroll speed</span>
+                  <div className="flex items-center gap-1 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => handleMoveTool(idx, 'up')}
+                      disabled={idx === 0}
+                      className="p-1 text-muted hover:text-foreground disabled:opacity-20"
+                      title="Move Up"
+                    >
+                      <ArrowUp className="w-3 h-3" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleMoveTool(idx, 'down')}
+                      disabled={idx === toolsList.length - 1}
+                      className="p-1 text-muted hover:text-foreground disabled:opacity-20"
+                      title="Move Down"
+                    >
+                      <ArrowDown className="w-3 h-3" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteTool(tool.id)}
+                      className="p-1 text-muted hover:text-red-400 opacity-60 group-hover:opacity-100 transition-opacity"
+                      title="Remove"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* SUBSECTION 7: SOCIAL LINKS EDITOR */}
+      {activeTab === 'social' && (
+        <div className="p-6 sm:p-8 rounded-2xl border border-border bg-surface/30 space-y-6">
+          <div className="border-b border-border pb-4">
+            <h2 className="text-lg font-bold uppercase tracking-tight text-foreground flex items-center gap-2">
+              <Share2 className="w-4 h-4 text-foreground" />
+              <span>Social Links Directory</span>
+            </h2>
+            <p className="text-xs text-muted font-mono mt-0.5">
+              LinkedIn, Dribbble, Behance, and Instagram profiles.
+            </p>
+          </div>
+
+          <div className="space-y-4">
+            {/* Input to Add New Social */}
+            <div className="grid grid-cols-1 sm:grid-cols-12 gap-2">
+              <select
+                value={newSocialPlatform}
+                onChange={(e) => {
+                  setNewSocialPlatform(e.target.value);
+                  setNewSocialLabel(e.target.value);
+                }}
+                className="sm:col-span-3 px-3 py-2.5 rounded-xl border border-border bg-background text-xs font-mono text-foreground"
+              >
+                <option value="LinkedIn">LinkedIn</option>
+                <option value="Dribbble">Dribbble</option>
+                <option value="Behance">Behance</option>
+                <option value="Instagram">Instagram</option>
+                <option value="GitHub">GitHub</option>
+                <option value="Other">Other</option>
+              </select>
+
+              <input
+                type="text"
+                value={newSocialUrl}
+                onChange={(e) => setNewSocialUrl(e.target.value)}
+                placeholder="https://linkedin.com/in/dsbhuva"
+                className="sm:col-span-6 px-4 py-2.5 rounded-xl border border-border bg-background text-xs font-mono text-foreground placeholder:text-muted"
+              />
+
+              <button
+                type="button"
+                onClick={handleAddSocialLink}
+                disabled={!newSocialUrl.trim()}
+                className="sm:col-span-3 min-h-[44px] px-4 py-2.5 rounded-xl bg-foreground text-background font-mono text-xs font-bold uppercase tracking-wider disabled:opacity-40"
+              >
+                Add Link
+              </button>
+            </div>
+
+            {/* List of social links */}
+            <div className="space-y-2">
+              {socialLinks.map((soc, idx) => (
+                <div
+                  key={soc.id || idx}
+                  className="p-3.5 rounded-xl border border-border bg-background flex items-center justify-between gap-4"
+                >
+                  <div className="flex items-center gap-3 truncate">
+                    <span className="font-bold text-xs text-foreground uppercase">{soc.label}</span>
+                    <span className="font-mono text-xs text-muted truncate">{soc.href || soc.url}</span>
+                  </div>
+
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => handleMoveSocialLink(idx, 'up')}
+                      disabled={idx === 0}
+                      className="p-1.5 rounded-lg border border-border text-muted hover:text-foreground disabled:opacity-20"
+                      title="Move Up"
+                    >
+                      <ArrowUp className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleMoveSocialLink(idx, 'down')}
+                      disabled={idx === socialLinks.length - 1}
+                      className="p-1.5 rounded-lg border border-border text-muted hover:text-foreground disabled:opacity-20"
+                      title="Move Down"
+                    >
+                      <ArrowDown className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleToggleSocialVisibility(idx)}
+                      className={`p-1.5 rounded-lg border text-xs ${
+                        soc.visible !== false ? 'border-border text-emerald-500' : 'border-border text-muted opacity-40'
+                      }`}
+                      title={soc.visible !== false ? 'Visible' : 'Hidden'}
+                    >
+                      {soc.visible !== false ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteSocialLink(idx)}
+                      className="p-1.5 rounded-lg border border-red-500/30 text-red-400 hover:bg-red-500/10"
+                      title="Delete"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* SUBSECTION 8: PROFILE IMAGE & VISUAL SPECIMENS */}
+      {activeTab === 'image' && (
+        <div className="p-6 sm:p-8 rounded-2xl border border-border bg-surface/30 space-y-8">
+          <div className="border-b border-border pb-4">
+            <h2 className="text-lg font-bold uppercase tracking-tight text-foreground flex items-center gap-2">
+              <ImageIcon className="w-4 h-4 text-foreground" />
+              <span>Profile Photo & Cover Artifact</span>
+            </h2>
+            <p className="text-xs text-muted font-mono mt-0.5">
+              Manage resume profile headshot, media uploads, and portfolio cover specimen.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* 1. Profile Headshot */}
+            <div className="p-5 rounded-xl border border-border bg-background space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="font-bold text-xs uppercase tracking-wider text-foreground">
+                  Profile Photograph (Resume)
+                </span>
+                <span className="font-mono text-[10px] text-muted">[1200 × 1200]</span>
+              </div>
+
+              <div className="w-full aspect-square max-w-[240px] mx-auto overflow-hidden rounded-xl border border-border bg-surface shadow-md">
+                <img
+                  src={profileForm.profileImage || '/images/darshil-profile.jpg'}
+                  alt="Profile"
+                  className="w-full h-full object-cover filter contrast-105"
+                />
+              </div>
+
+              <div className="flex flex-wrap gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMediaTarget('profile');
+                    fileInputRef.current?.click();
+                  }}
+                  className="flex-1 min-h-[40px] px-3 py-2 rounded-lg border border-border font-mono text-xs uppercase text-foreground hover:bg-surface flex items-center justify-center gap-1.5"
+                >
+                  <Upload className="w-3.5 h-3.5" />
+                  <span>Upload</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMediaTarget('profile');
+                    setIsMediaPickerOpen(true);
+                  }}
+                  className="flex-1 min-h-[40px] px-3 py-2 rounded-lg bg-foreground text-background font-mono text-xs uppercase font-bold flex items-center justify-center gap-1.5"
+                >
+                  <Layers className="w-3.5 h-3.5" />
+                  <span>Choose Media</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleProfileChange('profileImage', '')}
+                  className="min-h-[40px] px-3 py-2 rounded-lg border border-red-500/30 text-red-400 font-mono text-xs uppercase hover:bg-red-500/10"
+                >
+                  Remove
+                </button>
+              </div>
+            </div>
+
+            {/* 2. Cover / Portfolio Visual Specimen */}
+            <div className="p-5 rounded-xl border border-border bg-background space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="font-bold text-xs uppercase tracking-wider text-foreground">
+                  Cover / Specimen Artifact
+                </span>
+                <span className="font-mono text-[10px] text-muted">[4032 × 2268]</span>
+              </div>
+
+              <div className="w-full aspect-video max-w-[320px] mx-auto overflow-hidden rounded-xl border border-border bg-surface shadow-md">
+                <img
+                  src={profileForm.coverImage || '/images/darshil-cover.png'}
+                  alt="Cover Artifact"
+                  className="w-full h-full object-cover filter contrast-105"
+                />
+              </div>
+
+              <div className="flex flex-wrap gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMediaTarget('cover');
+                    fileInputRef.current?.click();
+                  }}
+                  className="flex-1 min-h-[40px] px-3 py-2 rounded-lg border border-border font-mono text-xs uppercase text-foreground hover:bg-surface flex items-center justify-center gap-1.5"
+                >
+                  <Upload className="w-3.5 h-3.5" />
+                  <span>Upload</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMediaTarget('cover');
+                    setIsMediaPickerOpen(true);
+                  }}
+                  className="flex-1 min-h-[40px] px-3 py-2 rounded-lg bg-foreground text-background font-mono text-xs uppercase font-bold flex items-center justify-center gap-1.5"
+                >
+                  <Layers className="w-3.5 h-3.5" />
+                  <span>Choose Media</span>
+                </button>
               </div>
             </div>
           </div>
         </div>
       )}
 
-      {/* ================================================== */}
-      {/* 4. DESIGN PHILOSOPHY TAB */}
-      {/* ================================================== */}
+      {/* SUBSECTION 9: PHILOSOPHY EDITOR */}
       {activeTab === 'philosophy' && (
-        <div className="space-y-6">
-          <div className="rounded-xl border border-border bg-surface p-6 sm:p-8 space-y-6 shadow-xs">
-            <div className="border-b border-border pb-4 flex items-center justify-between">
-              <div>
-                <h3 className="font-bold text-base text-foreground">Design Philosophy Statement</h3>
-                <p className="text-xs text-muted">Section 04 large display typographic thesis and attribution</p>
-              </div>
-              <div className="flex items-center gap-3">
-                <label className="flex items-center gap-2 text-xs font-semibold text-foreground cursor-pointer select-none">
-                  <input
-                    type="checkbox"
-                    checked={philosophyForm.visible !== false}
-                    onChange={(e) => handlePhilosophyChange('visible', e.target.checked)}
-                    className="w-4 h-4 rounded border-border text-foreground accent-foreground"
-                  />
-                  <span>Visible on Site</span>
-                </label>
-                <span className="text-[11px] font-mono px-2.5 py-1 rounded-md bg-background border border-border text-muted">
-                  Section ID: philosophy
-                </span>
-              </div>
+        <div className="p-6 sm:p-8 rounded-2xl border border-border bg-surface/30 space-y-6">
+          <div className="border-b border-border pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <h2 className="text-lg font-bold uppercase tracking-tight text-foreground flex items-center gap-2">
+                <Compass className="w-4 h-4 text-foreground" />
+                <span>Design Philosophy Statement</span>
+              </h2>
+              <p className="text-xs text-muted font-mono mt-0.5">
+                Editable design philosophy thesis, typographic line breaks, and author attribution.
+              </p>
+            </div>
+            {philosophyForm.placeholder && (
+              <span className="px-2 py-0.5 rounded text-[10px] font-mono font-semibold border border-amber-500/30 bg-amber-500/10 text-amber-500">
+                Default Content
+              </span>
+            )}
+          </div>
+
+          {/* Editable Statement Notice */}
+          <div className="p-4 rounded-xl border border-blue-500/20 bg-blue-500/5 flex items-start gap-3 text-xs text-foreground">
+            <Compass className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />
+            <div className="space-y-0.5">
+              <p className="font-bold">Editable Default Philosophy</p>
+              <p className="text-muted leading-relaxed">
+                The resume emphasizes utility, ease of use, and pleasure in product interaction. The default editable statement is <span className="text-foreground font-semibold">"Design should make complex things feel simple."</span> You can edit or refine this statement at any time.
+              </p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Full Main Statement */}
+            <div className="space-y-2 md:col-span-2">
+              <label htmlFor="phil-main" className="block text-xs font-semibold text-foreground">
+                Main Philosophy Statement
+              </label>
+              <textarea
+                id="phil-main"
+                rows={2}
+                value={philosophyForm.mainStatement || philosophyForm.title || ''}
+                onChange={(e) => {
+                  markDirty();
+                  const val = e.target.value;
+                  const parts = val.split(' ');
+                  const mid = Math.ceil(parts.length / 3);
+                  setPhilosophyForm((prev) => ({
+                    ...prev,
+                    mainStatement: val,
+                    title: val,
+                    line1: parts.slice(0, mid).join(' '),
+                    line2: parts.slice(mid, mid * 2).join(' '),
+                    line3: parts.slice(mid * 2).join(' '),
+                  }));
+                }}
+                placeholder="Design should make complex things feel simple."
+                className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-sm font-bold text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
+              />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Label */}
-              <div className="space-y-2">
-                <label htmlFor="phil-label" className="block text-xs font-semibold text-foreground">
-                  Section Label / Badge
-                </label>
-                <input
-                  id="phil-label"
-                  type="text"
-                  value={philosophyForm.label}
-                  onChange={(e) => handlePhilosophyChange('label', e.target.value)}
-                  placeholder="e.g. DESIGN PHILOSOPHY"
-                  className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-background text-xs font-bold uppercase text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
-                />
-              </div>
+            {/* Typographic Line 1 */}
+            <div className="space-y-2">
+              <label htmlFor="phil-line1" className="block text-xs font-semibold text-foreground">
+                Display Headline Line 1
+              </label>
+              <input
+                id="phil-line1"
+                type="text"
+                value={philosophyForm.line1 || ''}
+                onChange={(e) => {
+                  markDirty();
+                  setPhilosophyForm((prev) => ({ ...prev, line1: e.target.value }));
+                }}
+                placeholder="Design should make"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-xs text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
+              />
+            </div>
 
-              {/* Number */}
-              <div className="space-y-2">
-                <label htmlFor="phil-number" className="block text-xs font-semibold text-foreground">
-                  Section Index Number
-                </label>
-                <input
-                  id="phil-number"
-                  type="text"
-                  value={philosophyForm.number || '04'}
-                  onChange={(e) => handlePhilosophyChange('number', e.target.value)}
-                  placeholder="e.g. 04"
-                  className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-background text-xs text-foreground font-mono placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
-                />
-              </div>
+            {/* Typographic Line 2 */}
+            <div className="space-y-2">
+              <label htmlFor="phil-line2" className="block text-xs font-semibold text-foreground">
+                Display Headline Line 2 (Indented)
+              </label>
+              <input
+                id="phil-line2"
+                type="text"
+                value={philosophyForm.line2 || ''}
+                onChange={(e) => {
+                  markDirty();
+                  setPhilosophyForm((prev) => ({ ...prev, line2: e.target.value }));
+                }}
+                placeholder="complex things"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-xs text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
+              />
+            </div>
 
-              {/* Line 1 */}
-              <div className="space-y-2 md:col-span-2">
-                <label htmlFor="phil-line1" className="block text-xs font-semibold text-foreground">
-                  Main Statement Line 1
-                </label>
-                <input
-                  id="phil-line1"
-                  type="text"
-                  value={philosophyForm.line1}
-                  onChange={(e) => handlePhilosophyChange('line1', e.target.value)}
-                  placeholder="e.g. Great design"
-                  className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-background text-sm font-bold text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
-                />
-              </div>
+            {/* Typographic Line 3 */}
+            <div className="space-y-2">
+              <label htmlFor="phil-line3" className="block text-xs font-semibold text-foreground">
+                Display Headline Line 3
+              </label>
+              <input
+                id="phil-line3"
+                type="text"
+                value={philosophyForm.line3 || ''}
+                onChange={(e) => {
+                  markDirty();
+                  setPhilosophyForm((prev) => ({ ...prev, line3: e.target.value }));
+                }}
+                placeholder="feel simple."
+                className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-xs text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
+              />
+            </div>
 
-              {/* Line 2 */}
-              <div className="space-y-2 md:col-span-2">
-                <label htmlFor="phil-line2" className="block text-xs font-semibold text-foreground">
-                  Main Statement Line 2 (Indented Line)
-                </label>
-                <input
-                  id="phil-line2"
-                  type="text"
-                  value={philosophyForm.line2}
-                  onChange={(e) => handlePhilosophyChange('line2', e.target.value)}
-                  placeholder="e.g. should feel obvious"
-                  className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-background text-sm font-bold text-muted placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
-                />
-              </div>
-
-              {/* Line 3 */}
-              <div className="space-y-2 md:col-span-2">
-                <label htmlFor="phil-line3" className="block text-xs font-semibold text-foreground">
-                  Main Statement Line 3
-                </label>
-                <input
-                  id="phil-line3"
-                  type="text"
-                  value={philosophyForm.line3}
-                  onChange={(e) => handlePhilosophyChange('line3', e.target.value)}
-                  placeholder="e.g. after you see it."
-                  className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-background text-sm font-bold text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
-                />
-              </div>
-
-              {/* Author / Attribution */}
-              <div className="space-y-2">
-                <label htmlFor="phil-author" className="block text-xs font-semibold text-foreground">
-                  Author / Attribution Year Stamp
-                </label>
-                <input
-                  id="phil-author"
-                  type="text"
-                  value={philosophyForm.author || philosophyForm.yearMeta || '— 2026'}
-                  onChange={(e) => handlePhilosophyChange('author', e.target.value)}
-                  placeholder="e.g. — 2026"
-                  className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-background text-xs text-foreground font-mono placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
-                />
-              </div>
-
-              {/* Supporting Text / Sub-descriptor */}
-              <div className="space-y-2">
-                <label htmlFor="phil-subtext" className="block text-xs font-semibold text-foreground">
-                  Supporting Text / Sub-descriptor
-                </label>
-                <input
-                  id="phil-subtext"
-                  type="text"
-                  value={philosophyForm.supportingText || philosophyForm.subMeta || 'PHILOSOPHY STATEMENT'}
-                  onChange={(e) => handlePhilosophyChange('supportingText', e.target.value)}
-                  placeholder="e.g. PHILOSOPHY STATEMENT"
-                  className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-background text-xs text-foreground uppercase tracking-wider placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
-                />
-              </div>
+            {/* Author Attribution */}
+            <div className="space-y-2">
+              <label htmlFor="phil-author" className="block text-xs font-semibold text-foreground">
+                Author Attribution
+              </label>
+              <input
+                id="phil-author"
+                type="text"
+                value={philosophyForm.author || philosophyForm.attribution || philosophyForm.yearMeta || ''}
+                onChange={(e) => {
+                  markDirty();
+                  setPhilosophyForm((prev) => ({
+                    ...prev,
+                    author: e.target.value,
+                    attribution: e.target.value,
+                    yearMeta: e.target.value,
+                  }));
+                }}
+                placeholder="— DARSHIL S. BHUVA"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-xs font-mono uppercase text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
+              />
             </div>
           </div>
         </div>
       )}
 
-      {/* ================================================== */}
-      {/* 5. CONTACT CTA TAB */}
-      {/* ================================================== */}
-      {activeTab === 'contact' && (
-        <div className="space-y-6">
-          <div className="rounded-xl border border-border bg-surface p-6 sm:p-8 space-y-6 shadow-xs">
-            <div className="border-b border-border pb-4 flex items-center justify-between">
-              <div>
-                <h3 className="font-bold text-base text-foreground">Contact CTA & Final Climax</h3>
-                <p className="text-xs text-muted">Section 06 giant headline, direct email action, and availability status</p>
-              </div>
-              <div className="flex items-center gap-3">
-                <label className="flex items-center gap-2 text-xs font-semibold text-foreground cursor-pointer select-none">
-                  <input
-                    type="checkbox"
-                    checked={contactForm.visible !== false}
-                    onChange={(e) => handleContactChange('visible', e.target.checked)}
-                    className="w-4 h-4 rounded border-border text-foreground accent-foreground"
-                  />
-                  <span>Visible on Site</span>
-                </label>
-                <span className="text-[11px] font-mono px-2.5 py-1 rounded-md bg-background border border-border text-muted">
-                  Section ID: contact
-                </span>
-              </div>
+      {/* SUBSECTION 10: MARQUEE STRIP EDITOR */}
+      {activeTab === 'marquee' && (
+        <div className="p-6 sm:p-8 rounded-2xl border border-border bg-surface/30 space-y-6">
+          <div className="border-b border-border pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <h2 className="text-lg font-bold uppercase tracking-tight text-foreground flex items-center gap-2">
+                <Repeat className="w-4 h-4 text-foreground" />
+                <span>Kinetic Marquee Typography</span>
+              </h2>
+              <p className="text-xs text-muted font-mono mt-0.5">
+                Manage moving ticker phrases, velocity animation, and separator tokens.
+              </p>
             </div>
+            {marqueeForm.placeholder && (
+              <span className="px-2 py-0.5 rounded text-[10px] font-mono font-semibold border border-amber-500/30 bg-amber-500/10 text-amber-500">
+                Default Content
+              </span>
+            )}
+          </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Heading Line 1 */}
-              <div className="space-y-2">
-                <label htmlFor="cta-headline-1" className="block text-xs font-semibold text-foreground">
-                  Heading Line 1
-                </label>
-                <input
-                  id="cta-headline-1"
-                  type="text"
-                  value={contactForm.headlineLine1}
-                  onChange={(e) => handleContactChange('headlineLine1', e.target.value.toUpperCase())}
-                  placeholder="e.g. HAVE SOMETHING"
-                  className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-background text-xs font-bold uppercase text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
-                />
-              </div>
+          {/* Marquee Add New Item Bar */}
+          <div className="flex flex-col sm:flex-row gap-2 items-stretch">
+            <input
+              type="text"
+              value={newMarqueeItem}
+              onChange={(e) => setNewMarqueeItem(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && newMarqueeItem.trim()) {
+                  e.preventDefault();
+                  markDirty();
+                  setMarqueeForm((prev) => ({
+                    ...prev,
+                    items: [...prev.items, newMarqueeItem.trim().toUpperCase()],
+                  }));
+                  setNewMarqueeItem('');
+                }
+              }}
+              placeholder="e.g. DIGITAL EXPERIENCES"
+              className="flex-1 px-3.5 py-2.5 rounded-xl border border-border bg-background text-xs font-bold uppercase text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
+            />
+            <button
+              type="button"
+              onClick={() => {
+                if (!newMarqueeItem.trim()) return;
+                markDirty();
+                setMarqueeForm((prev) => ({
+                  ...prev,
+                  items: [...prev.items, newMarqueeItem.trim().toUpperCase()],
+                }));
+                setNewMarqueeItem('');
+              }}
+              disabled={!newMarqueeItem.trim()}
+              className="px-5 py-2.5 rounded-xl bg-foreground text-background text-xs font-semibold hover:opacity-90 transition-opacity disabled:opacity-40 flex items-center justify-center gap-1.5"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>Add Phrase</span>
+            </button>
+          </div>
 
-              {/* Heading Line 2 */}
-              <div className="space-y-2">
-                <label htmlFor="cta-headline-2" className="block text-xs font-semibold text-foreground">
-                  Heading Line 2
-                </label>
-                <input
-                  id="cta-headline-2"
-                  type="text"
-                  value={contactForm.headlineLine2}
-                  onChange={(e) => handleContactChange('headlineLine2', e.target.value.toUpperCase())}
-                  placeholder="e.g. WORTH BUILDING?"
-                  className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-background text-xs font-bold uppercase text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
-                />
-              </div>
+          {/* Active Items List */}
+          <div className="space-y-2">
+            <label className="block text-xs font-semibold text-foreground">
+              Current Marquee Phrases ({marqueeForm.items.length})
+            </label>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              {marqueeForm.items.map((item, idx) => (
+                <div
+                  key={idx}
+                  className="flex items-center justify-between gap-3 p-3 rounded-xl border border-border bg-background"
+                >
+                  <span className="font-bold text-xs uppercase text-foreground truncate">
+                    {idx + 1}. {item}
+                  </span>
+                  <div className="flex items-center gap-1 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (idx === 0) return;
+                        markDirty();
+                        const copy = [...marqueeForm.items];
+                        const temp = copy[idx];
+                        copy[idx] = copy[idx - 1];
+                        copy[idx - 1] = temp;
+                        setMarqueeForm((prev) => ({ ...prev, items: copy }));
+                      }}
+                      disabled={idx === 0}
+                      className="p-1 rounded-md border border-border text-muted hover:text-foreground disabled:opacity-20"
+                      title="Move Up"
+                    >
+                      <ArrowUp className="w-3 h-3" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (idx === marqueeForm.items.length - 1) return;
+                        markDirty();
+                        const copy = [...marqueeForm.items];
+                        const temp = copy[idx];
+                        copy[idx] = copy[idx + 1];
+                        copy[idx + 1] = temp;
+                        setMarqueeForm((prev) => ({ ...prev, items: copy }));
+                      }}
+                      disabled={idx === marqueeForm.items.length - 1}
+                      className="p-1 rounded-md border border-border text-muted hover:text-foreground disabled:opacity-20"
+                      title="Move Down"
+                    >
+                      <ArrowDown className="w-3 h-3" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        markDirty();
+                        setMarqueeForm((prev) => ({
+                          ...prev,
+                          items: prev.items.filter((_, i) => i !== idx),
+                        }));
+                      }}
+                      className="p-1 rounded-md border border-red-500/20 text-red-400 hover:text-red-500 hover:bg-red-500/10"
+                      title="Remove Item"
+                    >
+                      <Trash2 className="w-3 h-3" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
 
-              {/* Secondary Text */}
-              <div className="space-y-2 md:col-span-2">
-                <label htmlFor="cta-secondary" className="block text-xs font-semibold text-foreground">
-                  Secondary Supporting Text
-                </label>
-                <input
-                  id="cta-secondary"
-                  type="text"
-                  value={contactForm.secondaryText || contactForm.secondaryLine}
-                  onChange={(e) => handleContactChange('secondaryText', e.target.value)}
-                  placeholder="e.g. Let's make it real."
-                  className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-background text-xs text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
-                />
-              </div>
-
-              {/* Button Text */}
-              <div className="space-y-2">
-                <label htmlFor="cta-button-text" className="block text-xs font-semibold text-foreground">
-                  Button Text
-                </label>
-                <input
-                  id="cta-button-text"
-                  type="text"
-                  value={contactForm.buttonText || contactForm.ctaText}
-                  onChange={(e) => handleContactChange('buttonText', e.target.value.toUpperCase())}
-                  placeholder="e.g. START A PROJECT"
-                  className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-background text-xs font-bold uppercase text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
-                />
-              </div>
-
-              {/* Button Link */}
-              <div className="space-y-2">
-                <label htmlFor="cta-button-link" className="block text-xs font-semibold text-foreground">
-                  Button Link / Mailto Action
-                </label>
-                <input
-                  id="cta-button-link"
-                  type="text"
-                  value={contactForm.buttonLink || contactForm.ctaLink || ''}
-                  onChange={(e) => handleContactChange('buttonLink', e.target.value)}
-                  placeholder="e.g. mailto:contact@darshilbhuva.com"
-                  className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-background text-xs font-mono text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
-                />
-              </div>
-
-              {/* Email */}
-              <div className="space-y-2">
-                <label htmlFor="cta-email" className="block text-xs font-semibold text-foreground">
-                  Primary Contact Email
-                </label>
-                <input
-                  id="cta-email"
-                  type="email"
-                  value={contactForm.email}
-                  onChange={(e) => handleContactChange('email', e.target.value)}
-                  placeholder="contact@darshilbhuva.com"
-                  className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-background text-xs font-mono text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
-                />
-              </div>
-
-              {/* Availability Status */}
-              <div className="space-y-2">
-                <label htmlFor="cta-availability" className="block text-xs font-semibold text-foreground">
-                  Availability Status Label
-                </label>
-                <input
-                  id="cta-availability"
-                  type="text"
-                  value={contactForm.availabilityStatus || ''}
-                  onChange={(e) => handleContactChange('availabilityStatus', e.target.value.toUpperCase())}
-                  placeholder="e.g. AVAILABLE FOR COMMISSIONS WORLDWIDE"
-                  className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-background text-xs text-foreground uppercase placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
-                />
-              </div>
-
-              {/* Geographic Coordinates */}
-              <div className="space-y-2 md:col-span-2">
-                <label htmlFor="cta-coordinates" className="block text-xs font-semibold text-foreground">
-                  Geographic Coordinates Meta
-                </label>
-                <input
-                  id="cta-coordinates"
-                  type="text"
-                  value={contactForm.coordinates || ''}
-                  onChange={(e) => handleContactChange('coordinates', e.target.value)}
-                  placeholder="e.g. 21.1702° N, 72.8311° E"
-                  className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-background text-xs font-mono text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
-                />
-              </div>
+          {/* Marquee Speed & Separator */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 border-t border-border">
+            <div className="space-y-1.5">
+              <label className="block text-xs font-semibold text-foreground">Loop Duration (Seconds)</label>
+              <input
+                type="number"
+                min={10}
+                max={120}
+                value={marqueeForm.speed || 30}
+                onChange={(e) => {
+                  markDirty();
+                  setMarqueeForm((prev) => ({ ...prev, speed: Number(e.target.value) || 30 }));
+                }}
+                className="w-full px-3.5 py-2 rounded-xl border border-border bg-background text-xs font-mono text-foreground"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label className="block text-xs font-semibold text-foreground">Separator Token</label>
+              <input
+                type="text"
+                value={marqueeForm.separator || '✦'}
+                onChange={(e) => {
+                  markDirty();
+                  setMarqueeForm((prev) => ({ ...prev, separator: e.target.value }));
+                }}
+                className="w-full px-3.5 py-2 rounded-xl border border-border bg-background text-xs font-mono text-foreground"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label className="block text-xs font-semibold text-foreground">Movement Direction</label>
+              <select
+                value={marqueeForm.direction || 'left'}
+                onChange={(e) => {
+                  markDirty();
+                  setMarqueeForm((prev) => ({ ...prev, direction: e.target.value as 'left' | 'right' }));
+                }}
+                className="w-full px-3.5 py-2 rounded-xl border border-border bg-background text-xs text-foreground"
+              >
+                <option value="left">Left (Standard)</option>
+                <option value="right">Right (Reverse)</option>
+              </select>
             </div>
           </div>
         </div>
       )}
+
+      {/* Hidden file input for uploads */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        onChange={handleImageFileSelect}
+        className="hidden"
+      />
 
       {/* Media Picker Modal */}
       <MediaPickerModal
         isOpen={isMediaPickerOpen}
         onClose={() => setIsMediaPickerOpen(false)}
-        onSelect={(url) => handleHeroChange('heroImage', url)}
-        title="Select Hero Specimen Asset"
+        onSelect={handleMediaModalSelect}
+        title={mediaTarget === 'profile' ? 'Select Profile Photo' : 'Select Cover Artifact'}
       />
     </div>
   );

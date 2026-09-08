@@ -16,9 +16,21 @@ export const settingsService = {
     try {
       const { data, error } = await supabase.from('site_settings').select('*').single();
       if (error || !data?.settings) return { ...memorySettingsStore };
+      // Deep-merge sections: ensure every default section key is always present,
+      // with saved order/visibility values overriding defaults per-section.
+      const mergedSections = { ...defaultSettings.sections } as typeof defaultSettings.sections;
+      if (data.settings.sections) {
+        for (const key of Object.keys(defaultSettings.sections) as Array<keyof typeof defaultSettings.sections>) {
+          if (data.settings.sections[key]) {
+            mergedSections[key] = { ...defaultSettings.sections[key], ...data.settings.sections[key] };
+          }
+        }
+      }
+
       memorySettingsStore = {
         ...defaultSettings,
         ...data.settings,
+        sections: mergedSections,
         colors: {
           dark: { ...defaultSettings.colors.dark, ...(data.settings.colors?.dark || {}) },
           light: { ...defaultSettings.colors.light, ...(data.settings.colors?.light || {}) },

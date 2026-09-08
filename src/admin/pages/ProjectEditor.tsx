@@ -23,32 +23,11 @@ import { Project } from '../../types';
 import { MediaPickerModal } from '../components/MediaPickerModal';
 import { validators } from '../utils/validators';
 import { useUnsavedChanges } from '../hooks/useUnsavedChanges';
+import { defaultWebsiteData } from '../../data/defaultWebsiteData';
 
 interface ProjectEditorProps {
   mode: 'create' | 'edit';
 }
-
-const CATEGORY_PRESETS = [
-  'Product Design',
-  'AI Platform',
-  'E-commerce',
-  'Spatial Interface',
-  'Creative Direction',
-  'Brand Architecture',
-  'WebGL & Motion',
-  'Design Engineering',
-];
-
-const SERVICE_PRESETS = [
-  'UI Architecture',
-  'Design Systems',
-  'React / TypeScript',
-  'WebGL Shaders',
-  'Motion Choreography',
-  'Data Visualization',
-  'Headless Storefront',
-  'Spatial Prototyping',
-];
 
 const initialProjectState: Omit<Project, 'id'> = {
   title: '',
@@ -76,6 +55,14 @@ export const ProjectEditor: React.FC<ProjectEditorProps> = ({ mode }) => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { data, createProject, updateProject } = useWebsiteData();
+
+  const managedCategories = (data.categories && data.categories.length > 0 ? data.categories : defaultWebsiteData.categories || [])
+    .filter((c) => c.visible !== false)
+    .map((c) => c.name);
+
+  const managedServices = (data.services && data.services.length > 0 ? data.services.map((s) => s.title) : [])
+    .concat(managedCategories)
+    .filter((val, idx, arr) => arr.indexOf(val) === idx);
 
   const [form, setForm] = useState<Omit<Project, 'id'> & { id?: string }>(initialProjectState);
   const [newServiceTag, setNewServiceTag] = useState('');
@@ -444,6 +431,19 @@ export const ProjectEditor: React.FC<ProjectEditorProps> = ({ mode }) => {
               <p className="text-xs text-muted">Title, slug, temporal year, and public visibility states</p>
             </div>
             <div className="flex flex-wrap items-center gap-2.5">
+              {/* Placeholder Template Toggle */}
+              <label className="flex items-center gap-2 text-xs font-semibold text-foreground cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={form.placeholder || false}
+                  onChange={(e) => handleFieldChange('placeholder', e.target.checked)}
+                  className="w-4 h-4 rounded border-border text-amber-500 accent-amber-500"
+                />
+                <span className={`text-[11px] font-mono px-2 py-0.5 rounded border ${form.placeholder ? 'border-amber-500/40 bg-amber-500/10 text-amber-500' : 'border-border text-muted'}`}>
+                  {form.placeholder ? 'Template / Placeholder' : 'Verified Real Project'}
+                </span>
+              </label>
+
               {/* Featured Toggle */}
               <label className="flex items-center gap-2 text-xs font-semibold text-foreground cursor-pointer select-none">
                 <input
@@ -555,12 +555,16 @@ export const ProjectEditor: React.FC<ProjectEditorProps> = ({ mode }) => {
                 className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-background text-xs text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
               />
               <div className="flex flex-wrap gap-1.5 pt-1">
-                {CATEGORY_PRESETS.map((cat) => (
+                {managedCategories.map((cat) => (
                   <button
                     key={cat}
                     type="button"
                     onClick={() => handleFieldChange('category', cat)}
-                    className="text-[10px] px-2 py-0.5 rounded-md border border-border bg-background text-muted hover:text-foreground hover:border-foreground/40 transition-colors"
+                    className={`text-[10px] px-2 py-0.5 rounded-md border transition-colors ${
+                      form.category === cat
+                        ? 'border-foreground bg-foreground text-background font-semibold'
+                        : 'border-border bg-background text-muted hover:text-foreground hover:border-foreground/40'
+                    }`}
                   >
                     {cat}
                   </button>
@@ -675,9 +679,9 @@ export const ProjectEditor: React.FC<ProjectEditorProps> = ({ mode }) => {
 
             {/* Quick Presets */}
             <div className="pt-2">
-              <p className="text-[11px] text-muted mb-1.5">Quick add service scope presets:</p>
+              <p className="text-[11px] text-muted mb-1.5">Quick add managed category & service scope presets:</p>
               <div className="flex flex-wrap gap-1.5">
-                {SERVICE_PRESETS.map((preset) => (
+                {managedServices.map((preset) => (
                   <button
                     key={preset}
                     type="button"

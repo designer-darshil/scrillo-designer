@@ -12,6 +12,16 @@ interface MediaPickerModalProps {
 
 export const curatedLibraryImages = [
   {
+    title: 'Darshil S. Bhuva — Profile Photo (Resume)',
+    url: '/images/darshil-profile.jpg',
+    category: 'Profile',
+  },
+  {
+    title: 'Darshil S. Bhuva — Portfolio Cover Artifact',
+    url: '/images/darshil-cover.png',
+    category: 'Specimen',
+  },
+  {
     title: 'Aurora Spatial UI',
     url: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1200&q=80',
     category: 'Product Design',

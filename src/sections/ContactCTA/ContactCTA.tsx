@@ -24,7 +24,7 @@ export const ContactCTA: React.FC<ContactCTAProps> = ({ content: propContent }) 
   const bgGridRef = useRef<HTMLDivElement>(null);
   const metaRef = useRef<HTMLDivElement>(null);
 
-  const email = content.email || 'contact@darshilbhuva.com';
+  const email = content.email || 'darshilbhuva4322@gmail.com';
 
   useEffect(() => {
     const ctx = gsap.context(() => {

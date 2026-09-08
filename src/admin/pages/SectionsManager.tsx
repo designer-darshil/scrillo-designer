@@ -94,6 +94,11 @@ const SECTION_METADATA: Record<
     description: 'Massive headline climax, magnetic action button, and availability status pulse.',
     icon: Mail,
   },
+  experience: {
+    name: 'Career Experience & Education',
+    description: 'Professional career timeline, company roles, tenures, and academic foundation milestones.',
+    icon: Briefcase,
+  },
   footer: {
     name: 'Editorial Footer (Terminal Section)',
     description: '4-column editorial grid, live social directory, inquiry channels, and brand signature.',
@@ -231,6 +236,15 @@ const SortableSectionItem: React.FC<SortableSectionItemProps> = ({
   );
 };
 
+// Canonical list of ALL known section IDs — single source of truth.
+// Ensures no section is ever silently dropped during sync/reorder.
+const ALL_SECTION_IDS: SectionId[] = [
+  'hero', 'marquee', 'projects', 'statement', 'experience',
+  'skills', 'philosophy', 'services', 'image', 'contact', 'footer',
+];
+
+const ALL_MAIN_SECTION_IDS: SectionId[] = ALL_SECTION_IDS.filter((id) => id !== 'footer');
+
 export const SectionsManager: React.FC = () => {
   const { data, updateSettings } = useWebsiteData();
 
@@ -258,16 +272,29 @@ export const SectionsManager: React.FC = () => {
     })
   );
 
-  // Sync state from global data
+  // Sync state from global data — guarantees ALL known section IDs are present
   useEffect(() => {
     if (data.settings?.sections) {
       const currentSections = data.settings.sections;
-      setSectionsState(currentSections);
+
+      // Ensure every canonical section ID exists (fill missing with defaults)
+      const merged: SectionSettings = { ...currentSections };
+      for (const id of ALL_SECTION_IDS) {
+        if (!merged[id]) {
+          merged[id] = defaultWebsiteData.settings.sections[id] || {
+            id,
+            name: id,
+            visible: true,
+            order: 99,
+          };
+        }
+      }
+      setSectionsState(merged);
 
       // Extract main reorderable IDs sorted by order
-      const mainIds = (Object.keys(currentSections) as SectionId[])
-        .filter((id) => id !== 'footer')
-        .sort((a, b) => (currentSections[a]?.order ?? 0) - (currentSections[b]?.order ?? 0));
+      const mainIds = ALL_MAIN_SECTION_IDS
+        .slice()
+        .sort((a, b) => (merged[a]?.order ?? 0) - (merged[b]?.order ?? 0));
 
       setOrderedMainIds(mainIds);
       setIsDirty(false);
@@ -349,8 +376,8 @@ export const SectionsManager: React.FC = () => {
       const defaultSections = defaultWebsiteData.settings.sections;
       setSectionsState(defaultSections);
 
-      const defaultMainIds = (Object.keys(defaultSections) as SectionId[])
-        .filter((id) => id !== 'footer')
+      const defaultMainIds = ALL_MAIN_SECTION_IDS
+        .slice()
         .sort((a, b) => defaultSections[a].order - defaultSections[b].order);
 
       setOrderedMainIds(defaultMainIds);
@@ -361,11 +388,20 @@ export const SectionsManager: React.FC = () => {
   // Cancel changes
   const handleCancel = () => {
     if (data.settings?.sections) {
+      // Ensure all canonical sections are present
       const currentSections = data.settings.sections;
-      setSectionsState(currentSections);
-      const mainIds = (Object.keys(currentSections) as SectionId[])
-        .filter((id) => id !== 'footer')
-        .sort((a, b) => (currentSections[a]?.order ?? 0) - (currentSections[b]?.order ?? 0));
+      const merged: SectionSettings = { ...currentSections };
+      for (const id of ALL_SECTION_IDS) {
+        if (!merged[id]) {
+          merged[id] = defaultWebsiteData.settings.sections[id] || {
+            id, name: id, visible: true, order: 99,
+          };
+        }
+      }
+      setSectionsState(merged);
+      const mainIds = ALL_MAIN_SECTION_IDS
+        .slice()
+        .sort((a, b) => (merged[a]?.order ?? 0) - (merged[b]?.order ?? 0));
       setOrderedMainIds(mainIds);
       setIsDirty(false);
       setStatus('idle');

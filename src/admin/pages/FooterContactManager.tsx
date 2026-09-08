@@ -447,7 +447,7 @@ export const FooterContactManager: React.FC = () => {
                   type="text"
                   value={footerForm.brandText || ''}
                   onChange={(e) => handleFooterChange('brandText', e.target.value.toUpperCase())}
-                  placeholder="e.g. DARSHIL BHUVA"
+                  placeholder="e.g. DARSHIL S. BHUVA"
                   className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-xs font-bold tracking-wider text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
                 />
                 <p className="text-[11px] text-muted">Massive typographic text revealed in the footer climax.</p>
@@ -541,7 +541,7 @@ export const FooterContactManager: React.FC = () => {
 
               <div className="space-y-1">
                 <span className="text-[10px] text-muted block">[03 // CONTACT]</span>
-                <p className="font-bold text-foreground truncate">{footerForm.email || 'hello@example.com'}</p>
+                <p className="font-bold text-foreground truncate">{footerForm.email || 'darshilbhuva4322@gmail.com'}</p>
                 <p className="text-muted text-[11px]">{footerForm.responseWindow}</p>
               </div>
 
@@ -789,7 +789,7 @@ export const FooterContactManager: React.FC = () => {
                     handleContactChange('email', e.target.value);
                     handleFooterChange('email', e.target.value);
                   }}
-                  placeholder="contact@darshilbhuva.com"
+                  placeholder="darshilbhuva4322@gmail.com"
                   className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-xs font-mono text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
                 />
                 <p className="text-[11px] text-muted">Primary outreach address used in both Contact section and Footer col [03].</p>
@@ -806,7 +806,7 @@ export const FooterContactManager: React.FC = () => {
                   type="text"
                   value={contactForm.ctaLink || contactForm.buttonLink || ''}
                   onChange={(e) => handleContactChange('ctaLink', e.target.value)}
-                  placeholder="mailto:contact@darshilbhuva.com?subject=Project%20Inquiry"
+                  placeholder="mailto:darshilbhuva4322@gmail.com?subject=Project%20Inquiry"
                   className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-xs font-mono text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
                 />
                 <p className="text-[11px] text-muted">Triggered when user clicks the magnetic START A PROJECT button.</p>

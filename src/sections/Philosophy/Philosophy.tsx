@@ -98,12 +98,12 @@ export const Philosophy: React.FC<PhilosophyProps> = ({ content: propContent }) 
   const sectionLabel = content.label || 'DESIGN PHILOSOPHY';
   
   const rawLines = content.mainStatement ? content.mainStatement.split('\n') : [];
-  const line1 = content.line1 || rawLines[0] || 'Great design';
-  const line2 = content.line2 !== undefined ? content.line2 : (rawLines[1] !== undefined ? rawLines[1] : (rawLines.length === 1 ? '' : 'should feel obvious'));
-  const line3 = content.line3 !== undefined ? content.line3 : (rawLines[2] !== undefined ? rawLines[2] : (rawLines.length <= 2 ? '' : 'after you see it.'));
+  const line1 = content.line1 || rawLines[0] || 'Improve user experience';
+  const line2 = content.line2 !== undefined ? content.line2 : (rawLines[1] !== undefined ? rawLines[1] : (rawLines.length === 1 ? '' : 'through utility, ease of use'));
+  const line3 = content.line3 !== undefined ? content.line3 : (rawLines[2] !== undefined ? rawLines[2] : (rawLines.length <= 2 ? '' : 'and pleasure in design.'));
   
-  const yearMeta = content.author || content.attribution || content.yearMeta || '— 2026';
-  const subMeta = content.supportingText || content.subMeta || 'PHILOSOPHY STATEMENT';
+  const yearMeta = content.author || content.attribution || content.yearMeta || '— DARSHIL S. BHUVA';
+  const subMeta = content.supportingText || content.subMeta || 'CORE DESIGN OBJECTIVE';
 
   return (
     <section

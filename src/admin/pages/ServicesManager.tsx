@@ -23,21 +23,7 @@ import { useWebsiteData } from '../../hooks/useWebsiteData';
 import { Service } from '../../types';
 import { IconPicker, RenderLucideIcon } from '../components/IconPicker';
 import { validators } from '../utils/validators';
-
-const DELIVERABLE_PRESETS = [
-  'Interface Design',
-  'Design Systems',
-  'Rapid Prototyping',
-  'Interaction Specs',
-  'Multi-brand Architecture',
-  'Documentation',
-  'React / Next.js',
-  'Creative Development',
-  'GSAP & Shaders',
-  'Micro-interactions',
-  'Architecture Audit',
-  'Mentorship & Scaling',
-];
+import { defaultWebsiteData } from '../../data/defaultWebsiteData';
 
 export const ServicesManager: React.FC = () => {
   const {
@@ -51,6 +37,10 @@ export const ServicesManager: React.FC = () => {
     reorderServices,
     toggleServiceVisibility,
   } = useWebsiteData();
+
+  const deliverablePresets = (data.categories && data.categories.length > 0 ? data.categories : defaultWebsiteData.categories || [])
+    .filter((c) => c.visible !== false)
+    .map((c) => c.name);
 
   // Search & Filter & Sort State
   const [searchTerm, setSearchTerm] = useState('');
@@ -490,9 +480,9 @@ export const ServicesManager: React.FC = () => {
 
                   {/* Quick Presets */}
                   <div className="pt-1">
-                    <p className="text-[10px] font-mono text-muted mb-1.5 uppercase">Quick scope suggestions:</p>
+                    <p className="text-[10px] font-mono text-muted mb-1.5 uppercase">Managed category scope suggestions:</p>
                     <div className="flex flex-wrap gap-1">
-                      {DELIVERABLE_PRESETS.map((preset) => (
+                      {deliverablePresets.map((preset) => (
                         <button
                           key={preset}
                           type="button"
@@ -581,6 +571,19 @@ export const ServicesManager: React.FC = () => {
             <Plus className="w-4 h-4" />
             <span>New Service</span>
           </button>
+        </div>
+      </div>
+
+      {/* Editable Default Content Notice */}
+      <div className="rounded-2xl border border-blue-500/20 bg-blue-500/5 p-4 sm:p-5 flex items-start gap-3.5 text-xs text-foreground">
+        <div className="p-2 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 shrink-0">
+          <Briefcase className="w-4 h-4" />
+        </div>
+        <div className="space-y-1">
+          <p className="font-bold text-foreground">Editable Default Services</p>
+          <p className="text-muted leading-relaxed">
+            Initial default service offerings (<span className="text-foreground font-semibold">Website Design</span>, <span className="text-foreground font-semibold">UI/UX Design</span>, <span className="text-foreground font-semibold">Web Design</span>, <span className="text-foreground font-semibold">Prototyping & Wireframing</span>) are editable defaults based on core disciplines. You can edit any service title, deliverables, icons, or add custom service offerings at any time.
+          </p>
         </div>
       </div>
 

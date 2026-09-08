@@ -100,14 +100,14 @@ export const Footer: React.FC<FooterProps> = ({ content: propContent }) => {
     return () => ctx.revert();
   }, []);
 
-  const location = content.location || 'INDIA';
+  const location = content.location || 'SURAT, GUJARAT, INDIA';
   const workingGlobally = content.workingGlobally || 'WORKING GLOBALLY';
-  const coordinates = content.coordinates || 'UTC +05:30 · 21.1702° N, 72.8311° E';
-  const email = content.email || 'hello@example.com';
-  const responseWindow = content.responseWindow || 'Response within 24–48 hours';
-  const brandText = content.brandText || 'DARSHIL BHUVA';
-  const copyright = content.copyright || '© 2026 ALL RIGHTS RESERVED';
-  const subCopyright = content.subCopyright || 'CREATIVE DIRECTION & INTERFACE ARCHITECTURE';
+  const coordinates = content.coordinates || '+91 8866 90 2600 · UTC +05:30';
+  const email = content.email || 'darshilbhuva4322@gmail.com';
+  const responseWindow = content.responseWindow || 'Response within 24 hours';
+  const brandText = content.brandText || 'DARSHIL S. BHUVA';
+  const copyright = content.copyright || '© 2026 DARSHIL S. BHUVA';
+  const subCopyright = content.subCopyright || 'UI/UX DESIGNER / WEB DESIGNER';
   const editionMeta = content.editionMeta || 'PORTFOLIO VOL. 04';
 
   return (

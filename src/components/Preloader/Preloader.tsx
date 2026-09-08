@@ -17,8 +17,8 @@ const statusPhrases = [
 ];
 
 export const Preloader: React.FC<PreloaderProps> = ({
-  brandText = 'DARSHIL BHUVA',
-  brandSubtitle = 'DIGITAL PRODUCT DESIGNER',
+  brandText = 'DARSHIL S. BHUVA',
+  brandSubtitle = 'UI/UX DESIGNER / WEB DESIGNER',
   onExitComplete,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);

@@ -36,6 +36,7 @@ export type SectionId =
   | 'marquee'
   | 'projects'
   | 'statement'
+  | 'experience'
   | 'skills'
   | 'philosophy'
   | 'services'
@@ -103,6 +104,7 @@ export interface MarqueeContent {
   separator: string;
   direction?: 'left' | 'right';
   enableVelocity?: boolean;
+  placeholder?: boolean;
 }
 
 export interface Project {
@@ -124,6 +126,7 @@ export interface Project {
   link?: string;
   featured: boolean;
   published: boolean;
+  placeholder?: boolean;
   order: number;
   createdAt?: string;
   updatedAt?: string;
@@ -160,6 +163,7 @@ export interface Service {
   deliverables?: string[];
   icon?: string;
   visible: boolean;
+  placeholder?: boolean;
   order: number;
 }
 
@@ -177,6 +181,7 @@ export interface PhilosophyContent {
   attribution?: string;
   yearMeta: string;
   visible?: boolean;
+  placeholder?: boolean;
 }
 
 export interface FullBleedImageContent {
@@ -202,6 +207,7 @@ export interface ContactCTA {
   availabilityStatus?: string;
   coordinates?: string;
   visible?: boolean;
+  placeholder?: boolean;
 }
 
 export interface SocialLink {
@@ -228,13 +234,80 @@ export interface FooterContent {
   editionMeta?: string;
 }
 
+export interface ProfileContent {
+  name: string;
+  title: string;
+  primaryDescription: string;
+  objective: string;
+  email: string;
+  phone: string;
+  location: string;
+  address?: string;
+  city?: string;
+  country?: string;
+  profileImage?: string;
+  coverImage?: string;
+  linkedinUrl?: string;
+  dribbbleUrl?: string;
+  behanceUrl?: string;
+  instagramUrl?: string;
+}
+
+export interface ExperienceItem {
+  id: string;
+  company: string;
+  role: string;
+  startDate?: string;
+  endDate?: string;
+  currentlyWorking?: boolean;
+  period: string;
+  description: string;
+  order: number;
+  visible: boolean;
+}
+
+export interface EducationItem {
+  id: string;
+  institution: string;
+  educationType?: string;
+  degree?: string;
+  location?: string;
+  startDate?: string;
+  endDate?: string;
+  period: string;
+  description: string;
+  order: number;
+  visible: boolean;
+}
+
+export interface ToolItem {
+  id: string;
+  name: string;
+  category: 'Design' | 'Design Tools' | 'Technical' | string;
+  order: number;
+}
+
+export interface PortfolioCategory {
+  id: string;
+  name: string;
+  slug: string;
+  description?: string;
+  order: number;
+  visible: boolean;
+}
+
 export interface WebsiteData {
   settings: WebsiteSettings;
+  profile?: ProfileContent;
   hero: HeroContent;
   marquee: MarqueeContent;
   about: AboutContent;
+  experience?: ExperienceItem[];
+  education?: EducationItem[];
+  categories?: PortfolioCategory[];
   projects: Project[];
   skills: SkillCategory[];
+  tools?: ToolItem[];
   philosophy: PhilosophyContent;
   services: Service[];
   image: FullBleedImageContent;
@@ -244,7 +317,7 @@ export interface WebsiteData {
 
 export interface ContentDiffItem {
   id: string;
-  category: 'Projects' | 'Content' | 'Skills' | 'Services' | 'Sections' | 'Settings' | 'Media';
+  category: 'Projects' | 'Content' | 'Skills' | 'Services' | 'Sections' | 'Settings' | 'Media' | 'Experience' | 'Categories';
   title: string;
   description: string;
   type: 'added' | 'modified' | 'deleted' | 'reordered';
@@ -257,3 +330,4 @@ export interface ContentDiffSummary {
   lastPublishedAt?: string;
   draftUpdatedAt?: string;
 }
+

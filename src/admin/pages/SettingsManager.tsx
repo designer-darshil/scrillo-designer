@@ -792,7 +792,7 @@ export const SettingsManager: React.FC = () => {
                   type="text"
                   value={form.siteTitle || ''}
                   onChange={(e) => handleThemeChange('siteTitle', e.target.value)}
-                  placeholder="DARSHIL BHUVA"
+                  placeholder="DARSHIL S. BHUVA"
                   className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-xs font-bold text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
                 />
               </div>
@@ -822,7 +822,7 @@ export const SettingsManager: React.FC = () => {
                   rows={2}
                   value={form.siteDescription || ''}
                   onChange={(e) => handleThemeChange('siteDescription', e.target.value)}
-                  placeholder="Digital product designer & creative developer focused on thoughtful interfaces, products and interactive experiences."
+                  placeholder="As a UI/UX and Web Designer, I transform your ideas into dynamic digital experiences. Consider me your all-in-one expert for diverse business solutions."
                   className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-xs text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
                 />
               </div>
@@ -837,7 +837,7 @@ export const SettingsManager: React.FC = () => {
                   type="text"
                   value={form.seo?.metaTitle || ''}
                   onChange={(e) => handleSEOChange('metaTitle', e.target.value)}
-                  placeholder="DARSHIL BHUVA — Portfolio 2026"
+                  placeholder="DARSHIL S. BHUVA — UI/UX Designer & Web Designer"
                   className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-xs text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
                 />
               </div>

@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { useLenis } from './hooks/useLenis';
 import { Header } from './components/Header/Header';
 import { Hero } from './sections/Hero/Hero';
-import { CustomCursor } from './components/CustomCursor/CustomCursor';
 import { Marquee } from './components/Marquee/Marquee';
+import { SelectedWorks } from './sections/SelectedWorks/SelectedWorks';
+import { CustomCursor } from './components/CustomCursor/CustomCursor';
 
 export const App: React.FC = () => {
   // Initialize Lenis smooth scroll foundation
@@ -34,30 +35,33 @@ export const App: React.FC = () => {
         }}
       />
 
-      {/* Main Content: Hero & Full-Width Editorial Marquee */}
+      {/* Main Content */}
       <main className="relative z-10">
+        {/* 1. Hero Section */}
         <Hero />
 
-        {/* Full-width Editorial Horizontal Marquee */}
-        <section className="w-full py-8 bg-background">
-          <Marquee
-            items={marqueeItems}
-            speed={30}
-            direction="left"
-            enableVelocity={true}
-            velocityMultiplier={1.2}
-            size="display"
-            separator="✦"
-          />
-        </section>
+        {/* 2. Reusable Marquee Divider */}
+        <Marquee
+          items={marqueeItems}
+          speed={30}
+          direction="left"
+          enableVelocity={true}
+          velocityMultiplier={1.2}
+          size="display"
+          separator="✦"
+        />
+
+        {/* 3. Selected Works Section */}
+        <SelectedWorks />
       </main>
 
-      {/* Subtle bottom buffer for scroll testing without other sections */}
+      {/* Subtle bottom buffer for contact navigation target */}
       <div
-        id="works"
-        className="h-[40vh] bg-background border-t border-border flex items-center justify-center page-container text-meta text-muted"
+        id="contact"
+        className="h-[20vh] bg-background border-t border-border flex items-center justify-between page-container text-meta text-muted"
       >
-        <span>[ SELECTED WORKS SECTION RESERVED FOR NEXT PHASE ]</span>
+        <span>DARSHIL BHUVA · SELECTED WORKS EDITION</span>
+        <span>NEXT SECTIONS RESERVED FOR UPCOMING PHASES</span>
       </div>
     </div>
   );

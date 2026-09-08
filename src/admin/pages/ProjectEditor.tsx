@@ -21,6 +21,8 @@ import {
 import { useWebsiteData } from '../../hooks/useWebsiteData';
 import { Project } from '../../types';
 import { MediaPickerModal } from '../components/MediaPickerModal';
+import { validators } from '../utils/validators';
+import { useUnsavedChanges } from '../hooks/useUnsavedChanges';
 
 interface ProjectEditorProps {
   mode: 'create' | 'edit';
@@ -87,6 +89,9 @@ export const ProjectEditor: React.FC<ProjectEditorProps> = ({ mode }) => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isDirty, setIsDirty] = useState(false);
 
+  // Prevent accidental loss of unsaved changes when navigating away
+  useUnsavedChanges(isDirty);
+
   // Load existing project if in edit mode
   useEffect(() => {
     if (mode === 'edit' && id) {
@@ -110,16 +115,13 @@ export const ProjectEditor: React.FC<ProjectEditorProps> = ({ mode }) => {
   const handleTitleChange = (val: string) => {
     markDirty();
     setForm((prev) => {
-      const generatedSlug = val
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/(^-|-$)+/g, '');
+      const generatedSlug = validators.sanitizeSlug(val);
 
       return {
         ...prev,
         title: val,
         shortTitle: mode === 'create' && !prev.shortTitle ? val.split(' ')[0] : prev.shortTitle,
-        slug: mode === 'create' && (!prev.slug || prev.slug === prev.title.toLowerCase().replace(/[^a-z0-9]+/g, '-'))
+        slug: mode === 'create' && (!prev.slug || prev.slug === validators.sanitizeSlug(prev.title))
           ? generatedSlug
           : prev.slug,
       };
@@ -161,6 +163,15 @@ export const ProjectEditor: React.FC<ProjectEditorProps> = ({ mode }) => {
   const handleAddGalleryImage = (url: string) => {
     const trimmed = url.trim();
     if (!trimmed) return;
+
+    // Safety validation
+    const urlValidation = validators.url(trimmed, false, 'Gallery Image URL');
+    if (!urlValidation.isValid) {
+      setStatus('error');
+      setErrorMessage(urlValidation.error || 'Invalid gallery image URL');
+      return;
+    }
+
     markDirty();
     setForm((prev) => ({
       ...prev,
@@ -204,14 +215,84 @@ export const ProjectEditor: React.FC<ProjectEditorProps> = ({ mode }) => {
     setMediaPickerTarget(null);
   };
 
-  // Save handler
+  // Save handler with comprehensive validation & double-submission guard
   const handleSave = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
 
-    if (!form.title.trim()) {
+    // Prevent double submission
+    if (status === 'saving') return;
+
+    // 1. Required title validation
+    const titleCheck = validators.required(form.title, 'Project Title');
+    if (!titleCheck.isValid) {
       setStatus('error');
-      setErrorMessage('Project title is required.');
+      setErrorMessage(titleCheck.error || 'Project title is required.');
       return;
+    }
+
+    // 2. Slug validation
+    const slugCheck = validators.slug(form.slug, 'URL Slug');
+    if (!slugCheck.isValid) {
+      setStatus('error');
+      setErrorMessage(slugCheck.error || 'A valid URL slug is required.');
+      return;
+    }
+
+    // 3. Unique slug validation across all projects
+    const idToSlugMap = new Map<string, string>();
+    data.projects.forEach((p) => {
+      idToSlugMap.set(p.id, p.slug || p.id);
+    });
+    const uniqueSlugCheck = validators.uniqueSlug(
+      form.slug,
+      data.projects.map((p) => p.slug || p.id),
+      mode === 'edit' ? id : undefined,
+      idToSlugMap
+    );
+    if (!uniqueSlugCheck.isValid) {
+      setStatus('error');
+      setErrorMessage(uniqueSlugCheck.error || 'Slug must be unique.');
+      return;
+    }
+
+    // 4. URL Safety checks
+    if (form.thumbnail) {
+      const thumbCheck = validators.url(form.thumbnail, true, 'Thumbnail URL');
+      if (!thumbCheck.isValid) {
+        setStatus('error');
+        setErrorMessage(thumbCheck.error || 'Unsafe thumbnail URL detected.');
+        return;
+      }
+    }
+
+    if (form.coverImage) {
+      const coverCheck = validators.url(form.coverImage, true, 'Cover Image URL');
+      if (!coverCheck.isValid) {
+        setStatus('error');
+        setErrorMessage(coverCheck.error || 'Unsafe cover image URL detected.');
+        return;
+      }
+    }
+
+    if (form.gallery && form.gallery.length > 0) {
+      for (const [idx, imgUrl] of form.gallery.entries()) {
+        const galleryCheck = validators.url(imgUrl, true, `Gallery Image #${idx + 1}`);
+        if (!galleryCheck.isValid) {
+          setStatus('error');
+          setErrorMessage(galleryCheck.error || `Unsafe gallery image URL at position #${idx + 1}.`);
+          return;
+        }
+      }
+    }
+
+    // 5. Order validation
+    if (form.order !== undefined) {
+      const orderCheck = validators.order(form.order, 'Project Order');
+      if (!orderCheck.isValid) {
+        setStatus('error');
+        setErrorMessage(orderCheck.error || 'Order must be a valid positive integer.');
+        return;
+      }
     }
 
     try {
@@ -228,7 +309,7 @@ export const ProjectEditor: React.FC<ProjectEditorProps> = ({ mode }) => {
           }, 800);
         } else {
           setStatus('error');
-          setErrorMessage('Failed to create project.');
+          setErrorMessage('Failed to create project repository.');
         }
       } else if (mode === 'edit' && id) {
         const success = await updateProject(id, form);
@@ -238,12 +319,12 @@ export const ProjectEditor: React.FC<ProjectEditorProps> = ({ mode }) => {
           setTimeout(() => setStatus('idle'), 3000);
         } else {
           setStatus('error');
-          setErrorMessage('Failed to update project.');
+          setErrorMessage('Failed to update project repository.');
         }
       }
     } catch (err: any) {
       setStatus('error');
-      setErrorMessage(err?.message || 'Error saving project');
+      setErrorMessage(validators.formatFriendlyError(err));
     }
   };
 

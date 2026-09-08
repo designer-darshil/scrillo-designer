@@ -42,6 +42,8 @@ import {
 import { useWebsiteData } from '../../hooks/useWebsiteData';
 import { SectionId, SectionSetting, SectionSettings } from '../../types';
 import { defaultWebsiteData } from '../../data/defaultWebsiteData';
+import { validators } from '../utils/validators';
+import { useUnsavedChanges } from '../hooks/useUnsavedChanges';
 
 const SECTION_METADATA: Record<
   SectionId,
@@ -241,6 +243,9 @@ export const SectionsManager: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isDirty, setIsDirty] = useState(false);
 
+  // Prevent accidental loss of unsaved changes
+  useUnsavedChanges(isDirty);
+
   // DND Sensors
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -370,6 +375,7 @@ export const SectionsManager: React.FC = () => {
 
   // Save Layout
   const handleSaveLayout = async () => {
+    if (status === 'saving') return;
     setStatus('saving');
     setErrorMessage(null);
 
@@ -390,7 +396,7 @@ export const SectionsManager: React.FC = () => {
       }
     } catch (err: any) {
       setStatus('error');
-      setErrorMessage(err?.message || 'An unexpected error occurred.');
+      setErrorMessage(validators.formatFriendlyError(err));
     }
   };
 

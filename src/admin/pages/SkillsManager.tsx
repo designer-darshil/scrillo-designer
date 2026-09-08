@@ -23,6 +23,7 @@ import {
 import { useWebsiteData } from '../../hooks/useWebsiteData';
 import { SkillCategory, SkillItem } from '../../types';
 import { MediaPickerModal } from '../components/MediaPickerModal';
+import { validators } from '../utils/validators';
 
 export const SkillsManager: React.FC = () => {
   const {
@@ -139,55 +140,80 @@ export const SkillsManager: React.FC = () => {
   const handleSaveCategory = async (e: React.FormEvent) => {
     e.preventDefault();
     const cat = categoryModal.category;
-    if (!cat.title?.trim()) return;
 
-    if (categoryModal.mode === 'create') {
-      const created = await createSkillCategory({
-        title: cat.title.trim().toUpperCase(),
-        number: cat.number || String(data.skills.length + 1).padStart(2, '0'),
-        description: cat.description || '',
-        visible: cat.visible ?? true,
-        order: cat.order || data.skills.length + 1,
-        items: cat.items || [],
-      });
-      if (created) {
-        showToast(`Category "${created.title}" created.`);
-        setCategoryModal({ isOpen: false, mode: 'create', category: {} });
+    const titleCheck = validators.required(cat.title, 'Category Title');
+    if (!titleCheck.isValid) {
+      showToast(titleCheck.error || 'Category title is required.');
+      return;
+    }
+
+    if (cat.order !== undefined) {
+      const orderCheck = validators.order(cat.order, 'Category Order');
+      if (!orderCheck.isValid) {
+        showToast(orderCheck.error || 'Invalid category order.');
+        return;
       }
-    } else if (categoryModal.mode === 'edit' && cat.id) {
-      const success = await updateSkillCategory(cat.id, {
-        title: cat.title.trim().toUpperCase(),
-        number: cat.number,
-        description: cat.description,
-        visible: cat.visible,
-      });
-      if (success) {
-        showToast(`Category "${cat.title}" updated.`);
-        setCategoryModal({ isOpen: false, mode: 'create', category: {} });
+    }
+
+    try {
+      if (categoryModal.mode === 'create') {
+        const created = await createSkillCategory({
+          title: cat.title!.trim().toUpperCase(),
+          number: cat.number || String(data.skills.length + 1).padStart(2, '0'),
+          description: cat.description || '',
+          visible: cat.visible ?? true,
+          order: cat.order || data.skills.length + 1,
+          items: cat.items || [],
+        });
+        if (created) {
+          showToast(`Category "${created.title}" created.`);
+          setCategoryModal({ isOpen: false, mode: 'create', category: {} });
+        }
+      } else if (categoryModal.mode === 'edit' && cat.id) {
+        const success = await updateSkillCategory(cat.id, {
+          title: cat.title!.trim().toUpperCase(),
+          number: cat.number,
+          description: cat.description,
+          visible: cat.visible,
+        });
+        if (success) {
+          showToast(`Category "${cat.title}" updated.`);
+          setCategoryModal({ isOpen: false, mode: 'create', category: {} });
+        }
       }
+    } catch (err: any) {
+      showToast(validators.formatFriendlyError(err));
     }
   };
 
   const handleDuplicateCategory = async (catId: string) => {
-    const cloned = await duplicateSkillCategory(catId);
-    if (cloned) {
-      showToast(`Duplicated category "${cloned.title}".`);
+    try {
+      const cloned = await duplicateSkillCategory(catId);
+      if (cloned) {
+        showToast(`Duplicated category "${cloned.title}".`);
+      }
+    } catch (err: any) {
+      showToast(validators.formatFriendlyError(err));
     }
   };
 
   const handleConfirmDelete = async () => {
     if (!deleteModal) return;
 
-    if (deleteModal.type === 'category') {
-      const success = await deleteSkillCategory(deleteModal.categoryId);
-      if (success) {
-        showToast(`Deleted category "${deleteModal.title}".`);
+    try {
+      if (deleteModal.type === 'category') {
+        const success = await deleteSkillCategory(deleteModal.categoryId);
+        if (success) {
+          showToast(`Deleted category "${deleteModal.title}".`);
+        }
+      } else if (deleteModal.type === 'skill' && deleteModal.skillIndex !== undefined) {
+        const success = await deleteSkillItem(deleteModal.categoryId, deleteModal.skillIndex);
+        if (success) {
+          showToast(`Deleted skill "${deleteModal.title}".`);
+        }
       }
-    } else if (deleteModal.type === 'skill' && deleteModal.skillIndex !== undefined) {
-      const success = await deleteSkillItem(deleteModal.categoryId, deleteModal.skillIndex);
-      if (success) {
-        showToast(`Deleted skill "${deleteModal.title}".`);
-      }
+    } catch (err: any) {
+      showToast(validators.formatFriendlyError(err));
     }
     setDeleteModal(null);
   };
@@ -229,32 +255,49 @@ export const SkillsManager: React.FC = () => {
     e.preventDefault();
     const { categoryId, mode, skillIndex, skill } = skillModal;
     const skillName = skill.name?.trim() || skill.title?.trim();
-    if (!skillName) return;
 
-    if (mode === 'create') {
-      const success = await addSkillItem(categoryId, {
-        name: skillName,
-        title: skillName,
-        description: skill.description || '',
-        image: skill.image || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80',
-        visible: skill.visible ?? true,
-      });
-      if (success) {
-        showToast(`Skill "${skillName}" added.`);
-        setSkillModal({ isOpen: false, mode: 'create', categoryId: '', skill: {} });
+    const nameCheck = validators.required(skillName, 'Skill Title');
+    if (!nameCheck.isValid) {
+      showToast(nameCheck.error || 'Skill title is required.');
+      return;
+    }
+
+    if (skill.image) {
+      const imgCheck = validators.url(skill.image, true, 'Skill Preview Image');
+      if (!imgCheck.isValid) {
+        showToast(imgCheck.error || 'Unsafe skill image URL.');
+        return;
       }
-    } else if (mode === 'edit' && skillIndex !== undefined) {
-      const success = await updateSkillItem(categoryId, skillIndex, {
-        name: skillName,
-        title: skillName,
-        description: skill.description,
-        image: skill.image,
-        visible: skill.visible,
-      });
-      if (success) {
-        showToast(`Skill "${skillName}" updated.`);
-        setSkillModal({ isOpen: false, mode: 'create', categoryId: '', skill: {} });
+    }
+
+    try {
+      if (mode === 'create') {
+        const success = await addSkillItem(categoryId, {
+          name: skillName!,
+          title: skillName!,
+          description: skill.description || '',
+          image: skill.image || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80',
+          visible: skill.visible ?? true,
+        });
+        if (success) {
+          showToast(`Skill "${skillName}" added.`);
+          setSkillModal({ isOpen: false, mode: 'create', categoryId: '', skill: {} });
+        }
+      } else if (mode === 'edit' && skillIndex !== undefined) {
+        const success = await updateSkillItem(categoryId, skillIndex, {
+          name: skillName!,
+          title: skillName!,
+          description: skill.description,
+          image: skill.image,
+          visible: skill.visible,
+        });
+        if (success) {
+          showToast(`Skill "${skillName}" updated.`);
+          setSkillModal({ isOpen: false, mode: 'create', categoryId: '', skill: {} });
+        }
       }
+    } catch (err: any) {
+      showToast(validators.formatFriendlyError(err));
     }
   };
 

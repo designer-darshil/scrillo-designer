@@ -22,6 +22,7 @@ import {
 import { useWebsiteData } from '../../hooks/useWebsiteData';
 import { Service } from '../../types';
 import { IconPicker, RenderLucideIcon } from '../components/IconPicker';
+import { validators } from '../utils/validators';
 
 const DELIVERABLE_PRESETS = [
   'Interface Design',
@@ -175,52 +176,77 @@ export const ServicesManager: React.FC = () => {
   const handleSaveService = async (e: React.FormEvent) => {
     e.preventDefault();
     const svc = serviceModal.service;
-    if (!svc.title?.trim()) return;
 
-    if (serviceModal.mode === 'create') {
-      const created = await createService({
-        title: svc.title.trim().toUpperCase(),
-        number: svc.number || String(data.services.length + 1).padStart(2, '0'),
-        description: svc.description || '',
-        icon: svc.icon || 'Briefcase',
-        visible: svc.visible ?? true,
-        order: svc.order || data.services.length + 1,
-        deliverables: svc.deliverables || [],
-      });
-      if (created) {
-        showToast(`Service "${created.title}" created successfully.`);
-        setServiceModal({ isOpen: false, mode: 'create', service: {} });
+    const titleCheck = validators.required(svc.title, 'Service Title');
+    if (!titleCheck.isValid) {
+      showToast(titleCheck.error || 'Service title is required.');
+      return;
+    }
+
+    if (svc.order !== undefined) {
+      const orderCheck = validators.order(svc.order, 'Service Order');
+      if (!orderCheck.isValid) {
+        showToast(orderCheck.error || 'Invalid service order.');
+        return;
       }
-    } else if (serviceModal.mode === 'edit' && svc.id) {
-      const success = await updateService(svc.id, {
-        title: svc.title.trim().toUpperCase(),
-        number: svc.number,
-        description: svc.description,
-        icon: svc.icon,
-        visible: svc.visible,
-        deliverables: svc.deliverables,
-      });
-      if (success) {
-        showToast(`Service "${svc.title}" updated successfully.`);
-        setServiceModal({ isOpen: false, mode: 'create', service: {} });
+    }
+
+    try {
+      if (serviceModal.mode === 'create') {
+        const created = await createService({
+          title: svc.title!.trim().toUpperCase(),
+          number: svc.number || String(data.services.length + 1).padStart(2, '0'),
+          description: svc.description || '',
+          icon: svc.icon || 'Briefcase',
+          visible: svc.visible ?? true,
+          order: svc.order || data.services.length + 1,
+          deliverables: svc.deliverables || [],
+        });
+        if (created) {
+          showToast(`Service "${created.title}" created successfully.`);
+          setServiceModal({ isOpen: false, mode: 'create', service: {} });
+        }
+      } else if (serviceModal.mode === 'edit' && svc.id) {
+        const success = await updateService(svc.id, {
+          title: svc.title!.trim().toUpperCase(),
+          number: svc.number,
+          description: svc.description,
+          icon: svc.icon,
+          visible: svc.visible,
+          deliverables: svc.deliverables,
+        });
+        if (success) {
+          showToast(`Service "${svc.title}" updated successfully.`);
+          setServiceModal({ isOpen: false, mode: 'create', service: {} });
+        }
       }
+    } catch (err: any) {
+      showToast(validators.formatFriendlyError(err));
     }
   };
 
   // --- Duplicate Handler ---
   const handleDuplicate = async (id: string) => {
-    const cloned = await duplicateService(id);
-    if (cloned) {
-      showToast(`Duplicated as "${cloned.title}".`);
+    try {
+      const cloned = await duplicateService(id);
+      if (cloned) {
+        showToast(`Duplicated as "${cloned.title}".`);
+      }
+    } catch (err: any) {
+      showToast(validators.formatFriendlyError(err));
     }
   };
 
   // --- Delete Handler ---
   const handleConfirmDelete = async () => {
     if (!deleteModal) return;
-    const success = await deleteService(deleteModal.id);
-    if (success) {
-      showToast(`Service "${deleteModal.title}" deleted.`);
+    try {
+      const success = await deleteService(deleteModal.id);
+      if (success) {
+        showToast(`Service "${deleteModal.title}" deleted.`);
+      }
+    } catch (err: any) {
+      showToast(validators.formatFriendlyError(err));
     }
     setDeleteModal(null);
   };

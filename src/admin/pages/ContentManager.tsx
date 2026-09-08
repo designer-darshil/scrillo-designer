@@ -26,6 +26,8 @@ import { useWebsiteData } from '../../hooks/useWebsiteData';
 import { HeroContent, AboutContent, MarqueeContent, PhilosophyContent, ContactCTA } from '../../types';
 import { defaultWebsiteData } from '../../data/defaultWebsiteData';
 import { MediaPickerModal } from '../components/MediaPickerModal';
+import { validators } from '../utils/validators';
+import { useUnsavedChanges } from '../hooks/useUnsavedChanges';
 
 const curatedHeroImages = [
   {
@@ -79,6 +81,9 @@ export const ContentManager: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isDirty, setIsDirty] = useState(false);
   const [isMediaPickerOpen, setIsMediaPickerOpen] = useState(false);
+
+  // Prevent accidental loss of unsaved changes
+  useUnsavedChanges(isDirty);
 
   // Sync initial state when remote data loads
   useEffect(() => {
@@ -186,8 +191,72 @@ export const ContentManager: React.FC = () => {
     });
   };
 
-  // Save all sections concurrently
+  // Save all sections concurrently with rigorous validation
   const handleSave = async () => {
+    if (status === 'saving') return;
+
+    // 1. Hero validation
+    const heroTitleCheck = validators.required(heroForm.title, 'Hero Main Headline');
+    if (!heroTitleCheck.isValid) {
+      setStatus('error');
+      setErrorMessage(heroTitleCheck.error || 'Hero headline is required.');
+      return;
+    }
+
+    if (heroForm.heroImage) {
+      const heroImgCheck = validators.url(heroForm.heroImage, true, 'Hero Specimen Image URL');
+      if (!heroImgCheck.isValid) {
+        setStatus('error');
+        setErrorMessage(heroImgCheck.error || 'Unsafe Hero image URL.');
+        return;
+      }
+    }
+
+    if (heroForm.ctaLink) {
+      const heroCtaCheck = validators.url(heroForm.ctaLink, true, 'Hero CTA Link');
+      if (!heroCtaCheck.isValid) {
+        setStatus('error');
+        setErrorMessage(heroCtaCheck.error || 'Invalid Hero CTA link.');
+        return;
+      }
+    }
+
+    // 2. Creative Statement validation
+    const statementCheck = validators.required(aboutForm.label, 'Creative Statement Label');
+    if (!statementCheck.isValid) {
+      setStatus('error');
+      setErrorMessage(statementCheck.error || 'Statement label is required.');
+      return;
+    }
+
+    // 3. Design Philosophy validation
+    const philCheck = validators.required(philosophyForm.label, 'Design Philosophy Label');
+    if (!philCheck.isValid) {
+      setStatus('error');
+      setErrorMessage(philCheck.error || 'Philosophy label is required.');
+      return;
+    }
+
+    // 4. Contact CTA validation
+    if (contactForm.email) {
+      const emailCheck = validators.email(contactForm.email, true, 'Contact Email');
+      if (!emailCheck.isValid) {
+        setStatus('error');
+        setErrorMessage(emailCheck.error || 'Invalid contact email format.');
+        return;
+      }
+    }
+
+    const contactLink = contactForm.buttonLink || contactForm.ctaLink;
+    if (contactLink) {
+      const contactLinkCheck = validators.url(contactLink, true, 'Contact Action Link');
+      if (!contactLinkCheck.isValid) {
+        setStatus('error');
+        setErrorMessage(contactLinkCheck.error || 'Invalid or unsafe Contact Action link.');
+        return;
+      }
+    }
+
     try {
       setStatus('saving');
       setErrorMessage(null);
@@ -210,7 +279,7 @@ export const ContentManager: React.FC = () => {
       }
     } catch (err: any) {
       setStatus('error');
-      setErrorMessage(err?.message || 'Network error while updating content');
+      setErrorMessage(validators.formatFriendlyError(err));
     }
   };
 

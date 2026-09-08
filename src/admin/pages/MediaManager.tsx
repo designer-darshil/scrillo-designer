@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { useWebsiteData } from '../../hooks/useWebsiteData';
 import { mediaService, MediaAsset } from '../services/mediaService';
+import { validators } from '../utils/validators';
 
 export const MediaManager: React.FC = () => {
   const { data: websiteData } = useWebsiteData();
@@ -93,29 +94,43 @@ export const MediaManager: React.FC = () => {
     return `${mb} MB`;
   }, [assets]);
 
-  // Handle file uploads
+  // Handle file uploads with type & 10MB size validation
   const handleFiles = async (files: FileList | File[]) => {
-    const fileArray = Array.from(files).filter((f) =>
-      ['image/png', 'image/jpeg', 'image/webp', 'image/svg+xml'].includes(f.type)
-    );
+    const rawFiles = Array.from(files);
+    const validFiles: File[] = [];
 
-    if (fileArray.length === 0) {
-      showToast('Please select valid image files (PNG, JPG, WEBP, or SVG).');
+    for (const f of rawFiles) {
+      const check = validators.imageFile(f);
+      if (!check.isValid) {
+        showToast(check.error || `File "${f.name}" is invalid.`);
+        continue;
+      }
+      validFiles.push(f);
+    }
+
+    if (validFiles.length === 0) {
+      if (rawFiles.length > 0 && !toastMessage) {
+        showToast('No valid images (PNG, JPG, JPEG, WEBP, SVG under 10MB) to upload.');
+      }
       return;
     }
 
     setUploadProgress(0);
-    const uploaded = await mediaService.uploadMultipleAssets(fileArray, (progress, name) => {
-      setUploadProgress(progress);
-      setUploadingFileName(name);
-    });
+    try {
+      const uploaded = await mediaService.uploadMultipleAssets(validFiles, (progress, name) => {
+        setUploadProgress(progress);
+        setUploadingFileName(name);
+      });
 
-    setUploadProgress(null);
-    setUploadingFileName(null);
-
-    if (uploaded.length > 0) {
-      showToast(`Uploaded ${uploaded.length} asset${uploaded.length > 1 ? 's' : ''} successfully!`);
-      loadAssets();
+      if (uploaded.length > 0) {
+        showToast(`Uploaded ${uploaded.length} asset${uploaded.length > 1 ? 's' : ''} successfully!`);
+        loadAssets();
+      }
+    } catch (err: any) {
+      showToast(validators.formatFriendlyError(err));
+    } finally {
+      setUploadProgress(null);
+      setUploadingFileName(null);
     }
   };
 

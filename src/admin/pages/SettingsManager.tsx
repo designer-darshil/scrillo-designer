@@ -25,6 +25,8 @@ import { useWebsiteData } from '../../hooks/useWebsiteData';
 import { WebsiteSettings, ThemeColorPalette } from '../../types';
 import { defaultWebsiteData } from '../../data/defaultWebsiteData';
 import { MediaPickerModal } from '../components/MediaPickerModal';
+import { validators } from '../utils/validators';
+import { useUnsavedChanges } from '../hooks/useUnsavedChanges';
 
 export const SettingsManager: React.FC = () => {
   const { data, updateSettings } = useWebsiteData();
@@ -39,6 +41,9 @@ export const SettingsManager: React.FC = () => {
   const [status, setStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isDirty, setIsDirty] = useState(false);
+
+  // Prevent accidental loss of unsaved changes
+  useUnsavedChanges(isDirty);
 
   // Media Picker Modal state
   const [mediaPickerTarget, setMediaPickerTarget] = useState<'favicon' | 'ogImage' | null>(null);
@@ -120,8 +125,40 @@ export const SettingsManager: React.FC = () => {
     setErrorMessage(null);
   };
 
-  // Save Settings
+  // Save Settings with validation
   const handleSave = async () => {
+    if (status === 'saving') return;
+
+    // Validate siteUrl if entered
+    if (form.siteUrl) {
+      const urlCheck = validators.url(form.siteUrl, true, 'Site Canonical URL');
+      if (!urlCheck.isValid) {
+        setStatus('error');
+        setErrorMessage(urlCheck.error || 'Invalid site canonical URL.');
+        return;
+      }
+    }
+
+    // Validate SEO OG image if entered
+    if (form.seo?.ogImage) {
+      const ogCheck = validators.url(form.seo.ogImage, true, 'Social Share Image (og:image)');
+      if (!ogCheck.isValid) {
+        setStatus('error');
+        setErrorMessage(ogCheck.error || 'Invalid or unsafe OpenGraph image URL.');
+        return;
+      }
+    }
+
+    // Validate favicon URL if entered
+    if (form.seo?.favicon) {
+      const favCheck = validators.url(form.seo.favicon, true, 'Favicon Asset URL');
+      if (!favCheck.isValid) {
+        setStatus('error');
+        setErrorMessage(favCheck.error || 'Invalid or unsafe favicon asset URL.');
+        return;
+      }
+    }
+
     setStatus('saving');
     setErrorMessage(null);
 
@@ -137,7 +174,7 @@ export const SettingsManager: React.FC = () => {
       }
     } catch (err: any) {
       setStatus('error');
-      setErrorMessage(err?.message || 'An error occurred while saving.');
+      setErrorMessage(validators.formatFriendlyError(err));
     }
   };
 

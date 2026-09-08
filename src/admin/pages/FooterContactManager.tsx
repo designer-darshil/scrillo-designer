@@ -27,6 +27,8 @@ import {
 import { useWebsiteData } from '../../hooks/useWebsiteData';
 import { FooterContent, ContactCTA, SocialLink } from '../../types';
 import { defaultWebsiteData } from '../../data/defaultWebsiteData';
+import { validators } from '../utils/validators';
+import { useUnsavedChanges } from '../hooks/useUnsavedChanges';
 
 const PLATFORM_OPTIONS: Array<SocialLink['platform']> = [
   'LinkedIn',
@@ -52,6 +54,9 @@ export const FooterContactManager: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isDirty, setIsDirty] = useState(false);
 
+  // Prevent accidental loss of unsaved changes
+  useUnsavedChanges(isDirty);
+
   // New social link input buffer
   const [newPlatform, setNewPlatform] = useState<SocialLink['platform']>('LinkedIn');
   const [newLabel, setNewLabel] = useState('');
@@ -68,32 +73,6 @@ export const FooterContactManager: React.FC = () => {
   const markDirty = () => {
     if (!isDirty) setIsDirty(true);
     if (status === 'saved' || status === 'error') setStatus('idle');
-  };
-
-  // URL & Email Validation helpers
-  const isValidEmail = (email: string) => {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
-  };
-
-  const isSafeUrl = (url: string) => {
-    if (!url) return false;
-    const lower = url.trim().toLowerCase();
-    if (lower.startsWith('javascript:') || lower.startsWith('data:') || lower.startsWith('vbscript:')) {
-      return false;
-    }
-    return true;
-  };
-
-  const isValidHttpOrMailtoUrl = (url: string) => {
-    if (!isSafeUrl(url)) return false;
-    const trimmed = url.trim();
-    return (
-      trimmed.startsWith('https://') ||
-      trimmed.startsWith('http://') ||
-      trimmed.startsWith('mailto:') ||
-      trimmed.startsWith('/') ||
-      trimmed.startsWith('#')
-    );
   };
 
   // Handlers for footer fields
@@ -120,8 +99,9 @@ export const FooterContactManager: React.FC = () => {
   const handleAddSocialLink = () => {
     if (!newLabel.trim() || !newHref.trim()) return;
 
-    if (!isSafeUrl(newHref)) {
-      setErrorMessage('Unsafe URL detected! Javascript and data URLs are strictly prohibited.');
+    const urlCheck = validators.url(newHref, false, 'Social Link URL');
+    if (!urlCheck.isValid) {
+      setErrorMessage(urlCheck.error || 'Unsafe URL detected! Javascript and data URLs are strictly prohibited.');
       setStatus('error');
       return;
     }
@@ -191,39 +171,53 @@ export const FooterContactManager: React.FC = () => {
     setFooterForm((prev) => ({ ...prev, socialLinks: updated }));
   };
 
-  // Save all changes
+  // Save all changes with complete validation & double-submission prevention
   const handleSaveAll = async () => {
-    setStatus('saving');
-    setErrorMessage(null);
+    if (status === 'saving') return;
 
     // Validation checks
-    if (contactForm.email && !isValidEmail(contactForm.email)) {
-      setStatus('error');
-      setErrorMessage('Please enter a valid Primary Contact Email address (e.g. contact@domain.com).');
-      return;
-    }
-
-    if (footerForm.email && !isValidEmail(footerForm.email)) {
-      setStatus('error');
-      setErrorMessage('Please enter a valid Footer Email address.');
-      return;
-    }
-
-    if (contactForm.ctaLink && !isSafeUrl(contactForm.ctaLink)) {
-      setStatus('error');
-      setErrorMessage('Unsafe CTA Link URL detected.');
-      return;
-    }
-
-    for (const link of socialLinks) {
-      if (link.href && !isValidHttpOrMailtoUrl(link.href)) {
+    if (contactForm.email) {
+      const emailCheck = validators.email(contactForm.email, true, 'Primary Contact Email');
+      if (!emailCheck.isValid) {
         setStatus('error');
-        setErrorMessage(`Invalid or unsafe URL found for social link "${link.label}". Must start with https://, http://, or mailto:`);
+        setErrorMessage(emailCheck.error || 'Please enter a valid Primary Contact Email address.');
         return;
       }
     }
 
+    if (footerForm.email) {
+      const emailCheck = validators.email(footerForm.email, true, 'Footer Email');
+      if (!emailCheck.isValid) {
+        setStatus('error');
+        setErrorMessage(emailCheck.error || 'Please enter a valid Footer Email address.');
+        return;
+      }
+    }
+
+    if (contactForm.ctaLink) {
+      const linkCheck = validators.url(contactForm.ctaLink, true, 'Contact CTA Link');
+      if (!linkCheck.isValid) {
+        setStatus('error');
+        setErrorMessage(linkCheck.error || 'Unsafe CTA Link URL detected.');
+        return;
+      }
+    }
+
+    for (const link of socialLinks) {
+      if (link.href) {
+        const linkCheck = validators.url(link.href, false, `Social Link "${link.label}"`);
+        if (!linkCheck.isValid) {
+          setStatus('error');
+          setErrorMessage(linkCheck.error || `Invalid or unsafe URL found for social link "${link.label}".`);
+          return;
+        }
+      }
+    }
+
     try {
+      setStatus('saving');
+      setErrorMessage(null);
+
       const footerPayload: FooterContent = {
         ...footerForm,
         socialLinks,
@@ -244,7 +238,7 @@ export const FooterContactManager: React.FC = () => {
       }
     } catch (err: any) {
       setStatus('error');
-      setErrorMessage(err?.message || 'Unexpected error occurred while saving.');
+      setErrorMessage(validators.formatFriendlyError(err));
     }
   };
 
@@ -721,7 +715,7 @@ export const FooterContactManager: React.FC = () => {
 
                       {/* Actions */}
                       <div className="flex items-center gap-1.5 self-end sm:self-auto shrink-0">
-                        {item.href && isSafeUrl(item.href) && (
+                        {item.href && validators.url(item.href).isValid && (
                           <a
                             href={item.href}
                             target="_blank"

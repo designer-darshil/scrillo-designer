@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { X, Image as ImageIcon, Upload, Check, Link, Search, Loader2, Sparkles } from 'lucide-react';
+import { X, Image as ImageIcon, Upload, Check, Link, Search, Loader2, Sparkles, AlertCircle } from 'lucide-react';
 import { mediaService, MediaAsset } from '../services/mediaService';
+import { validators } from '../utils/validators';
 
 interface MediaPickerModalProps {
   isOpen: boolean;
@@ -67,6 +68,7 @@ export const MediaPickerModal: React.FC<MediaPickerModalProps> = ({
   const [uploading, setUploading] = useState<boolean>(false);
   const [uploadProgress, setUploadProgress] = useState<number>(0);
   const [uploadStatus, setUploadStatus] = useState<string>('');
+  const [uploadError, setUploadError] = useState<string | null>(null);
 
   const loadAssets = useCallback(async () => {
     setLoading(true);
@@ -92,12 +94,20 @@ export const MediaPickerModal: React.FC<MediaPickerModalProps> = ({
     const files = e.target.files;
     if (!files || files.length === 0) return;
 
+    const file = files[0];
+    const check = validators.imageFile(file);
+    if (!check.isValid) {
+      setUploadError(check.error || 'Invalid file.');
+      return;
+    }
+
+    setUploadError(null);
     setUploading(true);
     setUploadProgress(20);
-    setUploadStatus(`Uploading ${files[0].name}...`);
+    setUploadStatus(`Uploading ${file.name}...`);
 
     try {
-      const asset = await mediaService.uploadAsset(files[0]);
+      const asset = await mediaService.uploadAsset(file);
       setUploadProgress(100);
       if (asset) {
         setSelectedUrl(asset.url);
@@ -106,7 +116,7 @@ export const MediaPickerModal: React.FC<MediaPickerModalProps> = ({
         setActiveTab('library');
       }
     } catch (err: any) {
-      setUploadStatus(`Upload failed: ${err?.message || 'Unknown error'}`);
+      setUploadError(validators.formatFriendlyError(err));
     } finally {
       setUploading(false);
     }
@@ -117,12 +127,20 @@ export const MediaPickerModal: React.FC<MediaPickerModalProps> = ({
     const files = e.dataTransfer.files;
     if (!files || files.length === 0) return;
 
+    const file = files[0];
+    const check = validators.imageFile(file);
+    if (!check.isValid) {
+      setUploadError(check.error || 'Invalid file.');
+      return;
+    }
+
+    setUploadError(null);
     setUploading(true);
     setUploadProgress(30);
-    setUploadStatus(`Uploading ${files[0].name}...`);
+    setUploadStatus(`Uploading ${file.name}...`);
 
     try {
-      const asset = await mediaService.uploadAsset(files[0]);
+      const asset = await mediaService.uploadAsset(file);
       setUploadProgress(100);
       if (asset) {
         setSelectedUrl(asset.url);
@@ -131,7 +149,7 @@ export const MediaPickerModal: React.FC<MediaPickerModalProps> = ({
         setActiveTab('library');
       }
     } catch (err: any) {
-      setUploadStatus(`Upload failed: ${err?.message || 'Unknown error'}`);
+      setUploadError(validators.formatFriendlyError(err));
     } finally {
       setUploading(false);
     }
@@ -140,6 +158,13 @@ export const MediaPickerModal: React.FC<MediaPickerModalProps> = ({
   const handleConfirm = () => {
     const finalUrl = activeTab === 'url' ? customUrl.trim() : selectedUrl;
     if (finalUrl) {
+      if (activeTab === 'url') {
+        const urlCheck = validators.url(finalUrl, false, 'Custom Asset URL');
+        if (!urlCheck.isValid) {
+          setUploadError(urlCheck.error || 'Unsafe URL format.');
+          return;
+        }
+      }
       onSelect(finalUrl);
       onClose();
     }
@@ -321,7 +346,14 @@ export const MediaPickerModal: React.FC<MediaPickerModalProps> = ({
                 </label>
               )}
 
-              {uploadStatus && !uploading && (
+              {uploadError && (
+                <div className="p-3 rounded-lg border border-red-500/30 bg-red-500/10 text-red-500 text-xs flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 shrink-0" />
+                  <span>{uploadError}</span>
+                </div>
+              )}
+
+              {uploadStatus && !uploading && !uploadError && (
                 <p className="text-[11px] text-emerald-500 font-medium pt-2">{uploadStatus}</p>
               )}
 
@@ -348,12 +380,21 @@ export const MediaPickerModal: React.FC<MediaPickerModalProps> = ({
                     id="media-picker-custom-url"
                     type="text"
                     value={customUrl}
-                    onChange={(e) => setCustomUrl(e.target.value)}
+                    onChange={(e) => {
+                      setCustomUrl(e.target.value);
+                      if (uploadError) setUploadError(null);
+                    }}
                     placeholder="https://images.unsplash.com/..."
                     className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-border bg-background text-xs text-foreground font-mono focus:outline-hidden focus:ring-1 focus:ring-foreground"
                   />
                 </div>
               </div>
+              {uploadError && (
+                <div className="p-3 rounded-lg border border-red-500/30 bg-red-500/10 text-red-500 text-xs flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 shrink-0" />
+                  <span>{uploadError}</span>
+                </div>
+              )}
               {customUrl && (
                 <div className="pt-2 max-w-xs">
                   <p className="text-[11px] text-muted mb-1 font-medium">Image Preview:</p>

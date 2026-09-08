@@ -10,6 +10,7 @@ import { Philosophy } from './sections/Philosophy/Philosophy';
 import { Services } from './sections/Services/Services';
 import { ExperimentalImage } from './sections/ExperimentalImage/ExperimentalImage';
 import { ContactCTA } from './sections/ContactCTA/ContactCTA';
+import { Footer } from './components/Footer/Footer';
 import { CustomCursor } from './components/CustomCursor/CustomCursor';
 
 export const App: React.FC = () => {
@@ -78,6 +79,9 @@ export const App: React.FC = () => {
         {/* 9. Final Contact CTA Climax */}
         <ContactCTA />
       </main>
+
+      {/* 10. Large Editorial Footer */}
+      <Footer />
     </div>
   );
 };

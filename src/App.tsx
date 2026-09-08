@@ -9,6 +9,7 @@ import { AdminLogin } from './admin/pages/AdminLogin';
 import { AdminDashboard } from './admin/pages/AdminDashboard';
 import { ContentManager } from './admin/pages/ContentManager';
 import { ProjectsManager } from './admin/pages/ProjectsManager';
+import { ProjectEditor } from './admin/pages/ProjectEditor';
 import { SkillsManager } from './admin/pages/SkillsManager';
 import { ServicesManager } from './admin/pages/ServicesManager';
 import { MediaManager } from './admin/pages/MediaManager';
@@ -39,6 +40,8 @@ export const App: React.FC = () => {
               <Route path="dashboard" element={<AdminDashboard />} />
               <Route path="content" element={<ContentManager />} />
               <Route path="projects" element={<ProjectsManager />} />
+              <Route path="projects/new" element={<ProjectEditor mode="create" />} />
+              <Route path="projects/:id/edit" element={<ProjectEditor mode="edit" />} />
               <Route path="skills" element={<SkillsManager />} />
               <Route path="services" element={<ServicesManager />} />
               <Route path="media" element={<MediaManager />} />
@@ -55,4 +58,3 @@ export const App: React.FC = () => {
 };
 
 export default App;
-

@@ -11,7 +11,9 @@ interface SelectedWorksProps {
 export const SelectedWorks: React.FC<SelectedWorksProps> = ({ projects: propProjects }) => {
   const { data } = useWebsiteData();
   const rawProjects = propProjects || data.projects;
-  const projects = rawProjects.filter((p) => p.published !== false);
+  const projects = [...rawProjects]
+    .filter((p) => p.published !== false)
+    .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 
   const sectionRef = useRef<HTMLElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);

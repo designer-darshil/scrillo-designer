@@ -20,6 +20,8 @@ import {
   Search,
 } from 'lucide-react';
 
+import { useWebsiteData } from '../../hooks/useWebsiteData';
+
 interface SummaryCard {
   title: string;
   value: string;
@@ -168,6 +170,46 @@ const moduleShortcuts = [
 ];
 
 export const AdminDashboard: React.FC = () => {
+  const { data } = useWebsiteData();
+
+  const publishedCount = data.projects.filter((p) => p.published !== false).length;
+  const draftCount = data.projects.filter((p) => p.published === false).length;
+
+  const dynamicSummaryMetrics: SummaryCard[] = [
+    {
+      title: 'Published Projects',
+      value: String(publishedCount),
+      change: `${publishedCount} active in folio`,
+      changeType: 'positive',
+      icon: FolderGit2,
+      description: 'Live in portfolio showcase',
+    },
+    {
+      title: 'Draft Projects',
+      value: String(draftCount),
+      change: draftCount > 0 ? `${draftCount} pending` : 'None in draft',
+      changeType: draftCount > 0 ? 'neutral' : 'positive',
+      icon: FileClock,
+      description: 'Unpublished staging works',
+    },
+    {
+      title: 'Media Items',
+      value: '24',
+      change: '142.8 MB stored',
+      changeType: 'info',
+      icon: ImageIcon,
+      description: 'Optimized CDN assets',
+    },
+    {
+      title: 'Last Updated',
+      value: 'Today',
+      change: 'Auto-synchronized',
+      changeType: 'positive',
+      icon: Clock,
+      description: 'By darshilbhuva4322@gmail.com',
+    },
+  ];
+
   return (
     <div className="max-w-7xl mx-auto space-y-8 pb-12">
       {/* Welcome Banner */}
@@ -200,7 +242,7 @@ export const AdminDashboard: React.FC = () => {
           </a>
 
           <NavLink
-            to="/admin/projects"
+            to="/admin/projects/new"
             className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-foreground text-background hover:opacity-90 text-xs font-semibold transition-opacity shadow-xs"
           >
             <Plus className="w-3.5 h-3.5" />
@@ -211,7 +253,7 @@ export const AdminDashboard: React.FC = () => {
 
       {/* Summary KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        {summaryMetrics.map((metric) => {
+        {dynamicSummaryMetrics.map((metric) => {
           const Icon = metric.icon;
           return (
             <div

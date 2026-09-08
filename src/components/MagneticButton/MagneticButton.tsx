@@ -1,5 +1,5 @@
-import React, { useRef, useState } from 'react';
-import { motion } from 'framer-motion';
+import React, { useRef, useEffect } from 'react';
+import { gsap } from '../../animations/gsapConfig';
 import { cn } from '../../utils/cn';
 
 interface MagneticButtonProps {
@@ -18,34 +18,52 @@ export const MagneticButton: React.FC<MagneticButtonProps> = ({
   strength = 0.35,
 }) => {
   const ref = useRef<HTMLDivElement>(null);
-  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const isFinePointer = useRef(true);
+
+  useEffect(() => {
+    isFinePointer.current =
+      window.matchMedia('(pointer: fine)').matches &&
+      !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  }, []);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!ref.current) return;
-    const { left, top, width, height } = ref.current.getBoundingClientRect();
-    const centerX = left + width / 2;
-    const centerY = top + height / 2;
+    if (!isFinePointer.current || !ref.current) return;
+    const rect = ref.current.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
     const distanceX = (e.clientX - centerX) * strength;
     const distanceY = (e.clientY - centerY) * strength;
-    setPosition({ x: distanceX, y: distanceY });
+
+    gsap.to(ref.current, {
+      x: distanceX,
+      y: distanceY,
+      duration: 0.3,
+      ease: 'power2.out',
+      overwrite: 'auto',
+    });
   };
 
   const handleMouseLeave = () => {
-    setPosition({ x: 0, y: 0 });
+    if (!ref.current) return;
+    gsap.to(ref.current, {
+      x: 0,
+      y: 0,
+      duration: 0.6,
+      ease: 'elastic.out(1, 0.4)',
+      overwrite: 'auto',
+    });
   };
 
   const content = (
-    <motion.div
+    <div
       ref={ref}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      animate={{ x: position.x, y: position.y }}
-      transition={{ type: 'spring', damping: 15, stiffness: 200, mass: 0.1 }}
-      className={cn('inline-block cursor-pointer', className)}
+      className={cn('inline-block will-change-transform', className)}
       onClick={onClick}
     >
       {children}
-    </motion.div>
+    </div>
   );
 
   if (href) {
@@ -58,3 +76,5 @@ export const MagneticButton: React.FC<MagneticButtonProps> = ({
 
   return content;
 };
+
+export default MagneticButton;

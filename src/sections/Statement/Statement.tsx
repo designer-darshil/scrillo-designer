@@ -107,6 +107,7 @@ export const Statement: React.FC = () => {
       <div className="page-container">
         <div ref={labelRef}>
           <SectionLabel number="02" title="CREATIVE MANIFESTO" />
+          <h2 className="sr-only">Creative Manifesto: Be Curious, Be Bold, Be Useful</h2>
         </div>
       </div>
 
@@ -125,7 +126,7 @@ export const Statement: React.FC = () => {
                 CURIOUS.
               </span>
             </span>
-            <span className="statement-symbol font-mono text-2xl sm:text-4xl text-muted opacity-60 align-super">
+            <span aria-hidden="true" className="statement-symbol font-mono text-2xl sm:text-4xl text-muted opacity-60 align-super select-none">
               *
             </span>
           </div>
@@ -142,7 +143,7 @@ export const Statement: React.FC = () => {
                 BOLD.
               </span>
             </span>
-            <span className="statement-symbol font-mono text-2xl sm:text-4xl text-muted opacity-60 align-super">
+            <span aria-hidden="true" className="statement-symbol font-mono text-2xl sm:text-4xl text-muted opacity-60 align-super select-none">
               +
             </span>
           </div>
@@ -159,7 +160,7 @@ export const Statement: React.FC = () => {
                 USEFUL.
               </span>
             </span>
-            <div className="inline-flex items-center gap-1.5 text-muted opacity-60 align-super">
+            <div aria-hidden="true" className="inline-flex items-center gap-1.5 text-muted opacity-60 align-super select-none">
               <span className="statement-symbol font-mono text-xl sm:text-3xl">°</span>
               <span className="statement-symbol font-mono text-xs sm:text-sm tracking-widest uppercase">™</span>
             </div>

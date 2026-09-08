@@ -18,11 +18,12 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
 }) => {
   return (
     <article
+      tabIndex={0}
       data-cursor="project"
       data-cursor-text="VIEW"
       onMouseEnter={(e) => onHoverStart?.(project, e)}
       onMouseLeave={() => onHoverEnd?.()}
-      className="group relative border-t border-border py-8 sm:py-10 md:py-12 transition-colors duration-300 hover:bg-surface/50 select-none"
+      className="group relative border-t border-border py-8 sm:py-10 md:py-12 transition-colors duration-300 hover:bg-surface/50 select-none focus-visible:outline focus-visible:outline-1 focus-visible:outline-foreground"
     >
       <div className="page-container flex flex-col md:flex-row md:items-center justify-between gap-6 md:gap-8">
         {/* Left: Number + Title */}
@@ -63,8 +64,9 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
         <div className="md:hidden mt-4 overflow-hidden border border-border">
           <img
             src={project.image}
-            alt={project.title}
+            alt={`Preview of ${project.title} — ${project.category}`}
             loading="lazy"
+            decoding="async"
             className="w-full aspect-[16/9] object-cover filter grayscale contrast-125 group-hover:grayscale-0 transition-all duration-500"
           />
         </div>

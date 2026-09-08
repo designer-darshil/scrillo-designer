@@ -27,6 +27,14 @@ export const App: React.FC = () => {
 
   return (
     <div className="relative min-h-screen bg-background text-foreground selection:bg-foreground selection:text-background">
+      {/* Accessible Skip to Content Link */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-foreground focus:text-background focus:font-mono focus:text-xs focus:font-bold focus:outline-none"
+      >
+        Skip to main content
+      </a>
+
       {/* Reusable High-Performance Desktop Custom Cursor */}
       <CustomCursor />
 
@@ -43,7 +51,7 @@ export const App: React.FC = () => {
       />
 
       {/* Main Content */}
-      <main className="relative z-10">
+      <main id="main-content" tabIndex={-1} className="relative z-10 focus:outline-none">
         {/* 1. Hero Section */}
         <Hero />
 

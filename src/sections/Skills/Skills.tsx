@@ -195,6 +195,7 @@ export const Skills: React.FC = () => {
       <div className="page-container mb-16 sm:mb-24">
         <div ref={labelRef}>
           <SectionLabel number="03" title="DISCIPLINE & CAPABILITIES" />
+          <h2 className="sr-only">Discipline and Technical Capabilities</h2>
         </div>
       </div>
 

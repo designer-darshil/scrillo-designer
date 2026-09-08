@@ -162,7 +162,7 @@ export const ContactCTA: React.FC = () => {
 
           {/* Primary CTA Button with Magnetic Pull & Inverted Color Hover */}
           <div ref={ctaBtnRef} className="pt-4 sm:pt-6 w-full sm:w-auto">
-            <MagneticButton strength={0.35} href={`mailto:${email}?subject=Project%20Inquiry`} className="w-full sm:w-auto">
+            <MagneticButton strength={0.35} className="w-full sm:w-auto">
               <a
                 href={`mailto:${email}?subject=Project%20Inquiry`}
                 data-cursor="cta"

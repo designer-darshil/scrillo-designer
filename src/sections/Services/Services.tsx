@@ -1,47 +1,19 @@
 import React, { useEffect, useRef } from 'react';
 import { SectionLabel } from '../../components/SectionLabel/SectionLabel';
 import { ArrowUpRight } from 'lucide-react';
-import { gsap, ScrollTrigger } from '../../animations/gsapConfig';
+import { gsap } from '../../animations/gsapConfig';
+import { useWebsiteData } from '../../hooks/useWebsiteData';
+import { Service } from '../../types';
 
-interface ServiceItem {
-  number: string;
-  title: string;
-  description: string;
-  deliverables: string[];
+interface ServicesProps {
+  services?: Service[];
 }
 
-const servicesList: ServiceItem[] = [
-  {
-    number: '01',
-    title: 'Website Design',
-    description:
-      'Art-directed, high-impact digital flagships with distinct typographic character, tailored micro-animations, and performance-first architecture.',
-    deliverables: ['Creative Direction', 'Editorial Layouts', 'Responsive Prototyping'],
-  },
-  {
-    number: '02',
-    title: 'Product Design',
-    description:
-      'End-to-end digital product design from conceptual wireframing to high-fidelity design systems, intuitive user flows, and rigorous design tokens.',
-    deliverables: ['UI/UX Systems', 'User Workflows', 'Figma Libraries'],
-  },
-  {
-    number: '03',
-    title: 'UI / Visual Design',
-    description:
-      'Monochrome & high-contrast visual identities, bespoke layout grids, editorial typography systems, and tactile digital interfaces.',
-    deliverables: ['Visual Systems', 'Typography Systems', 'Design Tokens'],
-  },
-  {
-    number: '04',
-    title: 'Creative Development',
-    description:
-      'Frontend engineering in React, Next.js, and TypeScript with fluid GSAP choreographies, custom WebGL shaders, and 60/120fps smooth scrolling.',
-    deliverables: ['React / Next.js', 'GSAP & Lenis', 'Motion Engineering'],
-  },
-];
+export const Services: React.FC<ServicesProps> = ({ services: propServices }) => {
+  const { data } = useWebsiteData();
+  const rawServices = propServices || data.services;
+  const services = rawServices.filter((s) => s.visible !== false);
 
-export const Services: React.FC = () => {
   const containerRef = useRef<HTMLElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
   const labelRef = useRef<HTMLDivElement>(null);
@@ -138,56 +110,63 @@ export const Services: React.FC = () => {
 
       {/* Asymmetrical 12-Column Service Rows */}
       <div ref={listRef} className="w-full border-b border-border">
-        {servicesList.map((svc) => (
-          <article
-            key={svc.number}
-            data-cursor="link"
-            className="service-row group relative border-t border-border py-10 sm:py-14 lg:py-16 hover:bg-surface/40 transition-colors duration-300"
-          >
-            {/* Animated Bottom/Top Underline Accent */}
-            <span className="absolute left-0 top-0 w-full h-[1px] bg-foreground scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-500 ease-out pointer-events-none z-10" />
+        {services.map((svc, index) => {
+          const svcNumber = svc.number || String(index + 1).padStart(2, '0');
+          const deliverables = svc.deliverables || [];
 
-            <div className="page-container editorial-grid items-start gap-y-6">
-              {/* Left Column (2 Cols Desktop): Number */}
-              <div className="col-span-4 md:col-span-2 lg:col-span-2 flex items-baseline">
-                <span className="font-mono text-2xl sm:text-3xl md:text-4xl text-muted/40 group-hover:text-foreground font-light transition-colors duration-300">
-                  [{svc.number}]
-                </span>
-              </div>
+          return (
+            <article
+              key={svc.id || svc.number}
+              data-cursor="link"
+              className="service-row group relative border-t border-border py-10 sm:py-14 lg:py-16 hover:bg-surface/40 transition-colors duration-300"
+            >
+              {/* Animated Bottom/Top Underline Accent */}
+              <span className="absolute left-0 top-0 w-full h-[1px] bg-foreground scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-500 ease-out pointer-events-none z-10" />
 
-              {/* Center Column (5 Cols Desktop): Title & Arrow */}
-              <div className="col-span-4 md:col-span-6 lg:col-span-5 space-y-3">
-                <div className="flex items-center gap-3 group-hover:translate-x-3 transition-transform duration-300 ease-out">
-                  <h3 className="text-3xl sm:text-4xl lg:text-5xl font-sans font-bold uppercase tracking-tight text-foreground">
-                    {svc.title}
-                  </h3>
-                  <div className="opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 text-foreground shrink-0">
-                    <ArrowUpRight className="w-6 h-6" />
+              <div className="page-container editorial-grid items-start gap-y-6">
+                {/* Left Column (2 Cols Desktop): Number */}
+                <div className="col-span-4 md:col-span-2 lg:col-span-2 flex items-baseline">
+                  <span className="font-mono text-2xl sm:text-3xl md:text-4xl text-muted/40 group-hover:text-foreground font-light transition-colors duration-300">
+                    [{svcNumber}]
+                  </span>
+                </div>
+
+                {/* Center Column (5 Cols Desktop): Title & Arrow */}
+                <div className="col-span-4 md:col-span-6 lg:col-span-5 space-y-3">
+                  <div className="flex items-center gap-3 group-hover:translate-x-3 transition-transform duration-300 ease-out">
+                    <h3 className="text-3xl sm:text-4xl lg:text-5xl font-sans font-bold uppercase tracking-tight text-foreground">
+                      {svc.title}
+                    </h3>
+                    <div className="opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 text-foreground shrink-0">
+                      <ArrowUpRight className="w-6 h-6" />
+                    </div>
                   </div>
+
+                  {/* Tags / Deliverables */}
+                  {deliverables.length > 0 && (
+                    <div className="flex flex-wrap gap-2 pt-1">
+                      {deliverables.map((item, idx) => (
+                        <span
+                          key={idx}
+                          className="font-mono text-[11px] uppercase tracking-wider text-muted hover:text-foreground bg-surface border border-border/80 px-2.5 py-1 transition-colors"
+                        >
+                          {item}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
-                {/* Tags / Deliverables */}
-                <div className="flex flex-wrap gap-2 pt-1">
-                  {svc.deliverables.map((item, idx) => (
-                    <span
-                      key={idx}
-                      className="font-mono text-[11px] uppercase tracking-wider text-muted hover:text-foreground bg-surface border border-border/80 px-2.5 py-1 transition-colors"
-                    >
-                      {item}
-                    </span>
-                  ))}
+                {/* Right Column (5 Cols Desktop): Short Description */}
+                <div className="col-span-4 md:col-span-8 md:col-start-3 lg:col-span-5 lg:col-start-8 pt-2">
+                  <p className="text-body-editorial text-sm sm:text-base text-muted font-light leading-relaxed text-pretty">
+                    {svc.description}
+                  </p>
                 </div>
               </div>
-
-              {/* Right Column (5 Cols Desktop): Short Description */}
-              <div className="col-span-4 md:col-span-8 md:col-start-3 lg:col-span-5 lg:col-start-8 pt-2">
-                <p className="text-body-editorial text-sm sm:text-base text-muted font-light leading-relaxed text-pretty">
-                  {svc.description}
-                </p>
-              </div>
-            </div>
-          </article>
-        ))}
+            </article>
+          );
+        })}
       </div>
 
       {/* Bottom Section Meta */}
@@ -201,3 +180,4 @@ export const Services: React.FC = () => {
 };
 
 export default Services;
+

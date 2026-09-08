@@ -2,12 +2,18 @@ import React, { useEffect, useRef } from 'react';
 import { gsap } from '../../animations/gsapConfig';
 import { ArrowDown, ArrowUpRight } from 'lucide-react';
 import { MagneticButton } from '../../components/MagneticButton/MagneticButton';
+import { useWebsiteData } from '../../hooks/useWebsiteData';
+import { HeroContent } from '../../types';
 
 interface HeroProps {
+  content?: HeroContent;
   onHoverStateChange?: (isHovered: boolean, type?: any, text?: string) => void;
 }
 
-export const Hero: React.FC<HeroProps> = ({ onHoverStateChange }) => {
+export const Hero: React.FC<HeroProps> = ({ content: propContent, onHoverStateChange }) => {
+  const { data } = useWebsiteData();
+  const content = propContent || data.hero;
+
   const containerRef = useRef<HTMLElement>(null);
   const headlineRef = useRef<HTMLHeadingElement>(null);
   const labelRef = useRef<HTMLDivElement>(null);
@@ -127,13 +133,20 @@ export const Hero: React.FC<HeroProps> = ({ onHoverStateChange }) => {
   }, []);
 
   const scrollToWorks = () => {
-    const worksElement = document.getElementById('works');
+    const target = content.ctaLink.startsWith('#') ? content.ctaLink.substring(1) : 'works';
+    const worksElement = document.getElementById(target);
     if (worksElement) {
       worksElement.scrollIntoView({ behavior: 'smooth' });
     } else {
       window.scrollTo({ top: window.innerHeight * 0.9, behavior: 'smooth' });
     }
   };
+
+  const lines = content.headlineLines || [
+    'Building digital',
+    'experiences that',
+    'feel inevitable.',
+  ];
 
   return (
     <section
@@ -145,39 +158,39 @@ export const Hero: React.FC<HeroProps> = ({ onHoverStateChange }) => {
       <div className="page-container flex items-center justify-between font-mono text-meta text-muted">
         <div ref={labelRef} className="flex items-center gap-2">
           <span className="w-1.5 h-1.5 bg-foreground inline-block" />
-          <span className="text-foreground/90 font-medium">(About me)</span>
+          <span className="text-foreground/90 font-medium">{content.eyebrow}</span>
         </div>
 
-        <div ref={parallaxRef} className="hidden sm:flex items-center gap-6 text-muted">
-          <span>PORTFOLIO SPECIMEN</span>
-          <span>/</span>
-          <span>AVAILABLE FOR SELECT COMMISSIONS</span>
-        </div>
+        {content.subEyebrow && (
+          <div ref={parallaxRef} className="hidden sm:flex items-center gap-6 text-muted uppercase">
+            <span>{content.subEyebrow.split('/')[0]?.trim()}</span>
+            {content.subEyebrow.includes('/') && <span>/</span>}
+            {content.subEyebrow.includes('/') && (
+              <span>{content.subEyebrow.split('/')[1]?.trim()}</span>
+            )}
+          </div>
+        )}
       </div>
 
-      {/* Main Asymmetrical Content: Anchored toward the lower portion of the viewport with huge negative space */}
+      {/* Main Asymmetrical Content */}
       <div className="page-container my-auto pt-16 sm:pt-24 pb-8 sm:pb-12">
         <div className="max-w-6xl">
-          {/* Large Headline (2-3 Lines, tight line-height, negative letter-spacing) */}
+          {/* Large Headline */}
           <h1
             ref={headlineRef}
             className="text-display font-bold uppercase tracking-display leading-[0.90] text-foreground will-change-transform"
           >
-            <span className="block overflow-hidden py-1">
-              <span className="headline-line-inner inline-block will-change-transform">
-                Building digital
+            {lines.map((line, idx) => (
+              <span key={idx} className="block overflow-hidden py-1">
+                <span
+                  className={`headline-line-inner inline-block will-change-transform ${
+                    idx === 1 ? 'text-foreground/95' : idx === 2 ? 'text-muted' : ''
+                  }`}
+                >
+                  {line}
+                </span>
               </span>
-            </span>
-            <span className="block overflow-hidden py-1">
-              <span className="headline-line-inner inline-block will-change-transform text-foreground/95">
-                experiences that
-              </span>
-            </span>
-            <span className="block overflow-hidden py-1">
-              <span className="headline-line-inner inline-block will-change-transform text-muted">
-                feel inevitable.
-              </span>
-            </span>
+            ))}
           </h1>
 
           {/* Lower Asymmetrical Row: Supporting Text + Primary CTA */}
@@ -185,7 +198,7 @@ export const Hero: React.FC<HeroProps> = ({ onHoverStateChange }) => {
             {/* Supporting Description */}
             <div ref={supportingRef} className="lg:col-span-7 xl:col-span-6">
               <p className="text-body-editorial text-muted leading-relaxed font-light text-pretty">
-                Digital product designer & creative developer focused on thoughtful interfaces, products and interactive experiences.
+                {content.description}
               </p>
             </div>
 
@@ -201,7 +214,7 @@ export const Hero: React.FC<HeroProps> = ({ onHoverStateChange }) => {
                   onMouseLeave={() => onHoverStateChange?.(false)}
                   className="group w-full sm:w-auto min-h-[48px] flex items-center justify-between sm:justify-center gap-4 px-6 sm:px-8 py-4 sm:py-5 bg-foreground text-background font-mono text-xs sm:text-sm font-semibold uppercase tracking-widest hover:opacity-90 transition-all focus-visible:outline focus-visible:outline-1 focus-visible:outline-foreground"
                 >
-                  <span>VIEW SELECTED WORKS</span>
+                  <span>{content.ctaText}</span>
                   <div className="w-5 h-5 flex items-center justify-center bg-background text-foreground group-hover:rotate-45 transition-transform duration-300">
                     <ArrowUpRight className="w-3.5 h-3.5" />
                   </div>
@@ -214,11 +227,15 @@ export const Hero: React.FC<HeroProps> = ({ onHoverStateChange }) => {
 
       {/* Bottom Metadata & Scroll Indicator Bar */}
       <div className="page-container border-t border-border pt-4 sm:pt-6 flex items-center justify-between font-mono text-meta text-muted">
-        {/* Left: 2026 Year Metadata */}
+        {/* Left: Year Metadata */}
         <div ref={metaRef} className="flex items-center gap-3">
-          <span className="text-foreground font-semibold">2026</span>
-          <span className="text-border">/</span>
-          <span className="hidden sm:inline">FOLIO ARCHIVE</span>
+          <span className="text-foreground font-semibold">{content.year}</span>
+          {content.yearLabel && (
+            <>
+              <span className="text-border">/</span>
+              <span className="hidden sm:inline">{content.yearLabel}</span>
+            </>
+          )}
         </div>
 
         {/* Right: Scroll Down Indicator with Kinetic Arrow */}
@@ -229,7 +246,7 @@ export const Hero: React.FC<HeroProps> = ({ onHoverStateChange }) => {
           onMouseEnter={() => onHoverStateChange?.(true, 'link')}
           onMouseLeave={() => onHoverStateChange?.(false)}
         >
-          <span className="tracking-widest font-medium">SCROLL</span>
+          <span className="tracking-widest font-medium">{content.scrollLabel}</span>
           <span className="scroll-arrow inline-block">
             <ArrowDown className="w-3.5 h-3.5" />
           </span>
@@ -240,3 +257,4 @@ export const Hero: React.FC<HeroProps> = ({ onHoverStateChange }) => {
 };
 
 export default Hero;
+

@@ -59,11 +59,11 @@ export const SettingsManager: React.FC = () => {
             [02 // SECTION VISIBILITY]
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 font-mono text-xs">
-            {Object.entries(defaultSettings.sectionVisibility).map(([key, isVisible]) => (
+            {Object.entries(defaultSettings.sections).map(([key, sec]) => (
               <div key={key} className="flex items-center justify-between p-3 border border-border bg-background">
-                <span className="uppercase text-foreground">{key}</span>
+                <span className="uppercase text-foreground">{sec.name || key}</span>
                 <span className="text-[11px] px-2 py-0.5 bg-foreground text-background font-bold">
-                  {isVisible ? 'ACTIVE' : 'HIDDEN'}
+                  {sec.visible ? 'ACTIVE' : 'HIDDEN'}
                 </span>
               </div>
             ))}
@@ -75,3 +75,4 @@ export const SettingsManager: React.FC = () => {
 };
 
 export default SettingsManager;
+

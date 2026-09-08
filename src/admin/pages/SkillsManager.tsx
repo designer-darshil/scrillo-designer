@@ -26,28 +26,36 @@ export const SkillsManager: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {skillCategories.map((cat) => (
-          <div key={cat.id} className="border border-border bg-surface p-6 space-y-4">
-            <div className="flex items-center justify-between border-b border-border pb-3">
-              <span className="font-mono text-xs text-muted">[{cat.number}]</span>
-              <span className="font-mono text-xs text-muted">{cat.count} ITEMS</span>
+        {skillCategories.map((cat) => {
+          const list = cat.items || cat.skills || [];
+          return (
+            <div key={cat.id} className="border border-border bg-surface p-6 space-y-4">
+              <div className="flex items-center justify-between border-b border-border pb-3">
+                <span className="font-mono text-xs text-muted">[{cat.number}]</span>
+                <span className="font-mono text-xs text-muted">{list.length} ITEMS</span>
+              </div>
+              <h3 className="font-sans text-xl font-bold uppercase tracking-tight text-foreground">
+                {cat.title}
+              </h3>
+              <ul className="space-y-2 pt-2 divide-y divide-border/60">
+                {list.map((skill, idx) => {
+                  const name = typeof skill === 'string' ? skill : skill.name;
+                  const index = typeof skill === 'string' ? String(idx + 1).padStart(2, '0') : skill.index;
+                  return (
+                    <li key={name} className="pt-2 flex items-center justify-between font-mono text-xs text-muted">
+                      <span>{name}</span>
+                      <span>[{index}]</span>
+                    </li>
+                  );
+                })}
+              </ul>
             </div>
-            <h3 className="font-sans text-xl font-bold uppercase tracking-tight text-foreground">
-              {cat.title}
-            </h3>
-            <ul className="space-y-2 pt-2 divide-y divide-border/60">
-              {cat.skills.map((skill) => (
-                <li key={skill.name} className="pt-2 flex items-center justify-between font-mono text-xs text-muted">
-                  <span>{skill.name}</span>
-                  <span>[{skill.index}]</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
 };
 
 export default SkillsManager;
+

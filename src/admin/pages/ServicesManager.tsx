@@ -26,30 +26,36 @@ export const ServicesManager: React.FC = () => {
       </div>
 
       <div className="space-y-4">
-        {defaultServicesList.map((svc) => (
-          <div key={svc.number} className="border border-border bg-surface p-6 space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="font-mono text-xs text-muted">[{svc.number}]</span>
-              <span className="font-mono text-[11px] text-muted">{svc.deliverables.length} DELIVERABLES</span>
+        {defaultServicesList.map((svc) => {
+          const deliverables = svc.deliverables || [];
+          return (
+            <div key={svc.id || svc.number} className="border border-border bg-surface p-6 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="font-mono text-xs text-muted">[{svc.number}]</span>
+                <span className="font-mono text-[11px] text-muted">{deliverables.length} DELIVERABLES</span>
+              </div>
+              <h3 className="font-sans text-xl font-bold uppercase tracking-tight text-foreground">
+                {svc.title}
+              </h3>
+              <p className="font-mono text-xs text-muted leading-relaxed">
+                {svc.description}
+              </p>
+              {deliverables.length > 0 && (
+                <div className="flex flex-wrap gap-2 pt-2">
+                  {deliverables.map((item, idx) => (
+                    <span key={idx} className="font-mono text-[10px] uppercase text-muted border border-border px-2 py-0.5">
+                      {item}
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
-            <h3 className="font-sans text-xl font-bold uppercase tracking-tight text-foreground">
-              {svc.title}
-            </h3>
-            <p className="font-mono text-xs text-muted leading-relaxed">
-              {svc.description}
-            </p>
-            <div className="flex flex-wrap gap-2 pt-2">
-              {svc.deliverables.map((item, idx) => (
-                <span key={idx} className="font-mono text-[10px] uppercase text-muted border border-border px-2 py-0.5">
-                  {item}
-                </span>
-              ))}
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
 };
 
 export default ServicesManager;
+

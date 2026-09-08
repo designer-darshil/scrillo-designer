@@ -1,40 +1,37 @@
 import { supabase, isSupabaseConfigured } from '../../lib/supabase';
-import { ProjectItem } from '../types';
+import { Project } from '../../types';
 import { projectsData } from '../../data/projects';
 
 export const projectService = {
-  async getProjects(): Promise<ProjectItem[]> {
+  async getProjects(): Promise<Project[]> {
     if (!isSupabaseConfigured) {
-      return projectsData.map((p, idx) => ({
-        ...p,
-        order: idx + 1,
-      }));
+      return projectsData;
     }
     try {
       const { data, error } = await supabase.from('projects').select('*').order('order', { ascending: true });
       if (error || !data || data.length === 0) {
-        return projectsData.map((p, idx) => ({ ...p, order: idx + 1 }));
+        return projectsData;
       }
-      return data as ProjectItem[];
+      return data as Project[];
     } catch {
-      return projectsData.map((p, idx) => ({ ...p, order: idx + 1 }));
+      return projectsData;
     }
   },
 
-  async createProject(project: Omit<ProjectItem, 'id'>): Promise<ProjectItem | null> {
+  async createProject(project: Omit<Project, 'id'>): Promise<Project | null> {
     if (!isSupabaseConfigured) {
       return { id: `proj-${Date.now()}`, ...project };
     }
     try {
       const { data, error } = await supabase.from('projects').insert([project]).select().single();
       if (error) return null;
-      return data as ProjectItem;
+      return data as Project;
     } catch {
       return null;
     }
   },
 
-  async updateProject(id: string, updates: Partial<ProjectItem>): Promise<boolean> {
+  async updateProject(id: string, updates: Partial<Project>): Promise<boolean> {
     if (!isSupabaseConfigured) return true;
     try {
       const { error } = await supabase.from('projects').update(updates).eq('id', id);
@@ -56,3 +53,4 @@ export const projectService = {
 };
 
 export default projectService;
+

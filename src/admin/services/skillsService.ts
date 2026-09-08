@@ -1,5 +1,5 @@
 import { supabase, isSupabaseConfigured } from '../../lib/supabase';
-import { SkillCategory } from '../types';
+import { SkillCategory } from '../../types';
 import { skillCategories } from '../../data/skills';
 
 export const skillsService = {
@@ -26,3 +26,4 @@ export const skillsService = {
 };
 
 export default skillsService;
+

@@ -1,51 +1,12 @@
 import { supabase, isSupabaseConfigured } from '../../lib/supabase';
-import { HeroContent, StatementContent, PhilosophyContent, ContactCTAContent, FooterContent } from '../types';
+import { HeroContent, AboutContent, PhilosophyContent, ContactCTA, FooterContent } from '../../types';
+import { defaultWebsiteData } from '../../data/defaultWebsiteData';
 
-export const defaultHeroContent: HeroContent = {
-  label: '(About me)',
-  headlineLine1: 'Building digital',
-  headlineLine2: 'experiences that',
-  headlineLine3: 'feel inevitable.',
-  supportingText: 'Digital product designer & creative developer focused on thoughtful interfaces, products and interactive experiences.',
-  ctaText: 'VIEW SELECTED WORKS',
-  yearMeta: '2026 / FOLIO ARCHIVE',
-};
-
-export const defaultStatementContent: StatementContent = {
-  label: 'CREATIVE MANIFESTO',
-  phrase1: 'BE CURIOUS.*',
-  phrase2: 'BE BOLD.+',
-  phrase3: 'BE USEFUL.°™',
-  subtext: 'FORM AS CONSEQUENCE OF FUNCTION AND RESTRAINT',
-};
-
-export const defaultPhilosophyContent: PhilosophyContent = {
-  label: 'DESIGN PHILOSOPHY',
-  line1: 'Great design',
-  line2: 'should feel obvious',
-  line3: 'after you see it.',
-  yearMeta: '— 2026 / PHILOSOPHY STATEMENT',
-};
-
-export const defaultContactCTAContent: ContactCTAContent = {
-  label: 'INITIATE COLLABORATION',
-  headlineLine1: 'HAVE SOMETHING',
-  headlineLine2: 'WORTH BUILDING?',
-  secondaryLine: "Let's make it real.",
-  ctaText: 'START A PROJECT',
-  email: 'contact@darshilbhuva.com',
-  location: '21.1702° N, 72.8311° E',
-};
-
-export const defaultFooterContent: FooterContent = {
-  locationTitle: 'INDIA',
-  locationStatus: 'WORKING GLOBALLY',
-  coordinates: 'UTC +05:30 · 21.1702° N, 72.8311° E',
-  contactEmail: 'hello@example.com',
-  responseWindow: 'Response within 24–48 hours',
-  brandName: 'DARSHIL BHUVA',
-  copyrightText: '© 2026 ALL RIGHTS RESERVED',
-};
+export const defaultHeroContent: HeroContent = defaultWebsiteData.hero;
+export const defaultStatementContent: AboutContent = defaultWebsiteData.about;
+export const defaultPhilosophyContent: PhilosophyContent = defaultWebsiteData.philosophy;
+export const defaultContactCTAContent: ContactCTA = defaultWebsiteData.contact;
+export const defaultFooterContent: FooterContent = defaultWebsiteData.footer;
 
 export const websiteService = {
   async getHeroContent(): Promise<HeroContent> {
@@ -69,7 +30,7 @@ export const websiteService = {
     }
   },
 
-  async getStatementContent(): Promise<StatementContent> {
+  async getStatementContent(): Promise<AboutContent> {
     return defaultStatementContent;
   },
 
@@ -77,7 +38,7 @@ export const websiteService = {
     return defaultPhilosophyContent;
   },
 
-  async getContactCTAContent(): Promise<ContactCTAContent> {
+  async getContactCTAContent(): Promise<ContactCTA> {
     return defaultContactCTAContent;
   },
 
@@ -87,3 +48,4 @@ export const websiteService = {
 };
 
 export default websiteService;
+

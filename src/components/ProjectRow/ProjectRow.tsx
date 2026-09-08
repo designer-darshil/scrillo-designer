@@ -1,7 +1,6 @@
 import React from 'react';
-import { Project } from '../../data/projects';
+import { Project } from '../../types';
 import { ArrowUpRight } from 'lucide-react';
-import { cn } from '../../utils/cn';
 
 interface ProjectRowProps {
   project: Project;
@@ -16,6 +15,9 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
   onHoverStart,
   onHoverEnd,
 }) => {
+  const displayNum = project.number || String(index + 1).padStart(2, '0');
+  const displayImage = project.coverImage || project.thumbnail || (project as any).image;
+
   return (
     <article
       tabIndex={0}
@@ -32,7 +34,7 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
         {/* Left: Number + Title */}
         <div className="flex items-baseline gap-4 sm:gap-8 flex-1">
           <span className="font-mono text-xs sm:text-sm text-muted/70 group-hover:text-foreground transition-colors shrink-0">
-            [{project.number}]
+            [{displayNum}]
           </span>
 
           <div className="space-y-1">
@@ -64,18 +66,21 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
         </div>
 
         {/* Mobile Inline Thumbnail: Visible on mobile devices, hidden on desktop */}
-        <div className="md:hidden mt-4 overflow-hidden border border-border">
-          <img
-            src={project.image}
-            alt={`Preview of ${project.title} — ${project.category}`}
-            loading="lazy"
-            decoding="async"
-            className="w-full aspect-[16/9] object-cover filter grayscale contrast-125 group-hover:grayscale-0 transition-all duration-500"
-          />
-        </div>
+        {displayImage && (
+          <div className="md:hidden mt-4 overflow-hidden border border-border">
+            <img
+              src={displayImage}
+              alt={`Preview of ${project.title} — ${project.category}`}
+              loading="lazy"
+              decoding="async"
+              className="w-full aspect-[16/9] object-cover filter grayscale contrast-125 group-hover:grayscale-0 transition-all duration-500"
+            />
+          </div>
+        )}
       </div>
     </article>
   );
 };
 
 export default ProjectRow;
+

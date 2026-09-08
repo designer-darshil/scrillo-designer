@@ -12,18 +12,17 @@ import { ExperimentalImage } from '../sections/ExperimentalImage/ExperimentalIma
 import { ContactCTA } from '../sections/ContactCTA/ContactCTA';
 import { Footer } from '../components/Footer/Footer';
 import { CustomCursor } from '../components/CustomCursor/CustomCursor';
+import { useWebsiteData } from '../hooks/useWebsiteData';
 
 export const PortfolioHome: React.FC = () => {
   // Initialize Lenis smooth scroll foundation
   useLenis();
 
+  const { data } = useWebsiteData();
   const [activeSection, setActiveSection] = useState('home');
 
-  const marqueeItems = [
-    'CREATIVE DEVELOPER',
-    'DIGITAL DESIGNER',
-    'INTERACTION DESIGNER',
-  ];
+  const { sections } = data.settings;
+  const marquee = data.marquee;
 
   return (
     <div className="relative min-h-screen bg-background text-foreground selection:bg-foreground selection:text-background">
@@ -36,7 +35,7 @@ export const PortfolioHome: React.FC = () => {
       </a>
 
       {/* Reusable High-Performance Desktop Custom Cursor */}
-      <CustomCursor />
+      {data.settings.enableCustomCursor !== false && <CustomCursor />}
 
       {/* Premium Minimalist Fixed Header */}
       <Header
@@ -53,45 +52,64 @@ export const PortfolioHome: React.FC = () => {
       {/* Main Content */}
       <main id="main-content" tabIndex={-1} className="relative z-10 focus:outline-none">
         {/* 1. Hero Section */}
-        <Hero />
+        {sections.hero?.visible !== false && <Hero content={data.hero} />}
 
         {/* 2. Reusable Marquee Divider */}
-        <Marquee
-          items={marqueeItems}
-          speed={30}
-          direction="left"
-          enableVelocity={true}
-          velocityMultiplier={1.2}
-          size="display"
-          separator="✦"
-        />
+        {sections.marquee?.visible !== false && (
+          <Marquee
+            items={marquee.items}
+            speed={marquee.speed || 30}
+            direction={marquee.direction || 'left'}
+            enableVelocity={marquee.enableVelocity ?? true}
+            velocityMultiplier={1.2}
+            size="display"
+            separator={marquee.separator || '✦'}
+          />
+        )}
 
         {/* 3. Selected Works Section */}
-        <SelectedWorks />
+        {sections.projects?.visible !== false && (
+          <SelectedWorks projects={data.projects} />
+        )}
 
         {/* 4. Creative Statement Section */}
-        <Statement />
+        {sections.statement?.visible !== false && (
+          <Statement content={data.about} />
+        )}
 
         {/* 5. Discipline & Skills Section */}
-        <Skills />
+        {sections.skills?.visible !== false && (
+          <Skills categories={data.skills} />
+        )}
 
         {/* 6. Design Philosophy Section */}
-        <Philosophy />
+        {sections.philosophy?.visible !== false && (
+          <Philosophy content={data.philosophy} />
+        )}
 
         {/* 7. Services Section */}
-        <Services />
+        {sections.services?.visible !== false && (
+          <Services services={data.services} />
+        )}
 
         {/* 8. Experimental Cinematic Visual Break */}
-        <ExperimentalImage />
+        {sections.image?.visible !== false && (
+          <ExperimentalImage content={data.image} />
+        )}
 
         {/* 9. Final Contact CTA Climax */}
-        <ContactCTA />
+        {sections.contact?.visible !== false && (
+          <ContactCTA content={data.contact} />
+        )}
       </main>
 
       {/* 10. Large Editorial Footer */}
-      <Footer />
+      {sections.footer?.visible !== false && (
+        <Footer content={data.footer} />
+      )}
     </div>
   );
 };
 
 export default PortfolioHome;
+

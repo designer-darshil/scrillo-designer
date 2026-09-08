@@ -3,6 +3,13 @@ import { FileText, Save } from 'lucide-react';
 import { defaultHeroContent, defaultStatementContent, defaultPhilosophyContent, defaultContactCTAContent } from '../services/websiteService';
 
 export const ContentManager: React.FC = () => {
+  const heroLines = defaultHeroContent.headlineLines?.join(' ') || defaultHeroContent.title;
+  const manifestoPhrases = defaultStatementContent.phrases || [
+    defaultStatementContent.line1 || 'BE CURIOUS.*',
+    defaultStatementContent.line2 || 'BE BOLD.+',
+    defaultStatementContent.line3 || 'BE USEFUL.°™',
+  ];
+
   return (
     <div className="max-w-5xl space-y-8">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-6">
@@ -34,11 +41,11 @@ export const ContentManager: React.FC = () => {
           </div>
           <div className="grid grid-cols-1 gap-4 font-mono text-xs">
             <div className="space-y-1">
-              <label className="text-muted block">Headline (Line 1-3)</label>
+              <label className="text-muted block">Headline</label>
               <input
                 type="text"
                 disabled
-                value={`${defaultHeroContent.headlineLine1} ${defaultHeroContent.headlineLine2} ${defaultHeroContent.headlineLine3}`}
+                value={heroLines}
                 className="w-full px-3 py-2 bg-background border border-border text-foreground/90 opacity-70"
               />
             </div>
@@ -47,7 +54,7 @@ export const ContentManager: React.FC = () => {
               <textarea
                 disabled
                 rows={2}
-                value={defaultHeroContent.supportingText}
+                value={defaultHeroContent.description}
                 className="w-full px-3 py-2 bg-background border border-border text-foreground/90 opacity-70"
               />
             </div>
@@ -61,9 +68,9 @@ export const ContentManager: React.FC = () => {
             <span className="font-mono text-[11px] text-muted">READ-ONLY PLACEHOLDER</span>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 font-mono text-xs">
-            <input type="text" disabled value={defaultStatementContent.phrase1} className="px-3 py-2 bg-background border border-border text-foreground/90 opacity-70" />
-            <input type="text" disabled value={defaultStatementContent.phrase2} className="px-3 py-2 bg-background border border-border text-foreground/90 opacity-70" />
-            <input type="text" disabled value={defaultStatementContent.phrase3} className="px-3 py-2 bg-background border border-border text-foreground/90 opacity-70" />
+            {manifestoPhrases.map((phrase, i) => (
+              <input key={i} type="text" disabled value={phrase} className="px-3 py-2 bg-background border border-border text-foreground/90 opacity-70" />
+            ))}
           </div>
         </div>
 
@@ -107,3 +114,4 @@ export const ContentManager: React.FC = () => {
 };
 
 export default ContentManager;
+

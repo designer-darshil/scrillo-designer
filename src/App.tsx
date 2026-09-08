@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './admin/hooks/useAuth';
+import { WebsiteDataProvider } from './context/WebsiteDataContext';
 import { PortfolioHome } from './pages/PortfolioHome';
 import { AdminLayout } from './admin/layouts/AdminLayout';
 import { ProtectedRoute } from './admin/components/ProtectedRoute';
@@ -16,39 +17,42 @@ import { SettingsManager } from './admin/pages/SettingsManager';
 export const App: React.FC = () => {
   return (
     <AuthProvider>
-      <BrowserRouter>
-      <Routes>
-        {/* Public Portfolio Route (Exact Unchanged Experience) */}
-        <Route path="/" element={<PortfolioHome />} />
+      <WebsiteDataProvider>
+        <BrowserRouter>
+          <Routes>
+            {/* Public Portfolio Route (Exact Unchanged Experience) */}
+            <Route path="/" element={<PortfolioHome />} />
 
-        {/* Admin Login Route */}
-        <Route path="/admin/login" element={<AdminLogin />} />
+            {/* Admin Login Route */}
+            <Route path="/admin/login" element={<AdminLogin />} />
 
-        {/* Protected Admin Routes */}
-        <Route
-          path="/admin"
-          element={
-            <ProtectedRoute>
-              <AdminLayout />
-            </ProtectedRoute>
-          }
-        >
-          <Route index element={<AdminDashboard />} />
-          <Route path="dashboard" element={<AdminDashboard />} />
-          <Route path="content" element={<ContentManager />} />
-          <Route path="projects" element={<ProjectsManager />} />
-          <Route path="skills" element={<SkillsManager />} />
-          <Route path="services" element={<ServicesManager />} />
-          <Route path="media" element={<MediaManager />} />
-          <Route path="settings" element={<SettingsManager />} />
-        </Route>
+            {/* Protected Admin Routes */}
+            <Route
+              path="/admin"
+              element={
+                <ProtectedRoute>
+                  <AdminLayout />
+                </ProtectedRoute>
+              }
+            >
+              <Route index element={<AdminDashboard />} />
+              <Route path="dashboard" element={<AdminDashboard />} />
+              <Route path="content" element={<ContentManager />} />
+              <Route path="projects" element={<ProjectsManager />} />
+              <Route path="skills" element={<SkillsManager />} />
+              <Route path="services" element={<ServicesManager />} />
+              <Route path="media" element={<MediaManager />} />
+              <Route path="settings" element={<SettingsManager />} />
+            </Route>
 
-        {/* Fallback to Public Home */}
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </BrowserRouter>
-  </AuthProvider>
+            {/* Fallback to Public Home */}
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </BrowserRouter>
+      </WebsiteDataProvider>
+    </AuthProvider>
   );
 };
 
 export default App;
+

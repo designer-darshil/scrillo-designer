@@ -1,8 +1,17 @@
 import React, { useEffect, useRef } from 'react';
-import { gsap, ScrollTrigger } from '../../animations/gsapConfig';
+import { gsap } from '../../animations/gsapConfig';
 import { SectionLabel } from '../../components/SectionLabel/SectionLabel';
+import { useWebsiteData } from '../../hooks/useWebsiteData';
+import { PhilosophyContent } from '../../types';
 
-export const Philosophy: React.FC = () => {
+interface PhilosophyProps {
+  content?: PhilosophyContent;
+}
+
+export const Philosophy: React.FC<PhilosophyProps> = ({ content: propContent }) => {
+  const { data } = useWebsiteData();
+  const content = propContent || data.philosophy;
+
   const containerRef = useRef<HTMLElement>(null);
   const headlineRef = useRef<HTMLHeadingElement>(null);
   const labelRef = useRef<HTMLDivElement>(null);
@@ -83,6 +92,14 @@ export const Philosophy: React.FC = () => {
     return () => ctx.revert();
   }, []);
 
+  const sectionNumber = content.number || '04';
+  const sectionLabel = content.label || 'DESIGN PHILOSOPHY';
+  const line1 = content.line1 || 'Great design';
+  const line2 = content.line2 || 'should feel obvious';
+  const line3 = content.line3 || 'after you see it.';
+  const yearMeta = content.yearMeta || '— 2026';
+  const subMeta = content.subMeta || 'PHILOSOPHY STATEMENT';
+
   return (
     <section
       ref={containerRef}
@@ -92,7 +109,7 @@ export const Philosophy: React.FC = () => {
       {/* Top Metadata Header */}
       <div className="page-container">
         <div ref={labelRef}>
-          <SectionLabel number="04" title="DESIGN PHILOSOPHY" />
+          <SectionLabel number={sectionNumber} title={sectionLabel} />
         </div>
       </div>
 
@@ -105,21 +122,21 @@ export const Philosophy: React.FC = () => {
           {/* Line 1: Great design */}
           <span className="block overflow-hidden py-1">
             <span className="philosophy-line-inner inline-block will-change-transform text-foreground">
-              Great design
+              {line1}
             </span>
           </span>
 
           {/* Line 2: should feel obvious (Asymmetrically Indented) */}
           <span className="block overflow-hidden py-1 pl-0 sm:pl-16 md:pl-28 lg:pl-44">
             <span className="philosophy-line-inner inline-block will-change-transform text-muted">
-              should feel obvious
+              {line2}
             </span>
           </span>
 
           {/* Line 3: after you see it. */}
           <span className="block overflow-hidden py-1 pl-0 sm:pl-8 md:pl-14 lg:pl-20">
             <span className="philosophy-line-inner inline-block will-change-transform text-foreground">
-              after you see it.
+              {line3}
             </span>
           </span>
         </h2>
@@ -131,8 +148,8 @@ export const Philosophy: React.FC = () => {
           ref={metaRef}
           className="flex items-center justify-between font-mono text-meta text-muted"
         >
-          <span className="text-foreground font-medium">— 2026</span>
-          <span className="tracking-meta">PHILOSOPHY STATEMENT</span>
+          <span className="text-foreground font-medium">{yearMeta}</span>
+          <span className="tracking-meta">{subMeta}</span>
         </div>
       </div>
     </section>
@@ -140,3 +157,4 @@ export const Philosophy: React.FC = () => {
 };
 
 export default Philosophy;
+

@@ -1,17 +1,26 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { skillCategories, SkillItem } from '../../data/skills';
+import { SkillCategory, SkillItem } from '../../types';
 import { SectionLabel } from '../../components/SectionLabel/SectionLabel';
 import { ArrowUpRight } from 'lucide-react';
 import { gsap } from '../../animations/gsapConfig';
+import { useWebsiteData } from '../../hooks/useWebsiteData';
 
-export const Skills: React.FC = () => {
+interface SkillsProps {
+  categories?: SkillCategory[];
+}
+
+export const Skills: React.FC<SkillsProps> = ({ categories: propCategories }) => {
+  const { data } = useWebsiteData();
+  const rawCategories = propCategories || data.skills;
+  const categories = rawCategories.filter((c) => c.visible !== false);
+
   const containerRef = useRef<HTMLElement>(null);
   const categoriesRef = useRef<HTMLDivElement>(null);
   const labelRef = useRef<HTMLDivElement>(null);
   const previewRef = useRef<HTMLDivElement>(null);
   const previewImgRef = useRef<HTMLImageElement>(null);
 
-  const [hoveredSkill, setHoveredSkill] = useState<SkillItem | null>(null);
+  const [, setHoveredSkill] = useState<SkillItem | null>(null);
 
   // GSAP ScrollTrigger reveals and staggered entrance
   useEffect(() => {
@@ -169,6 +178,11 @@ export const Skills: React.FC = () => {
     }
   };
 
+  const initialPreview =
+    categories[0]?.items?.[0]?.image ||
+    categories[0]?.skills?.[0]?.image ||
+    'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80';
+
   return (
     <section
       ref={containerRef}
@@ -184,7 +198,7 @@ export const Skills: React.FC = () => {
         <div className="w-[260px] aspect-[4/3] overflow-hidden border border-border bg-surface shadow-2xl">
           <img
             ref={previewImgRef}
-            src={skillCategories[0].skills[0].image}
+            src={initialPreview}
             alt="Skill Visual"
             className="w-full h-full object-cover filter grayscale contrast-125"
           />
@@ -205,53 +219,64 @@ export const Skills: React.FC = () => {
           ref={categoriesRef}
           className="grid grid-cols-1 lg:grid-cols-3 gap-16 lg:gap-12 xl:gap-16 items-start"
         >
-          {skillCategories.map((cat) => (
-            <div key={cat.id} className="skill-column flex flex-col will-change-transform">
-              {/* Category Header Bar */}
-              <div className="flex items-baseline justify-between font-mono text-xs text-muted mb-3">
-                <span className="text-foreground/80 font-semibold">[{cat.number}]</span>
-                <span>[{cat.count} DISCIPLINES]</span>
+          {categories.map((cat, idx) => {
+            const skillList = (cat.items || cat.skills || []).map((s, i) => {
+              if (typeof s === 'string') {
+                return { index: String(i + 1).padStart(2, '0'), name: s };
+              }
+              return s;
+            });
+            const catNumber = cat.number || String(idx + 1).padStart(2, '0');
+            const countLabel = cat.count || String(skillList.length).padStart(2, '0');
+
+            return (
+              <div key={cat.id} className="skill-column flex flex-col will-change-transform">
+                {/* Category Header Bar */}
+                <div className="flex items-baseline justify-between font-mono text-xs text-muted mb-3">
+                  <span className="text-foreground/80 font-semibold">[{catNumber}]</span>
+                  <span>[{countLabel} DISCIPLINES]</span>
+                </div>
+
+                {/* Giant Category Title */}
+                <h3 className="text-3xl sm:text-4xl md:text-5xl font-sans font-bold uppercase tracking-tighter text-foreground mb-4">
+                  {cat.title}
+                </h3>
+
+                {/* Thin Divider */}
+                <div className="w-full h-px bg-border mb-6" />
+
+                {/* Numbered Skill Rows */}
+                <ul className="space-y-0">
+                  {skillList.map((skill) => (
+                    <li
+                      key={skill.name}
+                      data-cursor="link"
+                      onMouseEnter={() => handleSkillHoverStart(skill)}
+                      onMouseLeave={handleSkillHoverEnd}
+                      className="skill-row-item group relative py-3.5 border-b border-border/70 flex items-center justify-between cursor-pointer transition-all duration-300"
+                    >
+                      <div className="flex items-center gap-4 group-hover:translate-x-2 transition-transform duration-300 ease-out">
+                        <span className="font-mono text-xs text-muted group-hover:text-foreground transition-colors shrink-0">
+                          {skill.index}
+                        </span>
+                        <span className="font-sans text-base sm:text-lg text-foreground/90 group-hover:text-foreground font-medium tracking-tight">
+                          {skill.name}
+                        </span>
+                      </div>
+
+                      {/* Animated Arrow Icon */}
+                      <div className="opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 text-foreground">
+                        <ArrowUpRight className="w-4 h-4" />
+                      </div>
+
+                      {/* Expanding Bottom Underline Accent */}
+                      <span className="absolute left-0 bottom-0 w-full h-px bg-foreground scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-300 ease-out pointer-events-none" />
+                    </li>
+                  ))}
+                </ul>
               </div>
-
-              {/* Giant Category Title */}
-              <h3 className="text-3xl sm:text-4xl md:text-5xl font-sans font-bold uppercase tracking-tighter text-foreground mb-4">
-                {cat.title}
-              </h3>
-
-              {/* Thin Divider */}
-              <div className="w-full h-px bg-border mb-6" />
-
-              {/* Numbered Skill Rows */}
-              <ul className="space-y-0">
-                {cat.skills.map((skill) => (
-                  <li
-                    key={skill.name}
-                    data-cursor="link"
-                    onMouseEnter={() => handleSkillHoverStart(skill)}
-                    onMouseLeave={handleSkillHoverEnd}
-                    className="skill-row-item group relative py-3.5 border-b border-border/70 flex items-center justify-between cursor-pointer transition-all duration-300"
-                  >
-                    <div className="flex items-center gap-4 group-hover:translate-x-2 transition-transform duration-300 ease-out">
-                      <span className="font-mono text-xs text-muted group-hover:text-foreground transition-colors shrink-0">
-                        {skill.index}
-                      </span>
-                      <span className="font-sans text-base sm:text-lg text-foreground/90 group-hover:text-foreground font-medium tracking-tight">
-                        {skill.name}
-                      </span>
-                    </div>
-
-                    {/* Animated Arrow Icon */}
-                    <div className="opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 text-foreground">
-                      <ArrowUpRight className="w-4 h-4" />
-                    </div>
-
-                    {/* Expanding Bottom Underline Accent */}
-                    <span className="absolute left-0 bottom-0 w-full h-px bg-foreground scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-300 ease-out pointer-events-none" />
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 
@@ -266,3 +291,4 @@ export const Skills: React.FC = () => {
 };
 
 export default Skills;
+

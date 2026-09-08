@@ -1,9 +1,18 @@
 import React, { useEffect, useRef } from 'react';
 import { ArrowUp, Asterisk } from 'lucide-react';
 import { MagneticButton } from '../MagneticButton/MagneticButton';
-import { gsap, ScrollTrigger } from '../../animations/gsapConfig';
+import { gsap } from '../../animations/gsapConfig';
+import { useWebsiteData } from '../../hooks/useWebsiteData';
+import { FooterContent } from '../../types';
 
-export const Footer: React.FC = () => {
+interface FooterProps {
+  content?: FooterContent;
+}
+
+export const Footer: React.FC<FooterProps> = ({ content: propContent }) => {
+  const { data } = useWebsiteData();
+  const content = propContent || data.footer;
+
   const footerRef = useRef<HTMLElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
   const brandRef = useRef<HTMLHeadingElement>(null);
@@ -13,7 +22,7 @@ export const Footer: React.FC = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const socialList = [
+  const socialList = content.socialLinks || [
     { label: 'LinkedIn', href: 'https://linkedin.com' },
     { label: 'Instagram', href: 'https://instagram.com' },
     { label: 'Behance', href: 'https://behance.net' },
@@ -87,6 +96,16 @@ export const Footer: React.FC = () => {
     return () => ctx.revert();
   }, []);
 
+  const location = content.location || 'INDIA';
+  const workingGlobally = content.workingGlobally || 'WORKING GLOBALLY';
+  const coordinates = content.coordinates || 'UTC +05:30 · 21.1702° N, 72.8311° E';
+  const email = content.email || 'hello@example.com';
+  const responseWindow = content.responseWindow || 'Response within 24–48 hours';
+  const brandText = content.brandText || 'DARSHIL BHUVA';
+  const copyright = content.copyright || '© 2026 ALL RIGHTS RESERVED';
+  const subCopyright = content.subCopyright || 'CREATIVE DIRECTION & INTERFACE ARCHITECTURE';
+  const editionMeta = content.editionMeta || 'PORTFOLIO VOL. 04';
+
   return (
     <footer
       ref={footerRef}
@@ -102,11 +121,11 @@ export const Footer: React.FC = () => {
           <div className="footer-col space-y-4">
             <span className="font-mono text-meta text-muted block">[01 // LOCATION]</span>
             <div className="font-mono text-sm uppercase text-foreground leading-relaxed">
-              <p className="font-semibold">INDIA</p>
-              <p className="text-muted">WORKING GLOBALLY</p>
+              <p className="font-semibold">{location}</p>
+              <p className="text-muted">{workingGlobally}</p>
             </div>
             <p className="font-mono text-[11px] text-muted/60 pt-2">
-              UTC +05:30 · 21.1702° N, 72.8311° E
+              {coordinates}
             </p>
           </div>
 
@@ -136,15 +155,15 @@ export const Footer: React.FC = () => {
             <span className="font-mono text-meta text-muted block">[03 // CONTACT]</span>
             <div className="space-y-2">
               <a
-                href="mailto:hello@example.com"
+                href={`mailto:${email}`}
                 data-cursor="link"
                 className="group relative inline-block font-mono text-sm uppercase text-foreground hover:opacity-80 transition-opacity"
               >
-                <span>hello@example.com</span>
+                <span>{email}</span>
                 <span className="absolute left-0 bottom-0 w-full h-px bg-foreground scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-300 ease-out" />
               </a>
               <p className="font-mono text-xs text-muted/70">
-                Response within 24–48 hours
+                {responseWindow}
               </p>
             </div>
           </div>
@@ -183,7 +202,7 @@ export const Footer: React.FC = () => {
             >
               <span className="block overflow-hidden py-1">
                 <span className="footer-brand-inner inline-block will-change-transform">
-                  DARSHIL BHUVA
+                  {brandText}
                 </span>
               </span>
             </h2>
@@ -194,9 +213,9 @@ export const Footer: React.FC = () => {
             ref={copyStripRef}
             className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 font-mono text-meta text-muted border-t border-border pt-6"
           >
-            <span>© 2026 ALL RIGHTS RESERVED</span>
-            <span>CREATIVE DIRECTION & INTERFACE ARCHITECTURE</span>
-            <span className="hidden md:inline">PORTFOLIO VOL. 04</span>
+            <span>{copyright}</span>
+            <span>{subCopyright}</span>
+            <span className="hidden md:inline">{editionMeta}</span>
           </div>
         </div>
       </div>
@@ -205,3 +224,4 @@ export const Footer: React.FC = () => {
 };
 
 export default Footer;
+

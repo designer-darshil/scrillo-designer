@@ -1,9 +1,18 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { projectsData, Project } from '../../data/projects';
+import { Project } from '../../types';
 import { ProjectRow } from '../../components/ProjectRow/ProjectRow';
-import { gsap, ScrollTrigger } from '../../animations/gsapConfig';
+import { gsap } from '../../animations/gsapConfig';
+import { useWebsiteData } from '../../hooks/useWebsiteData';
 
-export const SelectedWorks: React.FC = () => {
+interface SelectedWorksProps {
+  projects?: Project[];
+}
+
+export const SelectedWorks: React.FC<SelectedWorksProps> = ({ projects: propProjects }) => {
+  const { data } = useWebsiteData();
+  const rawProjects = propProjects || data.projects;
+  const projects = rawProjects.filter((p) => p.published !== false);
+
   const sectionRef = useRef<HTMLElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
   const labelRef = useRef<HTMLDivElement>(null);
@@ -13,7 +22,7 @@ export const SelectedWorks: React.FC = () => {
   const floatingPreviewRef = useRef<HTMLDivElement>(null);
   const previewImageRef = useRef<HTMLImageElement>(null);
 
-  const [activeProject, setActiveProject] = useState<Project | null>(null);
+  const [, setActiveProject] = useState<Project | null>(null);
 
   // ScrollTrigger reveals for section heading and project rows
   useEffect(() => {
@@ -134,14 +143,14 @@ export const SelectedWorks: React.FC = () => {
   }, []);
 
   // Handle row hover start on desktop
-  const handleHoverStart = (project: Project, e: React.MouseEvent) => {
+  const handleHoverStart = (project: Project) => {
     setActiveProject(project);
 
     const floatingContainer = floatingPreviewRef.current;
     const img = previewImageRef.current;
 
     if (floatingContainer && img) {
-      img.src = project.image;
+      img.src = project.coverImage || project.thumbnail || (project as any).image;
       gsap.killTweensOf(floatingContainer);
       gsap.fromTo(
         floatingContainer,
@@ -172,6 +181,8 @@ export const SelectedWorks: React.FC = () => {
     }
   };
 
+  const initialImage = projects[0]?.coverImage || projects[0]?.thumbnail || (projects[0] as any)?.image;
+
   return (
     <section
       ref={sectionRef}
@@ -187,7 +198,7 @@ export const SelectedWorks: React.FC = () => {
         <div className="w-[380px] lg:w-[420px] aspect-[16/10] overflow-hidden border border-border/80 bg-surface shadow-2xl">
           <img
             ref={previewImageRef}
-            src={projectsData[0].image}
+            src={initialImage}
             alt="Project Preview"
             className="w-full h-full object-cover filter grayscale contrast-125"
           />
@@ -222,7 +233,7 @@ export const SelectedWorks: React.FC = () => {
 
       {/* Project Rows Listing Container (NO CARD UI) */}
       <div ref={rowsContainerRef} className="w-full border-b border-border">
-        {projectsData.map((project, index) => (
+        {projects.map((project, index) => (
           <ProjectRow
             key={project.id}
             project={project}
@@ -235,7 +246,7 @@ export const SelectedWorks: React.FC = () => {
 
       {/* Section Bottom Meta */}
       <div className="page-container pt-8 flex items-center justify-between text-meta text-muted">
-        <span>ARCHIVE COUNT: 08 REPOSITORIES</span>
+        <span>ARCHIVE COUNT: {String(projects.length).padStart(2, '0')} REPOSITORIES</span>
         <span>ALL RIGHTS & ARTIFACTS RESERVED</span>
       </div>
     </section>
@@ -243,3 +254,4 @@ export const SelectedWorks: React.FC = () => {
 };
 
 export default SelectedWorks;
+

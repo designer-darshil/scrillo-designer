@@ -1,7 +1,16 @@
 import React, { useEffect, useRef } from 'react';
-import { gsap, ScrollTrigger } from '../../animations/gsapConfig';
+import { gsap } from '../../animations/gsapConfig';
+import { useWebsiteData } from '../../hooks/useWebsiteData';
+import { FullBleedImageContent } from '../../types';
 
-export const ExperimentalImage: React.FC = () => {
+interface ExperimentalImageProps {
+  content?: FullBleedImageContent;
+}
+
+export const ExperimentalImage: React.FC<ExperimentalImageProps> = ({ content: propContent }) => {
+  const { data } = useWebsiteData();
+  const content = propContent || data.image;
+
   const sectionRef = useRef<HTMLElement>(null);
   const imageWrapperRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
@@ -92,8 +101,8 @@ export const ExperimentalImage: React.FC = () => {
         {/* High-Resolution Black-and-White Cinematic Visual */}
         <img
           ref={imageRef}
-          src="https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=2400&q=85"
-          alt="Monolithic Architectural Visual Study"
+          src={content.image}
+          alt={content.alt}
           loading="lazy"
           className="w-full h-full object-cover filter grayscale contrast-125 brightness-90 will-change-transform"
         />
@@ -118,11 +127,11 @@ export const ExperimentalImage: React.FC = () => {
           <div className="page-container flex items-center justify-between text-meta text-foreground/90 drop-shadow-md">
             <span className="flex items-center gap-2">
               <span className="w-1.5 h-1.5 bg-foreground inline-block" />
-              <span>Selected visual study — 2026</span>
+              <span>{content.captionLeft}</span>
             </span>
 
             <span className="hidden sm:inline font-mono text-muted text-xs">
-              [SPATIAL ARTIFACT // 35MM MONOCHROME]
+              {content.captionRight}
             </span>
           </div>
         </div>
@@ -132,3 +141,4 @@ export const ExperimentalImage: React.FC = () => {
 };
 
 export default ExperimentalImage;
+

@@ -1,8 +1,17 @@
 import React, { useEffect, useRef } from 'react';
-import { gsap, ScrollTrigger } from '../../animations/gsapConfig';
+import { gsap } from '../../animations/gsapConfig';
 import { SectionLabel } from '../../components/SectionLabel/SectionLabel';
+import { useWebsiteData } from '../../hooks/useWebsiteData';
+import { AboutContent } from '../../types';
 
-export const Statement: React.FC = () => {
+interface StatementProps {
+  content?: AboutContent;
+}
+
+export const Statement: React.FC<StatementProps> = ({ content: propContent }) => {
+  const { data } = useWebsiteData();
+  const content = propContent || data.about;
+
   const containerRef = useRef<HTMLElement>(null);
   const headlineRef = useRef<HTMLDivElement>(null);
   const labelRef = useRef<HTMLDivElement>(null);
@@ -97,6 +106,14 @@ export const Statement: React.FC = () => {
     return () => ctx.revert();
   }, []);
 
+  const sectionNumber = content.number || '02';
+  const sectionLabel = content.label || 'CREATIVE MANIFESTO';
+  const line1 = content.line1 || 'BE CURIOUS.';
+  const line2 = content.line2 || 'BE BOLD.';
+  const line3 = content.line3 || 'BE USEFUL.';
+  const corePrinciples = content.corePrinciples || 'FORM AS CONSEQUENCE OF FUNCTION AND RESTRAINT';
+  const yearMeta = content.yearMeta || 'EST. 2026';
+
   return (
     <section
       ref={containerRef}
@@ -106,24 +123,24 @@ export const Statement: React.FC = () => {
       {/* Top Header Label */}
       <div className="page-container">
         <div ref={labelRef}>
-          <SectionLabel number="02" title="CREATIVE MANIFESTO" />
-          <h2 className="sr-only">Creative Manifesto: Be Curious, Be Bold, Be Useful</h2>
+          <SectionLabel number={sectionNumber} title={sectionLabel} />
+          <h2 className="sr-only">Creative Manifesto: {line1}, {line2}, {line3}</h2>
         </div>
       </div>
 
-      {/* Main Asymmetrical Statement Display: Huge Typography with Empty Space */}
+      {/* Main Asymmetrical Statement Display */}
       <div className="page-container my-auto py-16 sm:py-24">
         <div ref={headlineRef} className="max-w-7xl space-y-4 sm:space-y-6">
           {/* Line 1: BE CURIOUS.* */}
           <div className="flex flex-wrap items-baseline gap-x-4 sm:gap-x-8">
             <span className="overflow-hidden inline-block py-1">
               <span className="statement-word inline-block font-sans text-display font-bold uppercase tracking-display text-foreground leading-[0.90] will-change-transform">
-                BE
+                {line1.split(' ')[0] || 'BE'}
               </span>
             </span>
             <span className="overflow-hidden inline-block py-1">
               <span className="statement-word inline-block font-sans text-display font-bold uppercase tracking-display text-foreground leading-[0.90] will-change-transform">
-                CURIOUS.
+                {line1.split(' ').slice(1).join(' ') || 'CURIOUS.'}
               </span>
             </span>
             <span aria-hidden="true" className="statement-symbol font-mono text-2xl sm:text-4xl text-muted opacity-80 align-super select-none">
@@ -135,12 +152,12 @@ export const Statement: React.FC = () => {
           <div className="flex flex-wrap items-baseline gap-x-4 sm:gap-x-8 pl-0 sm:pl-16 md:pl-32 lg:pl-48">
             <span className="overflow-hidden inline-block py-1">
               <span className="statement-word inline-block font-sans text-display font-bold uppercase tracking-display text-muted leading-[0.90] will-change-transform">
-                BE
+                {line2.split(' ')[0] || 'BE'}
               </span>
             </span>
             <span className="overflow-hidden inline-block py-1">
               <span className="statement-word inline-block font-sans text-display font-bold uppercase tracking-display text-foreground leading-[0.90] will-change-transform">
-                BOLD.
+                {line2.split(' ').slice(1).join(' ') || 'BOLD.'}
               </span>
             </span>
             <span aria-hidden="true" className="statement-symbol font-mono text-2xl sm:text-4xl text-muted opacity-80 align-super select-none">
@@ -152,12 +169,12 @@ export const Statement: React.FC = () => {
           <div className="flex flex-wrap items-baseline gap-x-4 sm:gap-x-8 pl-0 sm:pl-8 md:pl-16">
             <span className="overflow-hidden inline-block py-1">
               <span className="statement-word inline-block font-sans text-display font-bold uppercase tracking-display text-foreground leading-[0.90] will-change-transform">
-                BE
+                {line3.split(' ')[0] || 'BE'}
               </span>
             </span>
             <span className="overflow-hidden inline-block py-1">
               <span className="statement-word inline-block font-sans text-display font-bold uppercase tracking-display text-foreground leading-[0.90] will-change-transform">
-                USEFUL.
+                {line3.split(' ').slice(1).join(' ') || 'USEFUL.'}
               </span>
             </span>
             <div aria-hidden="true" className="inline-flex items-center gap-1.5 text-muted opacity-80 align-super select-none">
@@ -172,8 +189,8 @@ export const Statement: React.FC = () => {
       <div className="page-container border-t border-border pt-6">
         <div ref={metaRef} className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 font-mono text-meta text-muted">
           <span>[CORE DISCIPLINE PRINCIPLES]</span>
-          <span className="text-foreground/80">FORM AS CONSEQUENCE OF FUNCTION AND RESTRAINT</span>
-          <span>EST. 2026</span>
+          <span className="text-foreground/80">{corePrinciples}</span>
+          <span>{yearMeta}</span>
         </div>
       </div>
     </section>
@@ -181,3 +198,4 @@ export const Statement: React.FC = () => {
 };
 
 export default Statement;
+

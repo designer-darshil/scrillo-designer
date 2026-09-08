@@ -1,10 +1,19 @@
 import React, { useEffect, useRef } from 'react';
 import { SectionLabel } from '../../components/SectionLabel/SectionLabel';
 import { MagneticButton } from '../../components/MagneticButton/MagneticButton';
-import { ArrowRight, ArrowUpRight } from 'lucide-react';
-import { gsap, ScrollTrigger } from '../../animations/gsapConfig';
+import { ArrowRight } from 'lucide-react';
+import { gsap } from '../../animations/gsapConfig';
+import { useWebsiteData } from '../../hooks/useWebsiteData';
+import { ContactCTA as ContactCTAType } from '../../types';
 
-export const ContactCTA: React.FC = () => {
+interface ContactCTAProps {
+  content?: ContactCTAType;
+}
+
+export const ContactCTA: React.FC<ContactCTAProps> = ({ content: propContent }) => {
+  const { data } = useWebsiteData();
+  const content = propContent || data.contact;
+
   const sectionRef = useRef<HTMLElement>(null);
   const headlineRef = useRef<HTMLHeadingElement>(null);
   const labelRef = useRef<HTMLDivElement>(null);
@@ -13,7 +22,8 @@ export const ContactCTA: React.FC = () => {
   const bgGridRef = useRef<HTMLDivElement>(null);
   const metaRef = useRef<HTMLDivElement>(null);
 
-  const email = 'contact@darshilbhuva.com';
+  const email = content.email || 'contact@darshilbhuva.com';
+  const ctaLink = content.ctaLink || `mailto:${email}?subject=Project%20Inquiry`;
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -112,6 +122,15 @@ export const ContactCTA: React.FC = () => {
     return () => ctx.revert();
   }, []);
 
+  const sectionNumber = content.number || '06';
+  const sectionLabel = content.label || 'INITIATE COLLABORATION';
+  const line1 = content.headlineLine1 || 'HAVE SOMETHING';
+  const line2 = content.headlineLine2 || 'WORTH BUILDING?';
+  const secondary = content.secondaryLine || "Let's make it real.";
+  const ctaText = content.ctaText || 'START A PROJECT';
+  const availability = content.availabilityStatus || 'AVAILABLE FOR COMMISSIONS WORLDWIDE';
+  const coordinates = content.coordinates || '21.1702° N, 72.8311° E';
+
   return (
     <section
       ref={sectionRef}
@@ -128,11 +147,11 @@ export const ContactCTA: React.FC = () => {
       {/* Top Header Label */}
       <div className="page-container relative z-10">
         <div ref={labelRef}>
-          <SectionLabel number="06" title="INITIATE COLLABORATION" />
+          <SectionLabel number={sectionNumber} title={sectionLabel} />
         </div>
       </div>
 
-      {/* Main Climax Content: Extremely Large Typography & Huge Negative Space */}
+      {/* Main Climax Content */}
       <div className="page-container relative z-10 my-auto py-16 sm:py-24">
         <div className="max-w-6xl space-y-8 sm:space-y-12">
           {/* Main Huge Headline */}
@@ -142,12 +161,12 @@ export const ContactCTA: React.FC = () => {
           >
             <span className="block overflow-hidden py-1">
               <span className="cta-headline-line inline-block will-change-transform">
-                HAVE SOMETHING
+                {line1}
               </span>
             </span>
             <span className="block overflow-hidden py-1">
               <span className="cta-headline-line inline-block will-change-transform text-muted">
-                WORTH BUILDING?
+                {line2}
               </span>
             </span>
           </h2>
@@ -157,19 +176,19 @@ export const ContactCTA: React.FC = () => {
             ref={secondaryRef}
             className="text-2xl sm:text-3xl md:text-4xl text-muted font-light tracking-tight"
           >
-            Let's make it real.
+            {secondary}
           </p>
 
           {/* Primary CTA Button with Magnetic Pull & Inverted Color Hover */}
           <div ref={ctaBtnRef} className="pt-4 sm:pt-6 w-full sm:w-auto">
             <MagneticButton strength={0.35} className="w-full sm:w-auto">
               <a
-                href={`mailto:${email}?subject=Project%20Inquiry`}
+                href={ctaLink}
                 data-cursor="cta"
                 data-cursor-text="OPEN →"
                 className="group w-full sm:w-auto min-h-[52px] inline-flex items-center justify-between sm:justify-center gap-4 sm:gap-6 px-8 sm:px-12 py-5 sm:py-7 bg-foreground text-background border border-foreground font-mono text-xs sm:text-base font-bold uppercase tracking-widest hover:bg-transparent hover:text-foreground transition-all duration-300 focus-visible:outline focus-visible:outline-1 focus-visible:outline-foreground"
               >
-                <span>START A PROJECT</span>
+                <span>{ctaText}</span>
                 <div className="w-6 h-6 flex items-center justify-center text-background group-hover:text-foreground group-hover:translate-x-2 transition-all duration-300 shrink-0">
                   <ArrowRight className="w-5 h-5" />
                 </div>
@@ -187,7 +206,7 @@ export const ContactCTA: React.FC = () => {
         >
           <div className="flex items-center gap-3">
             <span className="w-2 h-2 rounded-full bg-emerald-400 inline-block animate-pulse" />
-            <span className="text-foreground/90">AVAILABLE FOR COMMISSIONS WORLDWIDE</span>
+            <span className="text-foreground/90">{availability}</span>
           </div>
 
           <a
@@ -197,7 +216,7 @@ export const ContactCTA: React.FC = () => {
             {email}
           </a>
 
-          <span>21.1702° N, 72.8311° E</span>
+          <span>{coordinates}</span>
         </div>
       </div>
     </section>
@@ -205,3 +224,4 @@ export const ContactCTA: React.FC = () => {
 };
 
 export default ContactCTA;
+

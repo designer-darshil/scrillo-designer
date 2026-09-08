@@ -12,6 +12,8 @@ export const Statement: React.FC<StatementProps> = ({ content: propContent }) =>
   const { data } = useWebsiteData();
   const content = propContent || data.about;
 
+  if (content.visible === false) return null;
+
   const containerRef = useRef<HTMLElement>(null);
   const headlineRef = useRef<HTMLDivElement>(null);
   const labelRef = useRef<HTMLDivElement>(null);
@@ -111,7 +113,7 @@ export const Statement: React.FC<StatementProps> = ({ content: propContent }) =>
   const line1 = content.line1 || 'BE CURIOUS.';
   const line2 = content.line2 || 'BE BOLD.';
   const line3 = content.line3 || 'BE USEFUL.';
-  const corePrinciples = content.corePrinciples || 'FORM AS CONSEQUENCE OF FUNCTION AND RESTRAINT';
+  const corePrinciples = content.supportingText || content.corePrinciples || 'FORM AS CONSEQUENCE OF FUNCTION AND RESTRAINT';
   const yearMeta = content.yearMeta || 'EST. 2026';
 
   return (

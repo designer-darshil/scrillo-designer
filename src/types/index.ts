@@ -66,7 +66,9 @@ export interface AboutContent {
   line3?: string;
   subtext?: string;
   corePrinciples?: string;
+  supportingText?: string;
   yearMeta?: string;
+  visible?: boolean;
 }
 
 export interface MarqueeContent {
@@ -139,11 +141,16 @@ export interface PhilosophyContent {
   number?: string;
   label: string;
   title?: string;
+  mainStatement?: string;
   line1: string;
   line2: string;
   line3: string;
-  yearMeta: string;
+  supportingText?: string;
   subMeta?: string;
+  author?: string;
+  attribution?: string;
+  yearMeta: string;
+  visible?: boolean;
 }
 
 export interface FullBleedImageContent {
@@ -156,14 +163,19 @@ export interface FullBleedImageContent {
 export interface ContactCTA {
   number?: string;
   label: string;
+  heading?: string;
   headlineLine1: string;
   headlineLine2: string;
+  secondaryText?: string;
   secondaryLine: string;
+  buttonText?: string;
   ctaText: string;
+  buttonLink?: string;
   ctaLink?: string;
   email: string;
   availabilityStatus?: string;
   coordinates?: string;
+  visible?: boolean;
 }
 
 export interface SocialLink {

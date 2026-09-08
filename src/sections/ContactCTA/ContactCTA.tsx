@@ -14,6 +14,8 @@ export const ContactCTA: React.FC<ContactCTAProps> = ({ content: propContent }) 
   const { data } = useWebsiteData();
   const content = propContent || data.contact;
 
+  if (content.visible === false) return null;
+
   const sectionRef = useRef<HTMLElement>(null);
   const headlineRef = useRef<HTMLHeadingElement>(null);
   const labelRef = useRef<HTMLDivElement>(null);
@@ -23,7 +25,6 @@ export const ContactCTA: React.FC<ContactCTAProps> = ({ content: propContent }) 
   const metaRef = useRef<HTMLDivElement>(null);
 
   const email = content.email || 'contact@darshilbhuva.com';
-  const ctaLink = content.ctaLink || `mailto:${email}?subject=Project%20Inquiry`;
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -124,10 +125,11 @@ export const ContactCTA: React.FC<ContactCTAProps> = ({ content: propContent }) 
 
   const sectionNumber = content.number || '06';
   const sectionLabel = content.label || 'INITIATE COLLABORATION';
-  const line1 = content.headlineLine1 || 'HAVE SOMETHING';
-  const line2 = content.headlineLine2 || 'WORTH BUILDING?';
-  const secondary = content.secondaryLine || "Let's make it real.";
-  const ctaText = content.ctaText || 'START A PROJECT';
+  const line1 = content.headlineLine1 || (content.heading ? content.heading.split('\n')[0] : 'HAVE SOMETHING');
+  const line2 = content.headlineLine2 || (content.heading ? content.heading.split('\n')[1] || '' : 'WORTH BUILDING?');
+  const secondary = content.secondaryText || content.secondaryLine || "Let's make it real.";
+  const ctaText = content.buttonText || content.ctaText || 'START A PROJECT';
+  const ctaLink = content.buttonLink || content.ctaLink || `mailto:${email}?subject=Project%20Inquiry`;
   const availability = content.availabilityStatus || 'AVAILABLE FOR COMMISSIONS WORLDWIDE';
   const coordinates = content.coordinates || '21.1702° N, 72.8311° E';
 

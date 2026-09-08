@@ -49,6 +49,9 @@ export const websiteService = {
           hero: memoryStore.hero,
           about: memoryStore.about,
           marquee: memoryStore.marquee,
+          philosophy: memoryStore.philosophy,
+          contact: memoryStore.contact,
+          footer: memoryStore.footer,
         };
       }
 
@@ -60,17 +63,26 @@ export const websiteService = {
       if (map.hero) memoryStore.hero = map.hero;
       if (map.about) memoryStore.about = map.about;
       if (map.marquee) memoryStore.marquee = map.marquee;
+      if (map.philosophy) memoryStore.philosophy = map.philosophy;
+      if (map.contact) memoryStore.contact = map.contact;
+      if (map.footer) memoryStore.footer = map.footer;
 
       return {
         hero: map.hero || memoryStore.hero,
         about: map.about || memoryStore.about,
         marquee: map.marquee || memoryStore.marquee,
+        philosophy: map.philosophy || memoryStore.philosophy,
+        contact: map.contact || memoryStore.contact,
+        footer: map.footer || memoryStore.footer,
       };
     } catch {
       return {
         hero: memoryStore.hero,
         about: memoryStore.about,
         marquee: memoryStore.marquee,
+        philosophy: memoryStore.philosophy,
+        contact: memoryStore.contact,
+        footer: memoryStore.footer,
       };
     }
   },
@@ -107,7 +119,7 @@ export const websiteService = {
   },
 
   /**
-   * Fetch About content
+   * Fetch About content (Creative Statement)
    */
   async getAboutContent(): Promise<AboutContent> {
     if (!isSupabaseConfigured) return memoryStore.about;
@@ -168,16 +180,70 @@ export const websiteService = {
     }
   },
 
+  /**
+   * Fetch Philosophy content
+   */
+  async getPhilosophyContent(): Promise<PhilosophyContent> {
+    if (!isSupabaseConfigured) return memoryStore.philosophy;
+    try {
+      const { data, error } = await supabase.from('website_content').select('content').eq('section', 'philosophy').single();
+      if (error || !data?.content) return memoryStore.philosophy;
+      memoryStore.philosophy = data.content as PhilosophyContent;
+      return memoryStore.philosophy;
+    } catch {
+      return memoryStore.philosophy;
+    }
+  },
+
+  /**
+   * Update Philosophy content in Supabase and memory store
+   */
+  async updatePhilosophyContent(content: PhilosophyContent): Promise<boolean> {
+    memoryStore.philosophy = { ...content };
+    if (!isSupabaseConfigured) return true;
+    try {
+      const { error } = await supabase
+        .from('website_content')
+        .upsert({ section: 'philosophy', content, updated_at: new Date().toISOString() }, { onConflict: 'section' });
+      return !error;
+    } catch {
+      return false;
+    }
+  },
+
+  /**
+   * Fetch Contact CTA content
+   */
+  async getContactCTAContent(): Promise<ContactCTA> {
+    if (!isSupabaseConfigured) return memoryStore.contact;
+    try {
+      const { data, error } = await supabase.from('website_content').select('content').eq('section', 'contact').single();
+      if (error || !data?.content) return memoryStore.contact;
+      memoryStore.contact = data.content as ContactCTA;
+      return memoryStore.contact;
+    } catch {
+      return memoryStore.contact;
+    }
+  },
+
+  /**
+   * Update Contact CTA content in Supabase and memory store
+   */
+  async updateContactCTAContent(content: ContactCTA): Promise<boolean> {
+    memoryStore.contact = { ...content };
+    if (!isSupabaseConfigured) return true;
+    try {
+      const { error } = await supabase
+        .from('website_content')
+        .upsert({ section: 'contact', content, updated_at: new Date().toISOString() }, { onConflict: 'section' });
+      return !error;
+    } catch {
+      return false;
+    }
+  },
+
   async getStatementContent(): Promise<AboutContent> {
     return this.getAboutContent();
-  },
-
-  async getPhilosophyContent(): Promise<PhilosophyContent> {
-    return memoryStore.philosophy;
-  },
-
-  async getContactCTAContent(): Promise<ContactCTA> {
-    return memoryStore.contact;
   },
 
   async getFooterContent(): Promise<FooterContent> {
@@ -186,5 +252,3 @@ export const websiteService = {
 };
 
 export default websiteService;
-
-

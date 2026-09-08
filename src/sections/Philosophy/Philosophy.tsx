@@ -12,6 +12,8 @@ export const Philosophy: React.FC<PhilosophyProps> = ({ content: propContent }) 
   const { data } = useWebsiteData();
   const content = propContent || data.philosophy;
 
+  if (content.visible === false) return null;
+
   const containerRef = useRef<HTMLElement>(null);
   const headlineRef = useRef<HTMLHeadingElement>(null);
   const labelRef = useRef<HTMLDivElement>(null);
@@ -97,8 +99,8 @@ export const Philosophy: React.FC<PhilosophyProps> = ({ content: propContent }) 
   const line1 = content.line1 || 'Great design';
   const line2 = content.line2 || 'should feel obvious';
   const line3 = content.line3 || 'after you see it.';
-  const yearMeta = content.yearMeta || '— 2026';
-  const subMeta = content.subMeta || 'PHILOSOPHY STATEMENT';
+  const yearMeta = content.author || content.attribution || content.yearMeta || '— 2026';
+  const subMeta = content.supportingText || content.subMeta || 'PHILOSOPHY STATEMENT';
 
   return (
     <section

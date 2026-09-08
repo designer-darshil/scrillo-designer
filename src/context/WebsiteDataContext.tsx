@@ -1,5 +1,16 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { WebsiteData, HeroContent, AboutContent, MarqueeContent, Project, SkillCategory, SkillItem, Service } from '../types';
+import {
+  WebsiteData,
+  HeroContent,
+  AboutContent,
+  MarqueeContent,
+  Project,
+  SkillCategory,
+  SkillItem,
+  Service,
+  PhilosophyContent,
+  ContactCTA,
+} from '../types';
 import { defaultWebsiteData } from '../data/defaultWebsiteData';
 import { websiteService } from '../admin/services/websiteService';
 import { projectService } from '../admin/services/projectService';
@@ -14,7 +25,10 @@ interface WebsiteDataContextType {
   updateHero: (hero: HeroContent) => Promise<boolean>;
   updateAbout: (about: AboutContent) => Promise<boolean>;
   updateMarquee: (marquee: MarqueeContent) => Promise<boolean>;
+  updatePhilosophy: (philosophy: PhilosophyContent) => Promise<boolean>;
+  updateContactCTA: (contact: ContactCTA) => Promise<boolean>;
   updateSectionVisibility: (sectionId: string, visible: boolean) => void;
+  // Project methods
   createProject: (project: Omit<Project, 'id'> & { id?: string }) => Promise<Project | null>;
   updateProject: (id: string, updates: Partial<Project>) => Promise<boolean>;
   deleteProject: (id: string) => Promise<boolean>;
@@ -51,6 +65,8 @@ const WebsiteDataContext = createContext<WebsiteDataContextType>({
   updateHero: async () => true,
   updateAbout: async () => true,
   updateMarquee: async () => true,
+  updatePhilosophy: async () => true,
+  updateContactCTA: async () => true,
   updateSectionVisibility: () => {},
   createProject: async () => null,
   updateProject: async () => true,
@@ -98,6 +114,8 @@ export const WebsiteDataProvider: React.FC<{ children: React.ReactNode }> = ({ c
         hero: remoteData.hero || prev.hero,
         about: remoteData.about || prev.about,
         marquee: remoteData.marquee || prev.marquee,
+        philosophy: remoteData.philosophy || prev.philosophy,
+        contact: remoteData.contact || prev.contact,
         projects: projects && projects.length > 0 ? projects : prev.projects,
         skills: skills && skills.length > 0 ? skills : prev.skills,
         services: services && services.length > 0 ? services : prev.services,
@@ -142,6 +160,30 @@ export const WebsiteDataProvider: React.FC<{ children: React.ReactNode }> = ({ c
       const success = await websiteService.updateMarqueeContent(marquee);
       if (success) {
         setData((prev) => ({ ...prev, marquee }));
+      }
+      return success;
+    } catch {
+      return false;
+    }
+  };
+
+  const updatePhilosophy = async (philosophy: PhilosophyContent): Promise<boolean> => {
+    try {
+      const success = await websiteService.updatePhilosophyContent(philosophy);
+      if (success) {
+        setData((prev) => ({ ...prev, philosophy }));
+      }
+      return success;
+    } catch {
+      return false;
+    }
+  };
+
+  const updateContactCTA = async (contact: ContactCTA): Promise<boolean> => {
+    try {
+      const success = await websiteService.updateContactCTAContent(contact);
+      if (success) {
+        setData((prev) => ({ ...prev, contact }));
       }
       return success;
     } catch {
@@ -555,6 +597,8 @@ export const WebsiteDataProvider: React.FC<{ children: React.ReactNode }> = ({ c
         updateHero,
         updateAbout,
         updateMarquee,
+        updatePhilosophy,
+        updateContactCTA,
         updateSectionVisibility,
         createProject,
         updateProject,
@@ -598,6 +642,8 @@ export const useWebsiteData = () => {
       updateHero: async () => true,
       updateAbout: async () => true,
       updateMarquee: async () => true,
+      updatePhilosophy: async () => true,
+      updateContactCTA: async () => true,
       updateSectionVisibility: () => {},
       createProject: async () => null,
       updateProject: async () => true,

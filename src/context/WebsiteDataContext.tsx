@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import {
   WebsiteData,
   HeroContent,
@@ -12,6 +12,7 @@ import {
   ContactCTA,
   FooterContent,
   WebsiteSettings,
+  ContentDiffSummary,
 } from '../types';
 import { defaultWebsiteData } from '../data/defaultWebsiteData';
 import { websiteService } from '../admin/services/websiteService';
@@ -19,12 +20,18 @@ import { settingsService } from '../admin/services/settingsService';
 import { projectService } from '../admin/services/projectService';
 import { skillService } from '../admin/services/skillService';
 import { servicesService } from '../admin/services/servicesService';
+import { publishService } from '../admin/services/publishService';
 
 interface WebsiteDataContextType {
   data: WebsiteData;
+  publishedData: WebsiteData;
+  diffSummary: ContentDiffSummary;
+  isDraftModified: boolean;
   loading: boolean;
   error: string | null;
   refreshData: () => Promise<void>;
+  publishDraft: () => Promise<boolean>;
+  revertToPublished: () => Promise<boolean>;
   updateHero: (hero: HeroContent) => Promise<boolean>;
   updateAbout: (about: AboutContent) => Promise<boolean>;
   updateMarquee: (marquee: MarqueeContent) => Promise<boolean>;
@@ -62,11 +69,22 @@ interface WebsiteDataContextType {
   toggleServiceVisibility: (id: string) => Promise<boolean>;
 }
 
+const defaultDiffSummary: ContentDiffSummary = {
+  hasChanges: false,
+  totalChanges: 0,
+  items: [],
+};
+
 const WebsiteDataContext = createContext<WebsiteDataContextType>({
   data: defaultWebsiteData,
+  publishedData: defaultWebsiteData,
+  diffSummary: defaultDiffSummary,
+  isDraftModified: false,
   loading: false,
   error: null,
   refreshData: async () => {},
+  publishDraft: async () => true,
+  revertToPublished: async () => true,
   updateHero: async () => true,
   updateAbout: async () => true,
   updateMarquee: async () => true,
@@ -103,18 +121,20 @@ const WebsiteDataContext = createContext<WebsiteDataContextType>({
 
 export const WebsiteDataProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [data, setData] = useState<WebsiteData>(defaultWebsiteData);
+  const [publishedData, setPublishedData] = useState<WebsiteData>(defaultWebsiteData);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
   const refreshData = useCallback(async () => {
     try {
       setLoading(true);
-      const [remoteData, projects, skills, services, settings] = await Promise.all([
+      const [remoteData, projects, skills, services, settings, publishedSnapshot] = await Promise.all([
         websiteService.getWebsiteData(),
         projectService.getProjects(),
         skillService.getSkillCategories(),
         servicesService.getServices(),
         settingsService.getSettings(),
+        publishService.getPublishedSnapshot(),
       ]);
 
       setData((prev) => ({
@@ -129,6 +149,10 @@ export const WebsiteDataProvider: React.FC<{ children: React.ReactNode }> = ({ c
         skills: skills && skills.length > 0 ? skills : prev.skills,
         services: services && services.length > 0 ? services : prev.services,
       }));
+
+      if (publishedSnapshot) {
+        setPublishedData(publishedSnapshot);
+      }
     } catch (err: any) {
       setError(err?.message || 'Failed to load website data');
     } finally {
@@ -139,6 +163,42 @@ export const WebsiteDataProvider: React.FC<{ children: React.ReactNode }> = ({ c
   useEffect(() => {
     refreshData();
   }, [refreshData]);
+
+  // Compute live diff between working draft and published snapshot
+  const diffSummary = useMemo(() => {
+    return publishService.computeContentDiff(data, publishedData);
+  }, [data, publishedData]);
+
+  const isDraftModified = diffSummary.hasChanges;
+
+  // Publish working draft snapshot to live
+  const publishDraft = async (): Promise<boolean> => {
+    try {
+      const res = await publishService.publishDraft(data);
+      if (res.success) {
+        setPublishedData(JSON.parse(JSON.stringify(data)));
+        return true;
+      }
+      return false;
+    } catch {
+      return false;
+    }
+  };
+
+  // Revert working draft to current published snapshot
+  const revertToPublished = async (): Promise<boolean> => {
+    try {
+      const reverted = await publishService.revertDraftToPublished();
+      if (reverted) {
+        setData(JSON.parse(JSON.stringify(reverted)));
+        setPublishedData(JSON.parse(JSON.stringify(reverted)));
+        return true;
+      }
+      return false;
+    } catch {
+      return false;
+    }
+  };
 
   const updateHero = async (hero: HeroContent): Promise<boolean> => {
     try {
@@ -624,9 +684,14 @@ export const WebsiteDataProvider: React.FC<{ children: React.ReactNode }> = ({ c
     <WebsiteDataContext.Provider
       value={{
         data,
+        publishedData,
+        diffSummary,
+        isDraftModified,
         loading,
         error,
         refreshData,
+        publishDraft,
+        revertToPublished,
         updateHero,
         updateAbout,
         updateMarquee,
@@ -671,9 +736,14 @@ export const useWebsiteData = () => {
   if (!context) {
     return {
       data: defaultWebsiteData,
+      publishedData: defaultWebsiteData,
+      diffSummary: defaultDiffSummary,
+      isDraftModified: false,
       loading: false,
       error: null,
       refreshData: async () => {},
+      publishDraft: async () => true,
+      revertToPublished: async () => true,
       updateHero: async () => true,
       updateAbout: async () => true,
       updateMarquee: async () => true,

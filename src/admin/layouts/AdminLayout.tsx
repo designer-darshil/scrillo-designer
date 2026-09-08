@@ -20,9 +20,14 @@ import {
   CheckCircle2,
   Globe,
   Layers,
+  Eye,
+  UploadCloud,
+  RotateCcw,
 } from 'lucide-react';
 import { useTheme } from '../../hooks/useTheme';
 import { useAuth } from '../hooks/useAuth';
+import { useWebsiteData } from '../../hooks/useWebsiteData';
+import { PublishReviewModal } from '../components/PublishReviewModal';
 
 interface NavItem {
   path: string;
@@ -46,9 +51,14 @@ const navItems: NavItem[] = [
 export const AdminLayout: React.FC = () => {
   const { theme, toggleTheme } = useTheme();
   const { user, signOut } = useAuth();
+  const { diffSummary, isDraftModified, publishDraft, revertToPublished } = useWebsiteData();
+
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
+  const [reverting, setReverting] = useState(false);
+
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -66,6 +76,21 @@ export const AdminLayout: React.FC = () => {
   const handleSignOut = async () => {
     await signOut();
     navigate('/admin/login');
+  };
+
+  const handleRevert = async () => {
+    if (
+      window.confirm(
+        'Discard all unpublished draft revisions and revert back to the currently published live version?'
+      )
+    ) {
+      setReverting(true);
+      try {
+        await revertToPublished();
+      } finally {
+        setReverting(false);
+      }
+    }
   };
 
   const userEmail = user?.email || 'darshilbhuva4322@gmail.com';
@@ -100,6 +125,15 @@ export const AdminLayout: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-1.5">
+          <a
+            href="/?preview=true"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="p-2 rounded-md border border-border text-xs font-semibold text-foreground hover:bg-background"
+            title="Preview Draft"
+          >
+            <Eye className="w-4 h-4" />
+          </a>
           <button
             type="button"
             onClick={toggleTheme}
@@ -124,9 +158,7 @@ export const AdminLayout: React.FC = () => {
         className={`
           fixed lg:sticky top-0 left-0 z-50 h-screen border-r border-border bg-surface flex flex-col justify-between
           transition-all duration-300 ease-in-out shrink-0
-          ${/* Mobile Drawer Position */ ''}
           ${mobileDrawerOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
-          ${/* Tablet/Desktop Collapse Width */ ''}
           ${sidebarCollapsed ? 'w-20' : 'w-64'}
         `}
       >
@@ -140,16 +172,21 @@ export const AdminLayout: React.FC = () => {
               {!sidebarCollapsed && (
                 <div className="flex flex-col">
                   <span className="font-bold text-sm tracking-tight text-foreground">SCRiLLO Panel</span>
-                  <span className="text-[11px] text-muted">Admin Console</span>
+                  <div className="flex items-center gap-1.5">
+                    <span className={`w-1.5 h-1.5 rounded-full ${isDraftModified ? 'bg-amber-400 animate-pulse' : 'bg-emerald-500'}`} />
+                    <span className="text-[10px] text-muted uppercase font-mono">
+                      {isDraftModified ? 'Draft Modified' : 'Live Synced'}
+                    </span>
+                  </div>
                 </div>
               )}
             </div>
 
-            {/* Mobile Close Button */}
+            {/* Mobile Drawer Close */}
             <button
               type="button"
               onClick={() => setMobileDrawerOpen(false)}
-              className="lg:hidden p-1.5 rounded-md text-muted hover:text-foreground hover:bg-background"
+              className="p-1 rounded-md text-muted hover:text-foreground lg:hidden"
               aria-label="Close menu"
             >
               <X className="w-5 h-5" />
@@ -219,21 +256,21 @@ export const AdminLayout: React.FC = () => {
             )}
           </div>
 
-          {/* View Live Portfolio Link */}
+          {/* Quick Preview Draft Button */}
           <a
-            href="/"
+            href="/?preview=true"
             target="_blank"
             rel="noopener noreferrer"
-            title={sidebarCollapsed ? 'View Live Portfolio' : undefined}
-            className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium text-muted hover:text-foreground hover:bg-background border border-border/80 transition-colors ${
+            title={sidebarCollapsed ? 'Preview Draft Website' : undefined}
+            className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold bg-background hover:bg-surface border border-border text-foreground transition-colors ${
               sidebarCollapsed ? 'lg:justify-center' : 'justify-between'
             }`}
           >
             <span className="flex items-center gap-2">
-              <ExternalLink className="w-3.5 h-3.5 shrink-0" />
-              {!sidebarCollapsed && <span>View Portfolio</span>}
+              <Eye className="w-3.5 h-3.5 shrink-0 text-amber-500" />
+              {!sidebarCollapsed && <span>Preview Draft</span>}
             </span>
-            {!sidebarCollapsed && <span className="text-[10px] text-muted">↗</span>}
+            {!sidebarCollapsed && <span className="text-[10px] text-muted font-mono">↗</span>}
           </a>
 
           {/* Desktop/Tablet Collapse Toggle */}
@@ -260,17 +297,62 @@ export const AdminLayout: React.FC = () => {
       {/* Main Container */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Top Header Bar (Desktop & Tablet) */}
-        <header className="hidden lg:flex items-center justify-between px-8 py-4 border-b border-border bg-surface/90 backdrop-blur-md sticky top-0 z-20">
+        <header className="hidden lg:flex items-center justify-between px-8 py-3.5 border-b border-border bg-surface/90 backdrop-blur-md sticky top-0 z-20">
           {/* Breadcrumb / Page Title */}
           <div className="flex items-center gap-3">
             <span className="text-xs font-mono text-muted uppercase">Admin /</span>
             <h1 className="text-base font-bold tracking-tight text-foreground">{currentNav.label}</h1>
           </div>
 
-          {/* Right Header Controls */}
+          {/* Right Header Controls (Workflow & Actions) */}
           <div className="flex items-center gap-3">
+            {/* Revert to Published (if modified) */}
+            {isDraftModified && (
+              <button
+                type="button"
+                onClick={handleRevert}
+                disabled={reverting}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-surface text-xs font-medium text-muted hover:text-foreground hover:bg-background transition-colors"
+                title="Discard all unpublished draft changes and revert to live version"
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+                <span>Revert</span>
+              </button>
+            )}
+
+            {/* Preview Website Button */}
+            <a
+              href="/?preview=true"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg border border-border bg-surface hover:bg-background text-xs font-semibold text-foreground transition-colors shadow-2xs"
+            >
+              <Eye className="w-3.5 h-3.5 text-amber-500" />
+              <span>Preview Website</span>
+              <ExternalLink className="w-3 h-3 text-muted" />
+            </a>
+
+            {/* Publish Changes Button */}
+            <button
+              type="button"
+              onClick={() => setIsPublishModalOpen(true)}
+              className={`flex items-center gap-2 px-4 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all shadow-xs ${
+                isDraftModified
+                  ? 'bg-foreground text-background hover:opacity-90 cursor-pointer animate-in fade-in'
+                  : 'bg-surface border border-border text-muted opacity-60'
+              }`}
+            >
+              <UploadCloud className="w-3.5 h-3.5" />
+              <span>Publish Changes</span>
+              {isDraftModified && (
+                <span className="px-1.5 py-0.2 rounded-full bg-amber-400 text-black text-[10px] font-mono font-extrabold">
+                  {diffSummary.totalChanges}
+                </span>
+              )}
+            </button>
+
             {/* Notifications Placeholder */}
-            <div className="relative">
+            <div className="relative pl-1">
               <button
                 type="button"
                 onClick={() => setShowNotifications(!showNotifications)}
@@ -286,20 +368,20 @@ export const AdminLayout: React.FC = () => {
                   <div className="flex items-center justify-between border-b border-border pb-2.5">
                     <span className="font-semibold text-foreground flex items-center gap-1.5">
                       <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
-                      Notifications
+                      Publication Status
                     </span>
-                    <span className="text-[10px] text-muted bg-background px-2 py-0.5 rounded-full border border-border">
-                      All Synced
+                    <span className="text-[10px] text-muted bg-background px-2 py-0.5 rounded-full border border-border font-mono">
+                      {isDraftModified ? `${diffSummary.totalChanges} Pending` : 'Live Synced'}
                     </span>
                   </div>
                   <div className="space-y-2.5 text-muted">
                     <div className="p-2 rounded-lg bg-background border border-border">
-                      <p className="text-foreground font-medium text-xs">Portfolio Status: Active</p>
-                      <p className="text-[11px] text-muted mt-0.5">8 projects published to live portfolio.</p>
-                    </div>
-                    <div className="p-2 rounded-lg bg-background border border-border">
-                      <p className="text-foreground font-medium text-xs">Supabase Connected</p>
-                      <p className="text-[11px] text-muted mt-0.5">Schema synchronized and authenticated.</p>
+                      <p className="text-foreground font-medium text-xs">Draft Version</p>
+                      <p className="text-[11px] text-muted mt-0.5">
+                        {isDraftModified
+                          ? `${diffSummary.totalChanges} draft modifications ready to deploy.`
+                          : 'Draft is identical to the published version.'}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -310,35 +392,18 @@ export const AdminLayout: React.FC = () => {
             <button
               type="button"
               onClick={toggleTheme}
-              className="flex items-center gap-2 px-3 py-2 rounded-lg border border-border text-xs font-medium text-muted hover:text-foreground hover:bg-background transition-colors"
+              className="flex items-center gap-1.5 p-2 rounded-lg border border-border text-xs font-medium text-muted hover:text-foreground hover:bg-background transition-colors"
               aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
             >
               {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-indigo-400" />}
-              <span className="capitalize">{theme}</span>
             </button>
 
-            {/* Public Portfolio Link */}
-            <a
-              href="/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium text-muted hover:text-foreground hover:bg-background border border-border transition-colors"
-            >
-              <span>Live Site</span>
-              <ExternalLink className="w-3.5 h-3.5" />
-            </a>
-
             {/* Current User & Logout */}
-            <div className="flex items-center gap-2 pl-3 border-l border-border">
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-background border border-border text-xs">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse" />
-                <span className="font-medium text-foreground max-w-[140px] truncate">{userEmail}</span>
-              </div>
-
+            <div className="flex items-center gap-2 pl-2 border-l border-border">
               <button
                 type="button"
                 onClick={handleSignOut}
-                className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium text-red-400 hover:text-red-300 hover:bg-red-500/10 border border-border hover:border-red-500/30 transition-colors"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-red-400 hover:text-red-300 hover:bg-red-500/10 border border-border hover:border-red-500/30 transition-colors"
                 title="Sign Out"
               >
                 <LogOut className="w-3.5 h-3.5" />
@@ -353,6 +418,14 @@ export const AdminLayout: React.FC = () => {
           <Outlet />
         </main>
       </div>
+
+      {/* Global Publish Review Modal */}
+      <PublishReviewModal
+        isOpen={isPublishModalOpen}
+        onClose={() => setIsPublishModalOpen(false)}
+        diffSummary={diffSummary}
+        onConfirmPublish={publishDraft}
+      />
     </div>
   );
 };

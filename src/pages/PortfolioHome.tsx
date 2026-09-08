@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useLenis } from '../hooks/useLenis';
 import { Header } from '../components/Header/Header';
 import { Hero } from '../sections/Hero/Hero';
@@ -12,16 +13,30 @@ import { ExperimentalImage } from '../sections/ExperimentalImage/ExperimentalIma
 import { ContactCTA } from '../sections/ContactCTA/ContactCTA';
 import { Footer } from '../components/Footer/Footer';
 import { CustomCursor } from '../components/CustomCursor/CustomCursor';
+import { AdminPreviewBanner } from '../components/AdminPreviewBanner/AdminPreviewBanner';
+import { PublishReviewModal } from '../admin/components/PublishReviewModal';
 import { useWebsiteData } from '../hooks/useWebsiteData';
+import { useAuth } from '../admin/hooks/useAuth';
 import { SectionId } from '../types';
 
 export const PortfolioHome: React.FC = () => {
-  const { data } = useWebsiteData();
-  const [activeSection, setActiveSection] = useState('home');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const { data: draftData, publishedData, diffSummary, publishDraft } = useWebsiteData();
+  const { user } = useAuth();
 
-  const { settings } = data;
+  // Preview Mode: Requires authenticated admin and ?preview=true
+  const isPreviewRequested = searchParams.get('preview') === 'true';
+  const isPreviewActive = isPreviewRequested && !!user;
+
+  // Active content: Draft if previewing as authenticated admin, otherwise live published data
+  const activeData = isPreviewActive ? draftData : publishedData;
+
+  const [activeSection, setActiveSection] = useState('home');
+  const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
+
+  const { settings } = activeData;
   const { sections, colors, animations, seo } = settings;
-  const marquee = data.marquee;
+  const marquee = activeData.marquee;
 
   // Initialize Lenis smooth scroll foundation with settings flag
   const isSmoothScrollEnabled =
@@ -32,7 +47,7 @@ export const PortfolioHome: React.FC = () => {
   useEffect(() => {
     // 1. Title & SEO Metadata
     const siteTitle = seo?.metaTitle || settings.siteTitle || 'DARSHIL BHUVA — Principal Creative Technologist';
-    document.title = siteTitle;
+    document.title = isPreviewActive ? `[PREVIEW] ${siteTitle}` : siteTitle;
 
     const metaDescription = seo?.metaDescription || settings.siteDescription;
     if (metaDescription) {
@@ -106,7 +121,7 @@ export const PortfolioHome: React.FC = () => {
 
       styleEl.innerHTML = `${darkCss}\n${lightCss}`;
     }
-  }, [settings, seo, colors]);
+  }, [settings, seo, colors, isPreviewActive]);
 
   const isCursorEnabled =
     animations?.cursorEnabled !== false && settings.enableCustomCursor !== false;
@@ -115,7 +130,7 @@ export const PortfolioHome: React.FC = () => {
 
   // Section Component Map
   const sectionRenderMap: Record<SectionId, () => React.ReactNode> = {
-    hero: () => <Hero key="hero" content={data.hero} />,
+    hero: () => <Hero key="hero" content={activeData.hero} />,
     marquee: () =>
       isMarqueeEnabled ? (
         <Marquee
@@ -129,13 +144,13 @@ export const PortfolioHome: React.FC = () => {
           separator={marquee.separator || '✦'}
         />
       ) : null,
-    projects: () => <SelectedWorks key="projects" projects={data.projects} />,
-    statement: () => <Statement key="statement" content={data.about} />,
-    skills: () => <Skills key="skills" categories={data.skills} />,
-    philosophy: () => <Philosophy key="philosophy" content={data.philosophy} />,
-    services: () => <Services key="services" services={data.services} />,
-    image: () => <ExperimentalImage key="image" content={data.image} />,
-    contact: () => <ContactCTA key="contact" content={data.contact} />,
+    projects: () => <SelectedWorks key="projects" projects={activeData.projects} />,
+    statement: () => <Statement key="statement" content={activeData.about} />,
+    skills: () => <Skills key="skills" categories={activeData.skills} />,
+    philosophy: () => <Philosophy key="philosophy" content={activeData.philosophy} />,
+    services: () => <Services key="services" services={activeData.services} />,
+    image: () => <ExperimentalImage key="image" content={activeData.image} />,
+    contact: () => <ContactCTA key="contact" content={activeData.contact} />,
     footer: () => null, // Rendered as root terminal section
   };
 
@@ -145,8 +160,21 @@ export const PortfolioHome: React.FC = () => {
     .filter((id) => sections[id]?.visible !== false)
     .sort((a, b) => (sections[a]?.order ?? 0) - (sections[b]?.order ?? 0));
 
+  const handleExitPreview = () => {
+    searchParams.delete('preview');
+    setSearchParams(searchParams);
+  };
+
   return (
-    <div className="relative min-h-screen bg-background text-foreground selection:bg-foreground selection:text-background">
+    <div className={`relative min-h-screen bg-background text-foreground selection:bg-foreground selection:text-background ${isPreviewActive ? 'pt-10' : ''}`}>
+      {/* Admin Floating Preview Mode Banner */}
+      {isPreviewActive && (
+        <AdminPreviewBanner
+          onExitPreview={handleExitPreview}
+          onOpenPublishModal={() => setIsPublishModalOpen(true)}
+        />
+      )}
+
       {/* Accessible Skip to Content Link */}
       <a
         href="#main-content"
@@ -177,8 +205,16 @@ export const PortfolioHome: React.FC = () => {
 
       {/* Large Structural Editorial Footer */}
       {sections?.footer?.visible !== false && (
-        <Footer content={data.footer} />
+        <Footer content={activeData.footer} />
       )}
+
+      {/* Publish Review Modal from Preview Mode */}
+      <PublishReviewModal
+        isOpen={isPublishModalOpen}
+        onClose={() => setIsPublishModalOpen(false)}
+        diffSummary={diffSummary}
+        onConfirmPublish={publishDraft}
+      />
     </div>
   );
 };

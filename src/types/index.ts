@@ -241,3 +241,19 @@ export interface WebsiteData {
   contact: ContactCTA;
   footer: FooterContent;
 }
+
+export interface ContentDiffItem {
+  id: string;
+  category: 'Projects' | 'Content' | 'Skills' | 'Services' | 'Sections' | 'Settings' | 'Media';
+  title: string;
+  description: string;
+  type: 'added' | 'modified' | 'deleted' | 'reordered';
+}
+
+export interface ContentDiffSummary {
+  hasChanges: boolean;
+  totalChanges: number;
+  items: ContentDiffItem[];
+  lastPublishedAt?: string;
+  draftUpdatedAt?: string;
+}

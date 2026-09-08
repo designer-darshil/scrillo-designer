@@ -195,6 +195,8 @@ export const Hero: React.FC<HeroProps> = ({ onHoverStateChange }) => {
                 <button
                   type="button"
                   onClick={scrollToWorks}
+                  data-cursor="cta"
+                  data-cursor-text="OPEN →"
                   onMouseEnter={() => onHoverStateChange?.(true, 'link')}
                   onMouseLeave={() => onHoverStateChange?.(false)}
                   className="group flex items-center gap-4 px-6 sm:px-8 py-4 sm:py-5 bg-foreground text-background font-mono text-xs sm:text-sm font-semibold uppercase tracking-widest hover:bg-[#E0E0DC] transition-colors focus-visible:outline focus-visible:outline-1 focus-visible:outline-foreground"

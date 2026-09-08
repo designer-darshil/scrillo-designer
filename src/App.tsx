@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useLenis } from './hooks/useLenis';
 import { Header } from './components/Header/Header';
 import { Hero } from './sections/Hero/Hero';
+import { CustomCursor } from './components/CustomCursor/CustomCursor';
 
 export const App: React.FC = () => {
   // Initialize Lenis smooth scroll foundation
@@ -11,6 +12,9 @@ export const App: React.FC = () => {
 
   return (
     <div className="relative min-h-screen bg-background text-foreground selection:bg-foreground selection:text-background">
+      {/* Reusable High-Performance Desktop Custom Cursor */}
+      <CustomCursor />
+
       {/* Premium Minimalist Fixed Header */}
       <Header
         activeSection={activeSection}

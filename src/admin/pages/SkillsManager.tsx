@@ -1,54 +1,1081 @@
-import React from 'react';
-import { Sparkles, Plus } from 'lucide-react';
-import { skillCategories } from '../../data/skills';
+import React, { useState, useMemo } from 'react';
+import {
+  Sparkles,
+  Plus,
+  Edit,
+  Trash2,
+  Copy,
+  GripVertical,
+  ArrowUp,
+  ArrowDown,
+  Eye,
+  EyeOff,
+  ChevronDown,
+  ChevronUp,
+  Image as ImageIcon,
+  CheckCircle2,
+  AlertTriangle,
+  X,
+  ExternalLink,
+  Layers,
+  Save,
+} from 'lucide-react';
+import { useWebsiteData } from '../../hooks/useWebsiteData';
+import { SkillCategory, SkillItem } from '../../types';
+import { MediaPickerModal } from '../components/MediaPickerModal';
 
 export const SkillsManager: React.FC = () => {
+  const {
+    data,
+    createSkillCategory,
+    updateSkillCategory,
+    deleteSkillCategory,
+    duplicateSkillCategory,
+    reorderSkillCategories,
+    toggleSkillCategoryVisibility,
+    addSkillItem,
+    updateSkillItem,
+    deleteSkillItem,
+    reorderSkillItems,
+    toggleSkillVisibility,
+  } = useWebsiteData();
+
+  // Expanded categories state (all open by default for fast editing)
+  const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({});
+
+  // Category Modal state
+  const [categoryModal, setCategoryModal] = useState<{
+    isOpen: boolean;
+    mode: 'create' | 'edit';
+    category: Partial<SkillCategory>;
+  }>({
+    isOpen: false,
+    mode: 'create',
+    category: {},
+  });
+
+  // Skill Item Modal state
+  const [skillModal, setSkillModal] = useState<{
+    isOpen: boolean;
+    mode: 'create' | 'edit';
+    categoryId: string;
+    skillIndex?: number;
+    skill: Partial<SkillItem>;
+  }>({
+    isOpen: false,
+    mode: 'create',
+    categoryId: '',
+    skill: {},
+  });
+
+  // Delete Confirmation Modal state
+  const [deleteModal, setDeleteModal] = useState<{
+    isOpen: boolean;
+    type: 'category' | 'skill';
+    categoryId: string;
+    skillIndex?: number;
+    title: string;
+  } | null>(null);
+
+  // Media Picker Modal state for skill image
+  const [mediaPickerOpen, setMediaPickerOpen] = useState(false);
+
+  // Drag and Drop for Categories
+  const [draggedCatIndex, setDraggedCatIndex] = useState<number | null>(null);
+  const [dragOverCatIndex, setDragOverCatIndex] = useState<number | null>(null);
+
+  // Drag and Drop for Skills inside a Category
+  const [draggedSkillData, setDraggedSkillData] = useState<{ categoryId: string; index: number } | null>(null);
+  const [dragOverSkillData, setDragOverSkillData] = useState<{ categoryId: string; index: number } | null>(null);
+
+  // Toast feedback
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const showToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 3500);
+  };
+
+  const sortedCategories = useMemo(() => {
+    return [...data.skills].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+  }, [data.skills]);
+
+  // Toggle category expansion
+  const toggleExpand = (catId: string) => {
+    setExpandedCategories((prev) => ({
+      ...prev,
+      [catId]: prev[catId] === undefined ? false : !prev[catId],
+    }));
+  };
+
+  const isExpanded = (catId: string) => {
+    return expandedCategories[catId] !== false; // default expanded
+  };
+
+  // --- Category CRUD Handlers ---
+  const handleOpenCreateCategory = () => {
+    const nextOrder = data.skills.length + 1;
+    setCategoryModal({
+      isOpen: true,
+      mode: 'create',
+      category: {
+        title: '',
+        number: String(nextOrder).padStart(2, '0'),
+        description: '',
+        visible: true,
+        order: nextOrder,
+        items: [],
+      },
+    });
+  };
+
+  const handleOpenEditCategory = (cat: SkillCategory) => {
+    setCategoryModal({
+      isOpen: true,
+      mode: 'edit',
+      category: { ...cat },
+    });
+  };
+
+  const handleSaveCategory = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const cat = categoryModal.category;
+    if (!cat.title?.trim()) return;
+
+    if (categoryModal.mode === 'create') {
+      const created = await createSkillCategory({
+        title: cat.title.trim().toUpperCase(),
+        number: cat.number || String(data.skills.length + 1).padStart(2, '0'),
+        description: cat.description || '',
+        visible: cat.visible ?? true,
+        order: cat.order || data.skills.length + 1,
+        items: cat.items || [],
+      });
+      if (created) {
+        showToast(`Category "${created.title}" created.`);
+        setCategoryModal({ isOpen: false, mode: 'create', category: {} });
+      }
+    } else if (categoryModal.mode === 'edit' && cat.id) {
+      const success = await updateSkillCategory(cat.id, {
+        title: cat.title.trim().toUpperCase(),
+        number: cat.number,
+        description: cat.description,
+        visible: cat.visible,
+      });
+      if (success) {
+        showToast(`Category "${cat.title}" updated.`);
+        setCategoryModal({ isOpen: false, mode: 'create', category: {} });
+      }
+    }
+  };
+
+  const handleDuplicateCategory = async (catId: string) => {
+    const cloned = await duplicateSkillCategory(catId);
+    if (cloned) {
+      showToast(`Duplicated category "${cloned.title}".`);
+    }
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteModal) return;
+
+    if (deleteModal.type === 'category') {
+      const success = await deleteSkillCategory(deleteModal.categoryId);
+      if (success) {
+        showToast(`Deleted category "${deleteModal.title}".`);
+      }
+    } else if (deleteModal.type === 'skill' && deleteModal.skillIndex !== undefined) {
+      const success = await deleteSkillItem(deleteModal.categoryId, deleteModal.skillIndex);
+      if (success) {
+        showToast(`Deleted skill "${deleteModal.title}".`);
+      }
+    }
+    setDeleteModal(null);
+  };
+
+  // --- Skill Item CRUD Handlers ---
+  const handleOpenAddSkill = (categoryId: string) => {
+    const cat = data.skills.find((c) => c.id === categoryId);
+    const currentLength = (cat?.items || cat?.skills || []).length;
+    setSkillModal({
+      isOpen: true,
+      mode: 'create',
+      categoryId,
+      skill: {
+        name: '',
+        title: '',
+        index: String(currentLength + 1).padStart(2, '0'),
+        description: '',
+        visible: true,
+        image: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80',
+      },
+    });
+  };
+
+  const handleOpenEditSkill = (categoryId: string, skillIndex: number, skill: SkillItem) => {
+    setSkillModal({
+      isOpen: true,
+      mode: 'edit',
+      categoryId,
+      skillIndex,
+      skill: {
+        ...skill,
+        name: skill.name || skill.title || '',
+        title: skill.title || skill.name || '',
+      },
+    });
+  };
+
+  const handleSaveSkill = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const { categoryId, mode, skillIndex, skill } = skillModal;
+    const skillName = skill.name?.trim() || skill.title?.trim();
+    if (!skillName) return;
+
+    if (mode === 'create') {
+      const success = await addSkillItem(categoryId, {
+        name: skillName,
+        title: skillName,
+        description: skill.description || '',
+        image: skill.image || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80',
+        visible: skill.visible ?? true,
+      });
+      if (success) {
+        showToast(`Skill "${skillName}" added.`);
+        setSkillModal({ isOpen: false, mode: 'create', categoryId: '', skill: {} });
+      }
+    } else if (mode === 'edit' && skillIndex !== undefined) {
+      const success = await updateSkillItem(categoryId, skillIndex, {
+        name: skillName,
+        title: skillName,
+        description: skill.description,
+        image: skill.image,
+        visible: skill.visible,
+      });
+      if (success) {
+        showToast(`Skill "${skillName}" updated.`);
+        setSkillModal({ isOpen: false, mode: 'create', categoryId: '', skill: {} });
+      }
+    }
+  };
+
+  // --- Category Drag & Drop ---
+  const handleCategoryDragStart = (index: number) => {
+    setDraggedCatIndex(index);
+  };
+
+  const handleCategoryDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    if (draggedCatIndex === null || draggedCatIndex === index) return;
+    setDragOverCatIndex(index);
+  };
+
+  const handleCategoryDrop = async (targetIndex: number) => {
+    if (draggedCatIndex === null || draggedCatIndex === targetIndex) {
+      setDraggedCatIndex(null);
+      setDragOverCatIndex(null);
+      return;
+    }
+
+    const reordered = [...sortedCategories];
+    const [moved] = reordered.splice(draggedCatIndex, 1);
+    reordered.splice(targetIndex, 0, moved);
+
+    setDraggedCatIndex(null);
+    setDragOverCatIndex(null);
+
+    const orderedIds = reordered.map((c) => c.id);
+    const success = await reorderSkillCategories(orderedIds);
+    if (success) {
+      showToast('Category sequence updated.');
+    }
+  };
+
+  const handleMoveCategoryOrder = async (index: number, direction: 'up' | 'down') => {
+    const targetIndex = direction === 'up' ? index - 1 : index + 1;
+    if (targetIndex < 0 || targetIndex >= sortedCategories.length) return;
+
+    const reordered = [...sortedCategories];
+    const temp = reordered[index];
+    reordered[index] = reordered[targetIndex];
+    reordered[targetIndex] = temp;
+
+    const success = await reorderSkillCategories(reordered.map((c) => c.id));
+    if (success) {
+      showToast('Category order updated.');
+    }
+  };
+
+  // --- Skill Item Drag & Drop ---
+  const handleSkillDragStart = (categoryId: string, index: number) => {
+    setDraggedSkillData({ categoryId, index });
+  };
+
+  const handleSkillDragOver = (e: React.DragEvent, categoryId: string, index: number) => {
+    e.preventDefault();
+    if (!draggedSkillData || draggedSkillData.categoryId !== categoryId || draggedSkillData.index === index) return;
+    setDragOverSkillData({ categoryId, index });
+  };
+
+  const handleSkillDrop = async (categoryId: string, targetIndex: number) => {
+    if (!draggedSkillData || draggedSkillData.categoryId !== categoryId || draggedSkillData.index === targetIndex) {
+      setDraggedSkillData(null);
+      setDragOverSkillData(null);
+      return;
+    }
+
+    const cat = data.skills.find((c) => c.id === categoryId);
+    if (!cat) return;
+
+    const items = [...(cat.items || cat.skills || [])];
+    const [moved] = items.splice(draggedSkillData.index, 1);
+    items.splice(targetIndex, 0, moved);
+
+    setDraggedSkillData(null);
+    setDragOverSkillData(null);
+
+    const success = await reorderSkillItems(categoryId, items);
+    if (success) {
+      showToast('Skill ordering updated.');
+    }
+  };
+
+  const handleMoveSkillOrder = async (categoryId: string, index: number, direction: 'up' | 'down') => {
+    const cat = data.skills.find((c) => c.id === categoryId);
+    if (!cat) return;
+
+    const items = [...(cat.items || cat.skills || [])];
+    const targetIndex = direction === 'up' ? index - 1 : index + 1;
+    if (targetIndex < 0 || targetIndex >= items.length) return;
+
+    const temp = items[index];
+    items[index] = items[targetIndex];
+    items[targetIndex] = temp;
+
+    const success = await reorderSkillItems(categoryId, items);
+    if (success) {
+      showToast('Skill order updated.');
+    }
+  };
+
   return (
-    <div className="max-w-6xl space-y-8">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-6">
-        <div className="space-y-1">
-          <div className="flex items-center gap-2 font-mono text-xs text-muted">
-            <Sparkles className="w-4 h-4" />
-            <span>DISCIPLINE MATRIX</span>
-          </div>
-          <h2 className="text-xl sm:text-2xl font-sans font-bold uppercase tracking-tight text-foreground">
-            SKILLS MANAGER
-          </h2>
+    <div className="max-w-6xl mx-auto space-y-8 pb-16">
+      {/* Media Picker Modal */}
+      <MediaPickerModal
+        isOpen={mediaPickerOpen}
+        onClose={() => setMediaPickerOpen(false)}
+        onSelect={(url) => {
+          setSkillModal((prev) => ({
+            ...prev,
+            skill: { ...prev.skill, image: url },
+          }));
+        }}
+        title="Select Skill Visual Preview Asset"
+      />
+
+      {/* Toast Notification */}
+      {toastMessage && (
+        <div className="fixed bottom-6 right-6 z-50 rounded-xl border border-emerald-500/30 bg-surface p-4 shadow-xl flex items-center gap-3 text-xs text-foreground animate-in fade-in slide-in-from-bottom-2 duration-200">
+          <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+          <span className="font-medium">{toastMessage}</span>
         </div>
-        <button
-          type="button"
-          disabled
-          className="inline-flex items-center gap-2 px-4 py-2 bg-foreground text-background font-mono text-xs font-bold uppercase tracking-widest opacity-60 cursor-not-allowed"
-        >
-          <Plus className="w-3.5 h-3.5" />
-          <span>Add Skill</span>
-        </button>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {deleteModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="w-full max-w-md rounded-2xl border border-border bg-surface p-6 sm:p-8 space-y-6 shadow-2xl">
+            <div className="flex items-center gap-3 text-red-500">
+              <div className="p-2.5 rounded-xl bg-red-500/10 border border-red-500/20">
+                <AlertTriangle className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="text-base font-bold uppercase tracking-wide text-foreground">
+                  Confirm {deleteModal.type === 'category' ? 'Category' : 'Skill'} Deletion
+                </h3>
+                <p className="text-xs text-muted">
+                  {deleteModal.type === 'category'
+                    ? 'All skills nested in this category will be removed.'
+                    : 'This skill discipline will be removed from the matrix.'}
+                </p>
+              </div>
+            </div>
+
+            <div className="p-4 rounded-xl bg-background border border-border text-xs">
+              <p className="text-muted">Target Item:</p>
+              <p className="font-bold text-foreground text-sm uppercase mt-0.5">{deleteModal.title}</p>
+            </div>
+
+            <div className="flex items-center justify-end gap-2.5 pt-2">
+              <button
+                type="button"
+                onClick={() => setDeleteModal(null)}
+                className="px-4 py-2 rounded-xl border border-border text-xs font-medium text-muted hover:text-foreground hover:bg-background transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmDelete}
+                className="px-5 py-2 rounded-xl bg-red-500 text-white text-xs font-bold uppercase tracking-wider hover:bg-red-600 transition-colors"
+              >
+                Delete Item
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Category Create/Edit Modal */}
+      {categoryModal.isOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="w-full max-w-lg rounded-2xl border border-border bg-surface shadow-2xl overflow-hidden">
+            <form onSubmit={handleSaveCategory}>
+              <div className="flex items-center justify-between px-6 py-4 border-b border-border">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-foreground" />
+                  <h3 className="text-sm font-bold uppercase tracking-wider text-foreground">
+                    {categoryModal.mode === 'create' ? 'Create Skill Category' : 'Edit Category'}
+                  </h3>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setCategoryModal({ isOpen: false, mode: 'create', category: {} })}
+                  className="p-1 rounded-lg text-muted hover:text-foreground hover:bg-background transition-colors"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              <div className="p-6 space-y-4">
+                <div className="grid grid-cols-3 gap-3">
+                  <div className="space-y-1.5 col-span-2">
+                    <label htmlFor="cat-title-input" className="block text-xs font-semibold text-foreground">
+                      Category Title <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      id="cat-title-input"
+                      type="text"
+                      required
+                      value={categoryModal.category.title || ''}
+                      onChange={(e) =>
+                        setCategoryModal((prev) => ({
+                          ...prev,
+                          category: { ...prev.category, title: e.target.value.toUpperCase() },
+                        }))
+                      }
+                      placeholder="e.g. UI DESIGN"
+                      className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-background text-xs font-bold uppercase text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label htmlFor="cat-number-input" className="block text-xs font-semibold text-foreground">
+                      Number Index
+                    </label>
+                    <input
+                      id="cat-number-input"
+                      type="text"
+                      value={categoryModal.category.number || ''}
+                      onChange={(e) =>
+                        setCategoryModal((prev) => ({
+                          ...prev,
+                          category: { ...prev.category, number: e.target.value },
+                        }))
+                      }
+                      placeholder="e.g. 01"
+                      className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-background text-xs font-mono text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label htmlFor="cat-desc-input" className="block text-xs font-semibold text-foreground">
+                    Description & Narrative
+                  </label>
+                  <textarea
+                    id="cat-desc-input"
+                    rows={3}
+                    value={categoryModal.category.description || ''}
+                    onChange={(e) =>
+                      setCategoryModal((prev) => ({
+                        ...prev,
+                        category: { ...prev.category, description: e.target.value },
+                      }))
+                    }
+                    placeholder="Precision typography, mathematical spatial scales, design tokens..."
+                    className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-background text-xs text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
+                  />
+                </div>
+
+                <div className="pt-2">
+                  <label className="flex items-center gap-2 text-xs font-semibold text-foreground cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      checked={categoryModal.category.visible !== false}
+                      onChange={(e) =>
+                        setCategoryModal((prev) => ({
+                          ...prev,
+                          category: { ...prev.category, visible: e.target.checked },
+                        }))
+                      }
+                      className="w-4 h-4 rounded border-border text-foreground accent-foreground"
+                    />
+                    <span>Category Visible on Public Website</span>
+                  </label>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-2 px-6 py-4 border-t border-border bg-surface">
+                <button
+                  type="button"
+                  onClick={() => setCategoryModal({ isOpen: false, mode: 'create', category: {} })}
+                  className="px-4 py-2 rounded-xl border border-border text-xs font-medium text-muted hover:text-foreground hover:bg-background transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 rounded-xl bg-foreground text-background text-xs font-semibold hover:opacity-90 transition-opacity"
+                >
+                  {categoryModal.mode === 'create' ? 'Create Category' : 'Save Changes'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Skill Item Create/Edit Modal */}
+      {skillModal.isOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="w-full max-w-lg rounded-2xl border border-border bg-surface shadow-2xl overflow-hidden">
+            <form onSubmit={handleSaveSkill}>
+              <div className="flex items-center justify-between px-6 py-4 border-b border-border">
+                <div className="flex items-center gap-2">
+                  <Layers className="w-4 h-4 text-foreground" />
+                  <h3 className="text-sm font-bold uppercase tracking-wider text-foreground">
+                    {skillModal.mode === 'create' ? 'Add Skill Discipline' : 'Edit Skill Discipline'}
+                  </h3>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setSkillModal({ isOpen: false, mode: 'create', categoryId: '', skill: {} })}
+                  className="p-1 rounded-lg text-muted hover:text-foreground hover:bg-background transition-colors"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              <div className="p-6 space-y-4">
+                <div className="space-y-1.5">
+                  <label htmlFor="skill-name-input" className="block text-xs font-semibold text-foreground">
+                    Discipline Title <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    id="skill-name-input"
+                    type="text"
+                    required
+                    value={skillModal.skill.name || skillModal.skill.title || ''}
+                    onChange={(e) =>
+                      setSkillModal((prev) => ({
+                        ...prev,
+                        skill: { ...prev.skill, name: e.target.value, title: e.target.value },
+                      }))
+                    }
+                    placeholder="e.g. Visual Direction"
+                    className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-background text-xs font-bold text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label htmlFor="skill-desc-input" className="block text-xs font-semibold text-foreground">
+                    Description (Optional)
+                  </label>
+                  <textarea
+                    id="skill-desc-input"
+                    rows={2}
+                    value={skillModal.skill.description || ''}
+                    onChange={(e) =>
+                      setSkillModal((prev) => ({
+                        ...prev,
+                        skill: { ...prev.skill, description: e.target.value },
+                      }))
+                    }
+                    placeholder="Editorial typography, mathematical layouts..."
+                    className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-background text-xs text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label htmlFor="skill-img-input" className="block text-xs font-semibold text-foreground">
+                      Hover Visual Preview Asset
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => setMediaPickerOpen(true)}
+                      className="text-xs font-semibold text-foreground hover:underline"
+                    >
+                      Pick Asset
+                    </button>
+                  </div>
+                  <input
+                    id="skill-img-input"
+                    type="text"
+                    value={skillModal.skill.image || ''}
+                    onChange={(e) =>
+                      setSkillModal((prev) => ({
+                        ...prev,
+                        skill: { ...prev.skill, image: e.target.value },
+                      }))
+                    }
+                    placeholder="https://images.unsplash.com/..."
+                    className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-background text-xs font-mono text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
+                  />
+
+                  {skillModal.skill.image && (
+                    <div className="w-32 aspect-[4/3] rounded-lg overflow-hidden border border-border mt-2">
+                      <img
+                        src={skillModal.skill.image}
+                        alt="Preview"
+                        className="w-full h-full object-cover grayscale contrast-125"
+                      />
+                    </div>
+                  )}
+                </div>
+
+                <div className="pt-2">
+                  <label className="flex items-center gap-2 text-xs font-semibold text-foreground cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      checked={skillModal.skill.visible !== false}
+                      onChange={(e) =>
+                        setSkillModal((prev) => ({
+                          ...prev,
+                          skill: { ...prev.skill, visible: e.target.checked },
+                        }))
+                      }
+                      className="w-4 h-4 rounded border-border text-foreground accent-foreground"
+                    />
+                    <span>Skill Visible in Category</span>
+                  </label>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-2 px-6 py-4 border-t border-border bg-surface">
+                <button
+                  type="button"
+                  onClick={() => setSkillModal({ isOpen: false, mode: 'create', categoryId: '', skill: {} })}
+                  className="px-4 py-2 rounded-xl border border-border text-xs font-medium text-muted hover:text-foreground hover:bg-background transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 rounded-xl bg-foreground text-background text-xs font-semibold hover:opacity-90 transition-opacity"
+                >
+                  {skillModal.mode === 'create' ? 'Add Skill' : 'Save Changes'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Header Bar */}
+      <div className="rounded-2xl border border-border bg-surface p-6 sm:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-xs">
+        <div className="space-y-1">
+          <div className="flex items-center gap-2">
+            <span className="font-mono text-xs font-semibold uppercase tracking-wider text-muted flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5" />
+              Section 03 / Discipline & Capabilities Matrix
+            </span>
+          </div>
+          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
+            Skills & Capabilities Manager
+          </h2>
+          <p className="text-xs sm:text-sm text-muted max-w-xl">
+            Configure skill categories, reorder clusters and disciplines, toggle visibility, and assign visual specimens.
+          </p>
+        </div>
+
+        {/* Header Actions */}
+        <div className="flex items-center gap-3 shrink-0">
+          <a
+            href="/#skills"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl border border-border bg-background hover:bg-surface text-xs font-medium text-foreground transition-colors"
+          >
+            <span>Live Section</span>
+            <ExternalLink className="w-3.5 h-3.5" />
+          </a>
+
+          <button
+            type="button"
+            onClick={handleOpenCreateCategory}
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-foreground text-background font-semibold text-xs hover:opacity-90 transition-opacity shadow-xs"
+          >
+            <Plus className="w-4 h-4" />
+            <span>New Category</span>
+          </button>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {skillCategories.map((cat) => {
-          const list = cat.items || cat.skills || [];
+      {/* Category List & Nested Skills */}
+      <div className="space-y-6">
+        {sortedCategories.map((cat, catIndex) => {
+          const items = cat.items || cat.skills || [];
+          const isCatDragging = draggedCatIndex === catIndex;
+          const isCatDropTarget = dragOverCatIndex === catIndex;
+          const expanded = isExpanded(cat.id);
+
           return (
-            <div key={cat.id} className="border border-border bg-surface p-6 space-y-4">
-              <div className="flex items-center justify-between border-b border-border pb-3">
-                <span className="font-mono text-xs text-muted">[{cat.number}]</span>
-                <span className="font-mono text-xs text-muted">{list.length} ITEMS</span>
+            <div
+              key={cat.id}
+              draggable
+              onDragStart={() => handleCategoryDragStart(catIndex)}
+              onDragOver={(e) => handleCategoryDragOver(e, catIndex)}
+              onDrop={() => handleCategoryDrop(catIndex)}
+              onDragEnd={() => {
+                setDraggedCatIndex(null);
+                setDragOverCatIndex(null);
+              }}
+              className={`rounded-2xl border bg-surface overflow-hidden transition-all shadow-xs ${
+                isCatDragging
+                  ? 'opacity-30 border-dashed border-foreground'
+                  : isCatDropTarget
+                  ? 'border-foreground ring-2 ring-foreground/20'
+                  : 'border-border'
+              }`}
+            >
+              {/* Category Header Row */}
+              <div className="p-5 sm:p-6 bg-surface flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border">
+                <div className="flex items-center gap-3">
+                  {/* Category Drag Handle */}
+                  <button
+                    type="button"
+                    className="cursor-grab active:cursor-grabbing text-muted hover:text-foreground p-1 rounded hover:bg-background transition-colors"
+                    title="Drag to reorder category"
+                  >
+                    <GripVertical className="w-4 h-4" />
+                  </button>
+
+                  <span className="font-mono text-xs font-bold text-foreground px-2 py-0.5 rounded-md bg-background border border-border">
+                    [{cat.number || String(catIndex + 1).padStart(2, '0')}]
+                  </span>
+
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-bold text-base sm:text-lg uppercase tracking-tight text-foreground">
+                        {cat.title}
+                      </h3>
+                      <span className="font-mono text-[11px] text-muted">
+                        ({items.length} {items.length === 1 ? 'item' : 'items'})
+                      </span>
+                      {!cat.visible && (
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-500/10 text-amber-500 border border-amber-500/20">
+                          Hidden
+                        </span>
+                      )}
+                    </div>
+                    {cat.description && (
+                      <p className="text-xs text-muted mt-0.5 line-clamp-1 max-w-xl">{cat.description}</p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Category Action Controls */}
+                <div className="flex items-center gap-1.5 shrink-0 self-end sm:self-center">
+                  {/* Category Reorder Buttons */}
+                  <button
+                    type="button"
+                    onClick={() => handleMoveCategoryOrder(catIndex, 'up')}
+                    disabled={catIndex === 0}
+                    className="p-1.5 rounded-lg border border-border text-muted hover:text-foreground hover:bg-background disabled:opacity-20 transition-colors"
+                    title="Move Category Up"
+                  >
+                    <ArrowUp className="w-3.5 h-3.5" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleMoveCategoryOrder(catIndex, 'down')}
+                    disabled={catIndex === sortedCategories.length - 1}
+                    className="p-1.5 rounded-lg border border-border text-muted hover:text-foreground hover:bg-background disabled:opacity-20 transition-colors"
+                    title="Move Category Down"
+                  >
+                    <ArrowDown className="w-3.5 h-3.5" />
+                  </button>
+
+                  {/* Toggle Visibility */}
+                  <button
+                    type="button"
+                    onClick={() => toggleSkillCategoryVisibility(cat.id)}
+                    className={`p-1.5 rounded-lg border transition-colors ${
+                      cat.visible
+                        ? 'border-border text-muted hover:text-foreground hover:bg-background'
+                        : 'border-amber-500/30 bg-amber-500/10 text-amber-500'
+                    }`}
+                    title={cat.visible ? 'Hide Category' : 'Show Category'}
+                  >
+                    {cat.visible ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
+                  </button>
+
+                  {/* Add Skill Button */}
+                  <button
+                    type="button"
+                    onClick={() => handleOpenAddSkill(cat.id)}
+                    className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-foreground text-background text-xs font-semibold hover:opacity-90 transition-opacity"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>Add Skill</span>
+                  </button>
+
+                  {/* Edit Category */}
+                  <button
+                    type="button"
+                    onClick={() => handleOpenEditCategory(cat)}
+                    className="p-1.5 rounded-lg border border-border text-muted hover:text-foreground hover:bg-background transition-colors"
+                    title="Edit Category Details"
+                  >
+                    <Edit className="w-3.5 h-3.5" />
+                  </button>
+
+                  {/* Duplicate Category */}
+                  <button
+                    type="button"
+                    onClick={() => handleDuplicateCategory(cat.id)}
+                    className="p-1.5 rounded-lg border border-border text-muted hover:text-foreground hover:bg-background transition-colors"
+                    title="Duplicate Category"
+                  >
+                    <Copy className="w-3.5 h-3.5" />
+                  </button>
+
+                  {/* Delete Category */}
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setDeleteModal({
+                        isOpen: true,
+                        type: 'category',
+                        categoryId: cat.id,
+                        title: cat.title,
+                      })
+                    }
+                    className="p-1.5 rounded-lg border border-red-500/20 text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors"
+                    title="Delete Category"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+
+                  {/* Accordion Expand/Collapse */}
+                  <button
+                    type="button"
+                    onClick={() => toggleExpand(cat.id)}
+                    className="p-1.5 rounded-lg border border-border text-muted hover:text-foreground hover:bg-background transition-colors ml-1"
+                    title={expanded ? 'Collapse Skills Panel' : 'Expand Skills Panel'}
+                  >
+                    {expanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                  </button>
+                </div>
               </div>
-              <h3 className="font-sans text-xl font-bold uppercase tracking-tight text-foreground">
-                {cat.title}
-              </h3>
-              <ul className="space-y-2 pt-2 divide-y divide-border/60">
-                {list.map((skill, idx) => {
-                  const name = typeof skill === 'string' ? skill : skill.name;
-                  const index = typeof skill === 'string' ? String(idx + 1).padStart(2, '0') : skill.index;
-                  return (
-                    <li key={name} className="pt-2 flex items-center justify-between font-mono text-xs text-muted">
-                      <span>{name}</span>
-                      <span>[{index}]</span>
-                    </li>
-                  );
-                })}
-              </ul>
+
+              {/* Nested Skills List */}
+              {expanded && (
+                <div className="p-4 sm:p-6 bg-background/50 space-y-3">
+                  {items.length === 0 ? (
+                    <div className="p-6 text-center rounded-xl border border-dashed border-border text-xs text-muted space-y-2">
+                      <p>No skills configured in this category.</p>
+                      <button
+                        type="button"
+                        onClick={() => handleOpenAddSkill(cat.id)}
+                        className="inline-flex items-center gap-1.5 text-xs font-semibold text-foreground underline hover:opacity-80"
+                      >
+                        <Plus className="w-3.5 h-3.5" />
+                        <span>Add first skill</span>
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      {items.map((rawSkill, skillIdx) => {
+                        const skill: SkillItem =
+                          typeof rawSkill === 'string'
+                            ? {
+                                index: String(skillIdx + 1).padStart(2, '0'),
+                                name: rawSkill,
+                                title: rawSkill,
+                                visible: true,
+                              }
+                            : {
+                                ...rawSkill,
+                                index: rawSkill.index || String(skillIdx + 1).padStart(2, '0'),
+                                name: rawSkill.name || rawSkill.title || '',
+                                title: rawSkill.title || rawSkill.name || '',
+                              };
+
+                        const isSkillDragging =
+                          draggedSkillData?.categoryId === cat.id && draggedSkillData.index === skillIdx;
+                        const isSkillDropTarget =
+                          dragOverSkillData?.categoryId === cat.id && dragOverSkillData.index === skillIdx;
+
+                        return (
+                          <div
+                            key={`${cat.id}-${skillIdx}-${skill.name}`}
+                            draggable
+                            onDragStart={(e) => {
+                              e.stopPropagation();
+                              handleSkillDragStart(cat.id, skillIdx);
+                            }}
+                            onDragOver={(e) => {
+                              e.stopPropagation();
+                              handleSkillDragOver(e, cat.id, skillIdx);
+                            }}
+                            onDrop={(e) => {
+                              e.stopPropagation();
+                              handleSkillDrop(cat.id, skillIdx);
+                            }}
+                            onDragEnd={(e) => {
+                              e.stopPropagation();
+                              setDraggedSkillData(null);
+                              setDragOverSkillData(null);
+                            }}
+                            className={`group flex items-center justify-between gap-3 p-3 rounded-xl border bg-surface transition-all ${
+                              isSkillDragging
+                                ? 'opacity-30 border-dashed border-foreground'
+                                : isSkillDropTarget
+                                ? 'border-foreground ring-2 ring-foreground/20'
+                                : 'border-border hover:border-foreground/30'
+                            }`}
+                          >
+                            {/* Drag & Number */}
+                            <div className="flex items-center gap-3">
+                              <button
+                                type="button"
+                                className="cursor-grab active:cursor-grabbing text-muted group-hover:text-foreground p-1 rounded hover:bg-background transition-colors"
+                                title="Drag to reorder skill"
+                              >
+                                <GripVertical className="w-3.5 h-3.5" />
+                              </button>
+
+                              <span className="font-mono text-xs text-muted w-6">
+                                {skill.index || String(skillIdx + 1).padStart(2, '0')}
+                              </span>
+
+                              {/* Hover Thumbnail preview */}
+                              {skill.image && (
+                                <div className="w-8 h-6 rounded-md overflow-hidden border border-border bg-background shrink-0">
+                                  <img
+                                    src={skill.image}
+                                    alt={skill.name}
+                                    className="w-full h-full object-cover grayscale contrast-125 group-hover:grayscale-0 transition-all"
+                                  />
+                                </div>
+                              )}
+
+                              <div>
+                                <div className="flex items-center gap-2">
+                                  <span className="font-semibold text-xs text-foreground">{skill.name}</span>
+                                  {skill.visible === false && (
+                                    <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-amber-500/10 text-amber-500 border border-amber-500/20">
+                                      Hidden
+                                    </span>
+                                  )}
+                                </div>
+                                {skill.description && (
+                                  <p className="text-[11px] text-muted line-clamp-1">{skill.description}</p>
+                                )}
+                              </div>
+                            </div>
+
+                            {/* Skill Action Buttons */}
+                            <div className="flex items-center gap-1 shrink-0">
+                              {/* Move Up */}
+                              <button
+                                type="button"
+                                onClick={() => handleMoveSkillOrder(cat.id, skillIdx, 'up')}
+                                disabled={skillIdx === 0}
+                                className="p-1 rounded-md border border-border text-muted hover:text-foreground hover:bg-background disabled:opacity-20 transition-colors"
+                                title="Move Up"
+                              >
+                                <ArrowUp className="w-3 h-3" />
+                              </button>
+
+                              {/* Move Down */}
+                              <button
+                                type="button"
+                                onClick={() => handleMoveSkillOrder(cat.id, skillIdx, 'down')}
+                                disabled={skillIdx === items.length - 1}
+                                className="p-1 rounded-md border border-border text-muted hover:text-foreground hover:bg-background disabled:opacity-20 transition-colors"
+                                title="Move Down"
+                              >
+                                <ArrowDown className="w-3 h-3" />
+                              </button>
+
+                              {/* Toggle Visibility */}
+                              <button
+                                type="button"
+                                onClick={() => toggleSkillVisibility(cat.id, skillIdx)}
+                                className={`p-1 rounded-md border transition-colors ${
+                                  skill.visible !== false
+                                    ? 'border-border text-muted hover:text-foreground hover:bg-background'
+                                    : 'border-amber-500/30 bg-amber-500/10 text-amber-500'
+                                }`}
+                                title={skill.visible !== false ? 'Hide Skill' : 'Show Skill'}
+                              >
+                                {skill.visible !== false ? (
+                                  <Eye className="w-3 h-3" />
+                                ) : (
+                                  <EyeOff className="w-3 h-3" />
+                                )}
+                              </button>
+
+                              {/* Edit Skill */}
+                              <button
+                                type="button"
+                                onClick={() => handleOpenEditSkill(cat.id, skillIdx, skill)}
+                                className="p-1 rounded-md border border-border text-muted hover:text-foreground hover:bg-background transition-colors"
+                                title="Edit Skill"
+                              >
+                                <Edit className="w-3 h-3" />
+                              </button>
+
+                              {/* Delete Skill */}
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setDeleteModal({
+                                    isOpen: true,
+                                    type: 'skill',
+                                    categoryId: cat.id,
+                                    skillIndex: skillIdx,
+                                    title: skill.name,
+                                  })
+                                }
+                                className="p-1 rounded-md border border-red-500/20 text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors"
+                                title="Delete Skill"
+                              >
+                                <Trash2 className="w-3 h-3" />
+                              </button>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+
+                  {/* Quick Add Button Bar inside Category */}
+                  <div className="pt-2 flex items-center justify-end">
+                    <button
+                      type="button"
+                      onClick={() => handleOpenAddSkill(cat.id)}
+                      className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted hover:text-foreground hover:underline transition-colors"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      <span>Add new discipline to {cat.title}</span>
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           );
         })}
@@ -58,4 +1085,3 @@ export const SkillsManager: React.FC = () => {
 };
 
 export default SkillsManager;
-

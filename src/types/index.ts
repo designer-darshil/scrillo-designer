@@ -102,9 +102,14 @@ export interface Project {
 }
 
 export interface SkillItem {
+  id?: string;
   index: string;
   name: string;
+  title?: string;
+  description?: string;
   image?: string;
+  visible?: boolean;
+  order?: number;
 }
 
 export interface SkillCategory {

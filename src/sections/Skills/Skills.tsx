@@ -12,7 +12,9 @@ interface SkillsProps {
 export const Skills: React.FC<SkillsProps> = ({ categories: propCategories }) => {
   const { data } = useWebsiteData();
   const rawCategories = propCategories || data.skills;
-  const categories = rawCategories.filter((c) => c.visible !== false);
+  const categories = [...rawCategories]
+    .filter((c) => c.visible !== false)
+    .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 
   const containerRef = useRef<HTMLElement>(null);
   const categoriesRef = useRef<HTMLDivElement>(null);
@@ -220,12 +222,20 @@ export const Skills: React.FC<SkillsProps> = ({ categories: propCategories }) =>
           className="grid grid-cols-1 lg:grid-cols-3 gap-16 lg:gap-12 xl:gap-16 items-start"
         >
           {categories.map((cat, idx) => {
-            const skillList = (cat.items || cat.skills || []).map((s, i) => {
-              if (typeof s === 'string') {
-                return { index: String(i + 1).padStart(2, '0'), name: s };
-              }
-              return s;
-            });
+            const rawItems = cat.items || cat.skills || [];
+            const skillList = [...rawItems]
+              .filter((s: any) => s.visible !== false)
+              .sort((a: any, b: any) => (a.order ?? 0) - (b.order ?? 0))
+              .map((s, i) => {
+                if (typeof s === 'string') {
+                  return { index: String(i + 1).padStart(2, '0'), name: s, image: undefined };
+                }
+                return {
+                  ...s,
+                  index: s.index || String(i + 1).padStart(2, '0'),
+                  name: s.name || s.title || '',
+                };
+              });
             const catNumber = cat.number || String(idx + 1).padStart(2, '0');
             const countLabel = cat.count || String(skillList.length).padStart(2, '0');
 

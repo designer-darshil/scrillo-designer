@@ -8,9 +8,14 @@ import { HeroContent } from '../../types';
 interface HeroProps {
   content?: HeroContent;
   onHoverStateChange?: (isHovered: boolean, type?: any, text?: string) => void;
+  isPreloaderActive?: boolean;
 }
 
-export const Hero: React.FC<HeroProps> = ({ content: propContent, onHoverStateChange }) => {
+export const Hero: React.FC<HeroProps> = ({
+  content: propContent,
+  onHoverStateChange,
+  isPreloaderActive = false,
+}) => {
   const { data } = useWebsiteData();
   const content = propContent || data.hero;
 
@@ -23,12 +28,15 @@ export const Hero: React.FC<HeroProps> = ({ content: propContent, onHoverStateCh
   const scrollIndicatorRef = useRef<HTMLDivElement>(null);
   const parallaxRef = useRef<HTMLDivElement>(null);
 
-  // GSAP Page Load Timeline & Line Reveals
+  // GSAP Page Load Timeline & Line Reveals (Synchronized with Preloader)
   useEffect(() => {
+    // If preloader is active, hold reveal until curtain lifts
+    if (isPreloaderActive) return;
+
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({
         defaults: { ease: 'power4.out' },
-        delay: 0.15,
+        delay: 0.05,
       });
 
       // 1. Reveal small label (About me)

@@ -158,7 +158,13 @@ export const PortfolioHome: React.FC = () => {
 
   // Section Component Map
   const sectionRenderMap: Record<SectionId, () => React.ReactNode> = {
-    hero: () => <Hero key="hero" content={activeData.hero} />,
+    hero: () => (
+      <Hero
+        key="hero"
+        content={activeData.hero}
+        isPreloaderActive={!isPreloaderComplete && shouldShowPreloader}
+      />
+    ),
     marquee: () =>
       isMarqueeEnabled ? (
         <Marquee

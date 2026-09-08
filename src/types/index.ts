@@ -179,20 +179,25 @@ export interface ContactCTA {
 }
 
 export interface SocialLink {
+  id?: string;
+  platform: 'LinkedIn' | 'Instagram' | 'Behance' | 'Dribbble' | 'X' | 'GitHub' | 'Other' | string;
   label: string;
+  url?: string;
   href: string;
-  platform?: string;
+  icon?: string;
+  visible?: boolean;
+  order?: number;
 }
 
 export interface FooterContent {
   location: string;
   workingGlobally: string;
+  brandText: string;
+  copyright: string;
   coordinates?: string;
-  email: string;
+  email?: string;
   responseWindow?: string;
   socialLinks: SocialLink[];
-  copyright: string;
-  brandText: string;
   subCopyright?: string;
   editionMeta?: string;
 }

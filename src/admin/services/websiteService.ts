@@ -247,7 +247,28 @@ export const websiteService = {
   },
 
   async getFooterContent(): Promise<FooterContent> {
-    return memoryStore.footer;
+    if (!isSupabaseConfigured) return memoryStore.footer;
+    try {
+      const { data, error } = await supabase.from('website_content').select('content').eq('section', 'footer').single();
+      if (error || !data?.content) return memoryStore.footer;
+      memoryStore.footer = data.content as FooterContent;
+      return memoryStore.footer;
+    } catch {
+      return memoryStore.footer;
+    }
+  },
+
+  async updateFooterContent(content: FooterContent): Promise<boolean> {
+    memoryStore.footer = { ...content };
+    if (!isSupabaseConfigured) return true;
+    try {
+      const { error } = await supabase
+        .from('website_content')
+        .upsert({ section: 'footer', content, updated_at: new Date().toISOString() }, { onConflict: 'section' });
+      return !error;
+    } catch {
+      return false;
+    }
   },
 };
 

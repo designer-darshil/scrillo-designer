@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import {
   Sparkles,
   Save,
@@ -19,6 +20,7 @@ import {
   Mail,
   Eye,
   EyeOff,
+  Globe,
 } from 'lucide-react';
 import { useWebsiteData } from '../../hooks/useWebsiteData';
 import { HeroContent, AboutContent, MarqueeContent, PhilosophyContent, ContactCTA } from '../../types';
@@ -396,6 +398,14 @@ export const ContentManager: React.FC = () => {
           <Mail className="w-3.5 h-3.5" />
           <span>Contact CTA</span>
         </button>
+
+        <Link
+          to="/admin/content/footer"
+          className="flex items-center gap-2 px-4 py-2.5 text-xs font-semibold rounded-lg transition-all text-muted hover:text-foreground hover:bg-surface border border-dashed border-border"
+        >
+          <Globe className="w-3.5 h-3.5" />
+          <span>Footer & Social →</span>
+        </Link>
       </div>
 
       {/* ================================================== */}

@@ -18,6 +18,7 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   CheckCircle2,
+  Globe,
 } from 'lucide-react';
 import { useTheme } from '../../hooks/useTheme';
 import { useAuth } from '../hooks/useAuth';
@@ -32,6 +33,7 @@ interface NavItem {
 const navItems: NavItem[] = [
   { path: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { path: '/admin/content', label: 'Website Content', icon: FileText },
+  { path: '/admin/content/footer', label: 'Footer & Outreach', icon: Globe },
   { path: '/admin/projects', label: 'Projects', icon: FolderGit2, badge: '8' },
   { path: '/admin/skills', label: 'Skills', icon: Sparkles },
   { path: '/admin/services', label: 'Services', icon: Briefcase },
@@ -48,12 +50,16 @@ export const AdminLayout: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const currentNav = navItems.find((item) => {
-    if (item.path === '/admin/dashboard') {
-      return location.pathname === '/admin/dashboard' || location.pathname === '/admin' || location.pathname === '/admin/';
-    }
-    return location.pathname.startsWith(item.path);
-  }) || navItems[0];
+  const currentNav =
+    navItems
+      .slice()
+      .sort((a, b) => b.path.length - a.path.length)
+      .find((item) => {
+        if (item.path === '/admin/dashboard') {
+          return location.pathname === '/admin/dashboard' || location.pathname === '/admin' || location.pathname === '/admin/';
+        }
+        return location.pathname.startsWith(item.path);
+      }) || navItems[0];
 
   const handleSignOut = async () => {
     await signOut();
@@ -155,6 +161,8 @@ export const AdminLayout: React.FC = () => {
               const isActive =
                 item.path === '/admin/dashboard'
                   ? location.pathname === '/admin/dashboard' || location.pathname === '/admin' || location.pathname === '/admin/'
+                  : item.path === '/admin/content'
+                  ? location.pathname === '/admin/content' || location.pathname === '/admin/content/'
                   : location.pathname.startsWith(item.path);
 
               return (

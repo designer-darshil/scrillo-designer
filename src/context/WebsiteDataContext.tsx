@@ -10,6 +10,7 @@ import {
   Service,
   PhilosophyContent,
   ContactCTA,
+  FooterContent,
 } from '../types';
 import { defaultWebsiteData } from '../data/defaultWebsiteData';
 import { websiteService } from '../admin/services/websiteService';
@@ -27,6 +28,7 @@ interface WebsiteDataContextType {
   updateMarquee: (marquee: MarqueeContent) => Promise<boolean>;
   updatePhilosophy: (philosophy: PhilosophyContent) => Promise<boolean>;
   updateContactCTA: (contact: ContactCTA) => Promise<boolean>;
+  updateFooter: (footer: FooterContent) => Promise<boolean>;
   updateSectionVisibility: (sectionId: string, visible: boolean) => void;
   // Project methods
   createProject: (project: Omit<Project, 'id'> & { id?: string }) => Promise<Project | null>;
@@ -67,6 +69,7 @@ const WebsiteDataContext = createContext<WebsiteDataContextType>({
   updateMarquee: async () => true,
   updatePhilosophy: async () => true,
   updateContactCTA: async () => true,
+  updateFooter: async () => true,
   updateSectionVisibility: () => {},
   createProject: async () => null,
   updateProject: async () => true,
@@ -184,6 +187,18 @@ export const WebsiteDataProvider: React.FC<{ children: React.ReactNode }> = ({ c
       const success = await websiteService.updateContactCTAContent(contact);
       if (success) {
         setData((prev) => ({ ...prev, contact }));
+      }
+      return success;
+    } catch {
+      return false;
+    }
+  };
+
+  const updateFooter = async (footer: FooterContent): Promise<boolean> => {
+    try {
+      const success = await websiteService.updateFooterContent(footer);
+      if (success) {
+        setData((prev) => ({ ...prev, footer }));
       }
       return success;
     } catch {
@@ -599,6 +614,7 @@ export const WebsiteDataProvider: React.FC<{ children: React.ReactNode }> = ({ c
         updateMarquee,
         updatePhilosophy,
         updateContactCTA,
+        updateFooter,
         updateSectionVisibility,
         createProject,
         updateProject,
@@ -644,6 +660,7 @@ export const useWebsiteData = () => {
       updateMarquee: async () => true,
       updatePhilosophy: async () => true,
       updateContactCTA: async () => true,
+      updateFooter: async () => true,
       updateSectionVisibility: () => {},
       createProject: async () => null,
       updateProject: async () => true,

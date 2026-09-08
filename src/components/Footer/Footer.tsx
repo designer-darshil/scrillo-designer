@@ -22,13 +22,17 @@ export const Footer: React.FC<FooterProps> = ({ content: propContent }) => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const socialList = content.socialLinks || [
-    { label: 'LinkedIn', href: 'https://linkedin.com' },
-    { label: 'Instagram', href: 'https://instagram.com' },
-    { label: 'Behance', href: 'https://behance.net' },
-    { label: 'Dribbble', href: 'https://dribbble.com' },
-    { label: 'X', href: 'https://x.com' },
-  ];
+  const socialList = (content.socialLinks || [])
+    .filter((item) => item.visible !== false)
+    .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+    .map((item) => {
+      const rawLink = (item.url || item.href || '').trim();
+      const isUnsafe = rawLink.toLowerCase().startsWith('javascript:') || rawLink.toLowerCase().startsWith('data:');
+      return {
+        ...item,
+        safeHref: isUnsafe ? '#' : rawLink,
+      };
+    });
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -134,9 +138,9 @@ export const Footer: React.FC<FooterProps> = ({ content: propContent }) => {
             <span className="font-mono text-meta text-muted block">[02 // SOCIAL]</span>
             <ul className="space-y-2">
               {socialList.map((item) => (
-                <li key={item.label}>
+                <li key={item.id || item.label}>
                   <a
-                    href={item.href}
+                    href={item.safeHref}
                     target="_blank"
                     rel="noopener noreferrer"
                     data-cursor="link"

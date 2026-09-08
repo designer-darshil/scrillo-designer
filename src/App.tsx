@@ -4,6 +4,7 @@ import { Header } from './components/Header/Header';
 import { Hero } from './sections/Hero/Hero';
 import { Marquee } from './components/Marquee/Marquee';
 import { SelectedWorks } from './sections/SelectedWorks/SelectedWorks';
+import { Statement } from './sections/Statement/Statement';
 import { CustomCursor } from './components/CustomCursor/CustomCursor';
 
 export const App: React.FC = () => {
@@ -53,6 +54,9 @@ export const App: React.FC = () => {
 
         {/* 3. Selected Works Section */}
         <SelectedWorks />
+
+        {/* 4. Creative Statement Section */}
+        <Statement />
       </main>
 
       {/* Subtle bottom buffer for contact navigation target */}
@@ -60,7 +64,7 @@ export const App: React.FC = () => {
         id="contact"
         className="h-[20vh] bg-background border-t border-border flex items-center justify-between page-container text-meta text-muted"
       >
-        <span>DARSHIL BHUVA · SELECTED WORKS EDITION</span>
+        <span>DARSHIL BHUVA · STATEMENT EDITION</span>
         <span>NEXT SECTIONS RESERVED FOR UPCOMING PHASES</span>
       </div>
     </div>

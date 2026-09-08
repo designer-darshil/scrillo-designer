@@ -142,11 +142,16 @@ export const Hero: React.FC<HeroProps> = ({ content: propContent, onHoverStateCh
     }
   };
 
-  const lines = content.headlineLines || [
-    'Building digital',
-    'experiences that',
-    'feel inevitable.',
-  ];
+  const lines =
+    content.headlineLines && content.headlineLines.length > 0
+      ? content.headlineLines
+      : content.title
+      ? content.title.split('\n')
+      : [
+          'Building digital',
+          'experiences that',
+          'feel inevitable.',
+        ];
 
   return (
     <section
@@ -154,8 +159,22 @@ export const Hero: React.FC<HeroProps> = ({ content: propContent, onHoverStateCh
       id="home"
       className="relative min-h-[100svh] flex flex-col justify-between pt-28 sm:pt-36 pb-10 sm:pb-14 select-none overflow-hidden bg-background text-foreground"
     >
+      {/* Subtle Specimen Visual Asset if configured */}
+      {content.heroImage && (
+        <div
+          aria-hidden="true"
+          className="absolute right-6 lg:right-16 top-1/2 -translate-y-1/2 w-48 sm:w-64 lg:w-80 aspect-[4/5] opacity-25 hover:opacity-60 transition-opacity duration-500 pointer-events-none hidden md:block overflow-hidden border border-border/80 shadow-2xl z-0"
+        >
+          <img
+            src={content.heroImage}
+            alt="Hero Specimen"
+            className="w-full h-full object-cover filter grayscale contrast-125 brightness-90"
+          />
+        </div>
+      )}
+
       {/* Top Subtle Coordinates / Spatial Anchor (Desktop) */}
-      <div className="page-container flex items-center justify-between font-mono text-meta text-muted">
+      <div className="page-container relative z-10 flex items-center justify-between font-mono text-meta text-muted">
         <div ref={labelRef} className="flex items-center gap-2">
           <span className="w-1.5 h-1.5 bg-foreground inline-block" />
           <span className="text-foreground/90 font-medium">{content.eyebrow}</span>

@@ -96,9 +96,12 @@ export const Philosophy: React.FC<PhilosophyProps> = ({ content: propContent }) 
 
   const sectionNumber = content.number || '04';
   const sectionLabel = content.label || 'DESIGN PHILOSOPHY';
-  const line1 = content.line1 || 'Great design';
-  const line2 = content.line2 || 'should feel obvious';
-  const line3 = content.line3 || 'after you see it.';
+  
+  const rawLines = content.mainStatement ? content.mainStatement.split('\n') : [];
+  const line1 = content.line1 || rawLines[0] || 'Great design';
+  const line2 = content.line2 !== undefined ? content.line2 : (rawLines[1] !== undefined ? rawLines[1] : (rawLines.length === 1 ? '' : 'should feel obvious'));
+  const line3 = content.line3 !== undefined ? content.line3 : (rawLines[2] !== undefined ? rawLines[2] : (rawLines.length <= 2 ? '' : 'after you see it.'));
+  
   const yearMeta = content.author || content.attribution || content.yearMeta || '— 2026';
   const subMeta = content.supportingText || content.subMeta || 'PHILOSOPHY STATEMENT';
 
@@ -122,25 +125,31 @@ export const Philosophy: React.FC<PhilosophyProps> = ({ content: propContent }) 
           className="max-w-7xl font-sans text-display font-bold uppercase tracking-display leading-[0.90] text-foreground will-change-transform"
         >
           {/* Line 1: Great design */}
-          <span className="block overflow-hidden py-1">
-            <span className="philosophy-line-inner inline-block will-change-transform text-foreground">
-              {line1}
+          {line1 && (
+            <span className="block overflow-hidden py-1">
+              <span className="philosophy-line-inner inline-block will-change-transform text-foreground">
+                {line1}
+              </span>
             </span>
-          </span>
+          )}
 
           {/* Line 2: should feel obvious (Asymmetrically Indented) */}
-          <span className="block overflow-hidden py-1 pl-0 sm:pl-16 md:pl-28 lg:pl-44">
-            <span className="philosophy-line-inner inline-block will-change-transform text-muted">
-              {line2}
+          {line2 && (
+            <span className="block overflow-hidden py-1 pl-0 sm:pl-16 md:pl-28 lg:pl-44">
+              <span className="philosophy-line-inner inline-block will-change-transform text-muted">
+                {line2}
+              </span>
             </span>
-          </span>
+          )}
 
           {/* Line 3: after you see it. */}
-          <span className="block overflow-hidden py-1 pl-0 sm:pl-8 md:pl-14 lg:pl-20">
-            <span className="philosophy-line-inner inline-block will-change-transform text-foreground">
-              {line3}
+          {line3 && (
+            <span className="block overflow-hidden py-1 pl-0 sm:pl-8 md:pl-14 lg:pl-20">
+              <span className="philosophy-line-inner inline-block will-change-transform text-foreground">
+                {line3}
+              </span>
             </span>
-          </span>
+          )}
         </h2>
       </div>
 

@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { navigationItems, socialLinks } from '../../data/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { gsap } from '../../animations/gsapConfig';
 import { ArrowUpRight } from 'lucide-react';
 import { useTheme } from '../../hooks/useTheme';
+import { useWebsiteData } from '../../hooks/useWebsiteData';
 
 interface HeaderProps {
   activeSection?: string;
@@ -14,6 +14,7 @@ export const Header: React.FC<HeaderProps> = ({
   activeSection = 'home',
   onNavigate,
 }) => {
+  const { data } = useWebsiteData();
   const { theme, toggleTheme } = useTheme();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeItem, setActiveItem] = useState(activeSection);
@@ -120,6 +121,26 @@ export const Header: React.FC<HeaderProps> = ({
     setIsMobileMenuOpen(false);
   };
 
+  const sections = data.settings?.sections || ({} as any);
+  const brandText = data.footer?.brandText || data.settings?.siteTitle || 'DARSHIL BHUVA';
+  const headerTagline = data.hero?.subEyebrow || data.settings?.siteDescription || 'DIGITAL PRODUCT DESIGNER';
+  const email = data.contact?.email || data.footer?.email || 'contact@darshilbhuva.com';
+  const availability = data.contact?.availabilityStatus || 'AVAILABLE Q2/Q3';
+  const socialList = (data.footer?.socialLinks || [])
+    .filter((s) => s.visible !== false)
+    .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+
+  const allNav = [
+    { id: 'home', label: 'Home', href: '#home', number: '01', visible: sections.hero?.visible !== false },
+    { id: 'about', label: 'About', href: '#about', number: '02', visible: sections.statement?.visible !== false },
+    { id: 'works', label: 'Works', href: '#works', number: '03', visible: sections.projects?.visible !== false },
+    { id: 'skills', label: 'Skills', href: '#skills', number: '04', visible: sections.skills?.visible !== false },
+    { id: 'services', label: 'Services', href: '#services', number: '05', visible: sections.services?.visible !== false },
+    { id: 'contact', label: "Let's Talk", href: '#contact', number: '06', visible: sections.contact?.visible !== false },
+  ];
+
+  const navigationItems = allNav.filter((n) => n.visible);
+
   return (
     <>
       <header
@@ -137,14 +158,14 @@ export const Header: React.FC<HeaderProps> = ({
                 className="group inline-flex items-center gap-2.5 text-xs sm:text-[13px] font-mono uppercase tracking-widest text-foreground/90 hover:text-foreground transition-opacity"
               >
                 <span className="w-1.5 h-1.5 bg-foreground rounded-none group-hover:rotate-45 transition-transform duration-300" />
-                <span className="font-semibold">DARSHIL BHUVA</span>
+                <span className="font-semibold">{brandText}</span>
               </a>
             </div>
 
-            {/* CENTER: Digital Product Designer (Desktop) */}
+            {/* CENTER: Tagline / Role (Desktop) */}
             <div className="hidden lg:flex items-center gap-2 text-xs sm:text-[13px] font-mono uppercase tracking-widest text-muted pointer-events-none">
               <span className="text-muted/40">/</span>
-              <span>DIGITAL PRODUCT DESIGNER</span>
+              <span>{headerTagline}</span>
             </div>
 
             {/* RIGHT: Navigation & Theme Toggle (Desktop) */}
@@ -298,22 +319,22 @@ export const Header: React.FC<HeaderProps> = ({
               className="relative z-10 border-t border-border pt-6 space-y-4"
             >
               <div className="flex items-center justify-between text-meta text-muted">
-                <span>DIGITAL PRODUCT DESIGNER</span>
-                <span className="text-foreground">AVAILABLE Q2/Q3</span>
+                <span>{headerTagline}</span>
+                <span className="text-foreground">{availability}</span>
               </div>
 
               <div className="flex items-center justify-between text-meta">
                 <a
-                  href="mailto:contact@darshilbhuva.com"
+                  href={`mailto:${email}`}
                   className="text-foreground underline underline-offset-4"
                 >
-                  contact@darshilbhuva.com
+                  {email}
                 </a>
                 <div className="flex gap-4 text-muted">
-                  {socialLinks.slice(0, 2).map((soc) => (
+                  {socialList.slice(0, 2).map((soc) => (
                     <a
                       key={soc.label}
-                      href={soc.href}
+                      href={soc.url || soc.href}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="hover:text-foreground transition-colors"

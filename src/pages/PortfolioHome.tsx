@@ -17,12 +17,14 @@ import { AdminPreviewBanner } from '../components/AdminPreviewBanner/AdminPrevie
 import { PublishReviewModal } from '../admin/components/PublishReviewModal';
 import { useWebsiteData } from '../hooks/useWebsiteData';
 import { useAuth } from '../admin/hooks/useAuth';
+import { useTheme } from '../hooks/useTheme';
 import { SectionId } from '../types';
 
 export const PortfolioHome: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const { data: draftData, publishedData, diffSummary, publishDraft } = useWebsiteData();
   const { user } = useAuth();
+  const { setTheme } = useTheme();
 
   // Preview Mode: Requires authenticated admin and ?preview=true
   const isPreviewRequested = searchParams.get('preview') === 'true';
@@ -37,6 +39,19 @@ export const PortfolioHome: React.FC = () => {
   const { settings } = activeData;
   const { sections, colors, animations, seo } = settings;
   const marquee = activeData.marquee;
+
+  // Sync admin default theme if no explicit user override is stored
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('portfolio-theme');
+    if (!savedTheme && settings?.defaultTheme) {
+      if (settings.defaultTheme === 'system') {
+        const isLight = window.matchMedia('(prefers-color-scheme: light)').matches;
+        setTheme(isLight ? 'light' : 'dark');
+      } else {
+        setTheme(settings.defaultTheme);
+      }
+    }
+  }, [settings?.defaultTheme, setTheme]);
 
   // Initialize Lenis smooth scroll foundation with settings flag
   const isSmoothScrollEnabled =

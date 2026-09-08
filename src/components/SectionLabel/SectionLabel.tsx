@@ -9,12 +9,12 @@ interface SectionLabelProps {
 
 export const SectionLabel: React.FC<SectionLabelProps> = ({ number, title, className }) => {
   return (
-    <div className={cn('flex items-center justify-between py-4 border-b border-white/10 text-xs font-mono tracking-widest uppercase text-light-500', className)}>
+    <div className={cn('section-label-bar', className)}>
       <span className="flex items-center gap-2">
-        <span className="w-1.5 h-1.5 bg-light-100 inline-block" />
+        <span className="w-1 h-1 bg-foreground inline-block" />
         <span>[{number}]</span>
       </span>
-      <span className="text-light-400 font-medium">{title}</span>
+      <span className="text-foreground/90 font-medium tracking-meta">{title}</span>
     </div>
   );
 };

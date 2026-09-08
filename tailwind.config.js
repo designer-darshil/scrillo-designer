@@ -8,57 +8,54 @@ export default {
   theme: {
     extend: {
       colors: {
-        dark: {
-          950: '#050505',
-          900: '#080808',
-          850: '#0F0F0F',
-          800: '#141414',
-          700: '#1F1F1F',
-          600: '#2E2E2E',
-        },
-        light: {
-          100: '#FFFFFF',
-          200: '#F5F5F5',
-          300: '#EBEBEB',
-          400: '#D4D4D4',
-          500: '#A3A3A3',
-          600: '#737373',
-        },
-        border: {
-          subtle: 'rgba(255, 255, 255, 0.08)',
-          medium: 'rgba(255, 255, 255, 0.15)',
-          strong: 'rgba(255, 255, 255, 0.3)',
-        }
+        background: '#050505',
+        surface: '#0B0B0B',
+        foreground: '#F5F5F2',
+        muted: '#8E8E8E',
+        border: '#292929',
       },
       fontFamily: {
-        display: ['"Syne"', 'sans-serif'],
-        sans: ['"Space Grotesk"', '"Inter"', 'sans-serif'],
-        serif: ['"Instrument Serif"', 'serif'],
+        sans: ['"General Sans"', '"Inter"', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'sans-serif'],
+        grotesk: ['"General Sans"', '"Inter"', 'sans-serif'],
         mono: ['"JetBrains Mono"', 'monospace'],
-        body: ['"Inter"', 'sans-serif'],
-      },
-      letterSpacing: {
-        tighter: '-0.05em',
-        tight: '-0.03em',
-        normal: '0em',
-        wide: '0.05em',
-        wider: '0.12em',
-        widest: '0.22em',
-        ultra: '0.35em',
       },
       fontSize: {
-        '2xs': ['0.65rem', { lineHeight: '0.9rem' }],
-        'display-2xl': ['clamp(3.5rem, 9vw, 9.5rem)', { lineHeight: '0.88', letterSpacing: '-0.04em' }],
-        'display-xl': ['clamp(2.5rem, 6.5vw, 6rem)', { lineHeight: '0.92', letterSpacing: '-0.03em' }],
-        'display-lg': ['clamp(2rem, 4.5vw, 4rem)', { lineHeight: '0.96', letterSpacing: '-0.02em' }],
-        'display-md': ['clamp(1.5rem, 3vw, 2.5rem)', { lineHeight: '1.05', letterSpacing: '-0.02em' }],
+        // Display: clamp(4rem, 8vw, 9rem) line-height: 0.88-0.95, letter-spacing: -0.05em
+        display: ['clamp(4rem, 8vw, 9rem)', { lineHeight: '0.9', letterSpacing: '-0.05em' }],
+        
+        // Section headings: clamp(3rem, 6vw, 7rem)
+        'heading-section': ['clamp(3rem, 6vw, 7rem)', { lineHeight: '0.92', letterSpacing: '-0.04em' }],
+        
+        // Project headings: clamp(2rem, 4vw, 5rem)
+        'heading-project': ['clamp(2rem, 4vw, 5rem)', { lineHeight: '0.95', letterSpacing: '-0.03em' }],
+        
+        // Body: 18-24px
+        'body-editorial': ['clamp(1.125rem, 1.25vw, 1.5rem)', { lineHeight: '1.5', letterSpacing: '-0.01em' }],
+        
+        // Metadata: 11-14px
+        metadata: ['clamp(0.6875rem, 0.8vw, 0.875rem)', { lineHeight: '1.4', letterSpacing: '0.08em' }],
       },
-      transitionTimingFunction: {
-        'expo-out': 'cubic-bezier(0.16, 1, 0.3, 1)',
-        'circ-out': 'cubic-bezier(0, 0.55, 0.45, 1)',
+      letterSpacing: {
+        'display': '-0.05em',
+        'heading': '-0.04em',
+        'subheading': '-0.03em',
+        'normal': '0em',
+        'meta': '0.08em',
+        'meta-wide': '0.14em',
+      },
+      spacing: {
+        'gutter': '24px',
+        'page-desktop': '5vw',
+        'page-mobile': '20px',
+      },
+      gridTemplateColumns: {
+        'desktop-12': 'repeat(12, minmax(0, 1fr))',
+        'tablet-8': 'repeat(8, minmax(0, 1fr))',
+        'mobile-4': 'repeat(4, minmax(0, 1fr))',
       }
     },
   },
   plugins: [],
 }
+
 

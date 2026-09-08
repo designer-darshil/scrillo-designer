@@ -52,7 +52,7 @@ export const Philosophy: React.FC = () => {
             'RADICAL CLARITY',
             'KINETIC CHOREOGRAPHY',
           ]}
-          speed="slow"
+          speed={40}
         />
       </div>
     </section>

@@ -83,7 +83,7 @@ export const IconPicker: React.FC<IconPickerProps> = ({ value, onChange }) => {
   return (
     <div className="space-y-2">
       <label className="block text-xs font-semibold text-foreground">Service Visual Icon</label>
-      <div className="grid grid-cols-6 sm:grid-cols-8 gap-2 p-3 rounded-xl border border-border bg-background max-h-48 overflow-y-auto">
+      <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-2 p-3 rounded-xl border border-border bg-background max-h-48 overflow-y-auto">
         {iconNames.map((name) => {
           const Icon = ICON_MAP[name];
           const isSelected = value === name;
@@ -93,7 +93,7 @@ export const IconPicker: React.FC<IconPickerProps> = ({ value, onChange }) => {
               key={name}
               type="button"
               onClick={() => onChange(name)}
-              className={`p-2.5 rounded-lg border flex flex-col items-center justify-center gap-1 transition-all ${
+              className={`p-2 min-h-[44px] rounded-lg border flex flex-col items-center justify-center gap-1 transition-all ${
                 isSelected
                   ? 'border-foreground bg-foreground text-background shadow-xs ring-1 ring-foreground'
                   : 'border-border bg-surface text-muted hover:text-foreground hover:border-foreground/40'
@@ -101,7 +101,7 @@ export const IconPicker: React.FC<IconPickerProps> = ({ value, onChange }) => {
               title={name}
             >
               <Icon className="w-4 h-4" />
-              <span className="text-[9px] font-mono truncate max-w-[45px]">{name}</span>
+              <span className="text-[9px] font-mono truncate max-w-[50px]">{name}</span>
             </button>
           );
         })}

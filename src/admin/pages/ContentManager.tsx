@@ -399,11 +399,11 @@ export const ContentManager: React.FC = () => {
       )}
 
       {/* Navigation Tabs */}
-      <div className="flex flex-wrap items-center gap-2 border-b border-border pb-1">
+      <div className="flex items-center gap-2 border-b border-border pb-2 overflow-x-auto no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap">
         <button
           type="button"
           onClick={() => setActiveTab('hero')}
-          className={`flex items-center gap-2 px-4 py-2.5 text-xs font-semibold rounded-lg transition-all ${
+          className={`flex items-center gap-2 px-4 py-2.5 text-xs font-semibold rounded-xl whitespace-nowrap shrink-0 transition-all ${
             activeTab === 'hero'
               ? 'bg-foreground text-background shadow-xs'
               : 'text-muted hover:text-foreground hover:bg-surface'
@@ -416,7 +416,7 @@ export const ContentManager: React.FC = () => {
         <button
           type="button"
           onClick={() => setActiveTab('statement')}
-          className={`flex items-center gap-2 px-4 py-2.5 text-xs font-semibold rounded-lg transition-all ${
+          className={`flex items-center gap-2 px-4 py-2.5 text-xs font-semibold rounded-xl whitespace-nowrap shrink-0 transition-all ${
             activeTab === 'statement'
               ? 'bg-foreground text-background shadow-xs'
               : 'text-muted hover:text-foreground hover:bg-surface'
@@ -429,7 +429,7 @@ export const ContentManager: React.FC = () => {
         <button
           type="button"
           onClick={() => setActiveTab('marquee')}
-          className={`flex items-center gap-2 px-4 py-2.5 text-xs font-semibold rounded-lg transition-all ${
+          className={`flex items-center gap-2 px-4 py-2.5 text-xs font-semibold rounded-xl whitespace-nowrap shrink-0 transition-all ${
             activeTab === 'marquee'
               ? 'bg-foreground text-background shadow-xs'
               : 'text-muted hover:text-foreground hover:bg-surface'
@@ -445,7 +445,7 @@ export const ContentManager: React.FC = () => {
         <button
           type="button"
           onClick={() => setActiveTab('philosophy')}
-          className={`flex items-center gap-2 px-4 py-2.5 text-xs font-semibold rounded-lg transition-all ${
+          className={`flex items-center gap-2 px-4 py-2.5 text-xs font-semibold rounded-xl whitespace-nowrap shrink-0 transition-all ${
             activeTab === 'philosophy'
               ? 'bg-foreground text-background shadow-xs'
               : 'text-muted hover:text-foreground hover:bg-surface'
@@ -458,7 +458,7 @@ export const ContentManager: React.FC = () => {
         <button
           type="button"
           onClick={() => setActiveTab('contact')}
-          className={`flex items-center gap-2 px-4 py-2.5 text-xs font-semibold rounded-lg transition-all ${
+          className={`flex items-center gap-2 px-4 py-2.5 text-xs font-semibold rounded-xl whitespace-nowrap shrink-0 transition-all ${
             activeTab === 'contact'
               ? 'bg-foreground text-background shadow-xs'
               : 'text-muted hover:text-foreground hover:bg-surface'
@@ -470,15 +470,15 @@ export const ContentManager: React.FC = () => {
 
         <Link
           to="/admin/content/sections"
-          className="flex items-center gap-2 px-4 py-2.5 text-xs font-semibold rounded-lg transition-all text-muted hover:text-foreground hover:bg-surface border border-dashed border-border"
+          className="flex items-center gap-2 px-4 py-2.5 text-xs font-semibold rounded-xl whitespace-nowrap shrink-0 transition-all text-muted hover:text-foreground hover:bg-surface border border-dashed border-border"
         >
           <Layers className="w-3.5 h-3.5" />
-          <span>Section Layout →</span>
+          <span>Reorder Sections →</span>
         </Link>
 
         <Link
           to="/admin/content/footer"
-          className="flex items-center gap-2 px-4 py-2.5 text-xs font-semibold rounded-lg transition-all text-muted hover:text-foreground hover:bg-surface border border-dashed border-border"
+          className="flex items-center gap-2 px-4 py-2.5 text-xs font-semibold rounded-lg transition-all text-muted hover:text-foreground hover:bg-surface border border-dashed border-border whitespace-nowrap shrink-0"
         >
           <Globe className="w-3.5 h-3.5" />
           <span>Footer & Social →</span>

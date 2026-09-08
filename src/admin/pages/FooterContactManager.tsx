@@ -344,11 +344,11 @@ export const FooterContactManager: React.FC = () => {
       )}
 
       {/* Tabs Navigation */}
-      <div className="flex items-center gap-2 border-b border-border pb-3">
+      <div className="flex items-center gap-2 border-b border-border pb-2 overflow-x-auto no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap">
         <button
           type="button"
           onClick={() => setActiveTab('footer')}
-          className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 ${
+          className={`px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider whitespace-nowrap shrink-0 transition-all flex items-center gap-2 ${
             activeTab === 'footer'
               ? 'bg-foreground text-background shadow-xs'
               : 'text-muted hover:text-foreground hover:bg-surface'
@@ -361,7 +361,7 @@ export const FooterContactManager: React.FC = () => {
         <button
           type="button"
           onClick={() => setActiveTab('social')}
-          className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 ${
+          className={`px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider whitespace-nowrap shrink-0 transition-all flex items-center gap-2 ${
             activeTab === 'social'
               ? 'bg-foreground text-background shadow-xs'
               : 'text-muted hover:text-foreground hover:bg-surface'
@@ -374,7 +374,7 @@ export const FooterContactManager: React.FC = () => {
         <button
           type="button"
           onClick={() => setActiveTab('contact')}
-          className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 ${
+          className={`px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider whitespace-nowrap shrink-0 transition-all flex items-center gap-2 ${
             activeTab === 'contact'
               ? 'bg-foreground text-background shadow-xs'
               : 'text-muted hover:text-foreground hover:bg-surface'
@@ -692,24 +692,24 @@ export const FooterContactManager: React.FC = () => {
                       </div>
 
                       {/* Label Input */}
-                      <div className="flex-1 min-w-[140px]">
+                      <div className="w-full sm:flex-1 min-w-0">
                         <input
                           type="text"
                           value={item.label}
                           onChange={(e) => handleUpdateSocialLink(index, 'label', e.target.value.toUpperCase())}
                           placeholder="Label"
-                          className="w-full px-2.5 py-1.5 rounded-lg border border-border bg-surface text-xs font-semibold uppercase text-foreground focus:outline-hidden focus:ring-1 focus:ring-foreground"
+                          className="w-full px-3 py-2 rounded-lg border border-border bg-surface text-xs font-semibold uppercase text-foreground focus:outline-hidden focus:ring-1 focus:ring-foreground"
                         />
                       </div>
 
                       {/* URL Input */}
-                      <div className="flex-2 min-w-[200px]">
+                      <div className="w-full sm:flex-2 min-w-0">
                         <input
                           type="text"
                           value={item.href || item.url || ''}
                           onChange={(e) => handleUpdateSocialLink(index, 'href', e.target.value)}
                           placeholder="https://..."
-                          className="w-full px-2.5 py-1.5 rounded-lg border border-border bg-surface text-xs font-mono text-foreground focus:outline-hidden focus:ring-1 focus:ring-foreground"
+                          className="w-full px-3 py-2 rounded-lg border border-border bg-surface text-xs font-mono text-foreground focus:outline-hidden focus:ring-1 focus:ring-foreground"
                         />
                       </div>
 

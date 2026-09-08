@@ -200,11 +200,11 @@ export const MediaPickerModal: React.FC<MediaPickerModalProps> = ({
 
         {/* Tab Controls & Search */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-6 pt-4 border-b border-border pb-3 bg-surface">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar -mx-2 px-2 sm:mx-0 sm:px-0">
             <button
               type="button"
               onClick={() => setActiveTab('library')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
+              className={`px-3 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
                 activeTab === 'library'
                   ? 'bg-foreground text-background shadow-xs'
                   : 'text-muted hover:text-foreground hover:bg-background'
@@ -216,7 +216,7 @@ export const MediaPickerModal: React.FC<MediaPickerModalProps> = ({
             <button
               type="button"
               onClick={() => setActiveTab('upload')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
+              className={`px-3 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
                 activeTab === 'upload'
                   ? 'bg-foreground text-background shadow-xs'
                   : 'text-muted hover:text-foreground hover:bg-background'
@@ -228,7 +228,7 @@ export const MediaPickerModal: React.FC<MediaPickerModalProps> = ({
             <button
               type="button"
               onClick={() => setActiveTab('url')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
+              className={`px-3 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
                 activeTab === 'url'
                   ? 'bg-foreground text-background shadow-xs'
                   : 'text-muted hover:text-foreground hover:bg-background'

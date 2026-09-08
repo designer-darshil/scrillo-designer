@@ -471,9 +471,9 @@ export const SkillsManager: React.FC = () => {
       {/* Category Create/Edit Modal */}
       {categoryModal.isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="w-full max-w-lg rounded-2xl border border-border bg-surface shadow-2xl overflow-hidden">
-            <form onSubmit={handleSaveCategory}>
-              <div className="flex items-center justify-between px-6 py-4 border-b border-border">
+          <div className="w-full max-w-lg rounded-2xl border border-border bg-surface shadow-2xl overflow-hidden flex flex-col max-h-[90dvh]">
+            <form onSubmit={handleSaveCategory} className="flex flex-col flex-1 overflow-hidden">
+              <div className="flex items-center justify-between px-6 py-4 border-b border-border bg-surface shrink-0">
                 <div className="flex items-center gap-2">
                   <Sparkles className="w-4 h-4 text-foreground" />
                   <h3 className="text-sm font-bold uppercase tracking-wider text-foreground">
@@ -489,9 +489,9 @@ export const SkillsManager: React.FC = () => {
                 </button>
               </div>
 
-              <div className="p-6 space-y-4">
-                <div className="grid grid-cols-3 gap-3">
-                  <div className="space-y-1.5 col-span-2">
+              <div className="p-5 sm:p-6 space-y-4 overflow-y-auto flex-1">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div className="space-y-1.5 sm:col-span-2">
                     <label htmlFor="cat-title-input" className="block text-xs font-semibold text-foreground">
                       Category Title <span className="text-red-500">*</span>
                     </label>
@@ -568,7 +568,7 @@ export const SkillsManager: React.FC = () => {
                 </div>
               </div>
 
-              <div className="flex items-center justify-end gap-2 px-6 py-4 border-t border-border bg-surface">
+              <div className="flex items-center justify-end gap-2 px-6 py-4 border-t border-border bg-surface shrink-0">
                 <button
                   type="button"
                   onClick={() => setCategoryModal({ isOpen: false, mode: 'create', category: {} })}
@@ -591,9 +591,9 @@ export const SkillsManager: React.FC = () => {
       {/* Skill Item Create/Edit Modal */}
       {skillModal.isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="w-full max-w-lg rounded-2xl border border-border bg-surface shadow-2xl overflow-hidden">
-            <form onSubmit={handleSaveSkill}>
-              <div className="flex items-center justify-between px-6 py-4 border-b border-border">
+          <div className="w-full max-w-lg rounded-2xl border border-border bg-surface shadow-2xl overflow-hidden flex flex-col max-h-[90dvh]">
+            <form onSubmit={handleSaveSkill} className="flex flex-col flex-1 overflow-hidden">
+              <div className="flex items-center justify-between px-6 py-4 border-b border-border bg-surface shrink-0">
                 <div className="flex items-center gap-2">
                   <Layers className="w-4 h-4 text-foreground" />
                   <h3 className="text-sm font-bold uppercase tracking-wider text-foreground">
@@ -609,7 +609,7 @@ export const SkillsManager: React.FC = () => {
                 </button>
               </div>
 
-              <div className="p-6 space-y-4">
+              <div className="p-5 sm:p-6 space-y-4 overflow-y-auto flex-1">
                 <div className="space-y-1.5">
                   <label htmlFor="skill-name-input" className="block text-xs font-semibold text-foreground">
                     Discipline Title <span className="text-red-500">*</span>
@@ -705,7 +705,7 @@ export const SkillsManager: React.FC = () => {
                 </div>
               </div>
 
-              <div className="flex items-center justify-end gap-2 px-6 py-4 border-t border-border bg-surface">
+              <div className="flex items-center justify-end gap-2 px-6 py-4 border-t border-border bg-surface shrink-0">
                 <button
                   type="button"
                   onClick={() => setSkillModal({ isOpen: false, mode: 'create', categoryId: '', skill: {} })}
@@ -982,7 +982,7 @@ export const SkillsManager: React.FC = () => {
                               setDraggedSkillData(null);
                               setDragOverSkillData(null);
                             }}
-                            className={`group flex items-center justify-between gap-3 p-3 rounded-xl border bg-surface transition-all ${
+                            className={`group flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-xl border bg-surface transition-all ${
                               isSkillDragging
                                 ? 'opacity-30 border-dashed border-foreground'
                                 : isSkillDropTarget
@@ -990,17 +990,17 @@ export const SkillsManager: React.FC = () => {
                                 : 'border-border hover:border-foreground/30'
                             }`}
                           >
-                            {/* Drag & Number */}
-                            <div className="flex items-center gap-3">
+                            {/* Drag & Number & Info */}
+                            <div className="flex items-center gap-3 min-w-0">
                               <button
                                 type="button"
-                                className="cursor-grab active:cursor-grabbing text-muted group-hover:text-foreground p-1 rounded hover:bg-background transition-colors"
+                                className="cursor-grab active:cursor-grabbing text-muted group-hover:text-foreground p-1 rounded hover:bg-background transition-colors shrink-0"
                                 title="Drag to reorder skill"
                               >
                                 <GripVertical className="w-3.5 h-3.5" />
                               </button>
 
-                              <span className="font-mono text-xs text-muted w-6">
+                              <span className="font-mono text-xs text-muted w-6 shrink-0">
                                 {skill.index || String(skillIdx + 1).padStart(2, '0')}
                               </span>
 
@@ -1015,11 +1015,11 @@ export const SkillsManager: React.FC = () => {
                                 </div>
                               )}
 
-                              <div>
+                              <div className="min-w-0 flex-1">
                                 <div className="flex items-center gap-2">
-                                  <span className="font-semibold text-xs text-foreground">{skill.name}</span>
+                                  <span className="font-semibold text-xs text-foreground truncate">{skill.name}</span>
                                   {skill.visible === false && (
-                                    <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-amber-500/10 text-amber-500 border border-amber-500/20">
+                                    <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-amber-500/10 text-amber-500 border border-amber-500/20 shrink-0">
                                       Hidden
                                     </span>
                                   )}
@@ -1031,7 +1031,7 @@ export const SkillsManager: React.FC = () => {
                             </div>
 
                             {/* Skill Action Buttons */}
-                            <div className="flex items-center gap-1 shrink-0">
+                            <div className="flex items-center gap-1 shrink-0 self-end sm:self-auto">
                               {/* Move Up */}
                               <button
                                 type="button"

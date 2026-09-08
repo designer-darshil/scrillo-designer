@@ -370,8 +370,8 @@ export const ServicesManager: React.FC = () => {
 
               <div className="p-6 overflow-y-auto space-y-6 flex-1">
                 {/* Number & Title */}
-                <div className="grid grid-cols-4 gap-4">
-                  <div className="space-y-1.5 col-span-3">
+                <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 sm:gap-4">
+                  <div className="space-y-1.5 sm:col-span-3">
                     <label htmlFor="svc-title-input" className="block text-xs font-semibold text-foreground">
                       Service Title <span className="text-red-500">*</span>
                     </label>
@@ -607,12 +607,12 @@ export const ServicesManager: React.FC = () => {
             )}
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:flex md:items-center gap-2">
             {/* Visibility Filter */}
             <select
               value={visibilityFilter}
               onChange={(e) => setVisibilityFilter(e.target.value as any)}
-              className="px-3 py-2 rounded-xl border border-border bg-background text-xs text-foreground focus:outline-hidden focus:ring-1 focus:ring-foreground"
+              className="w-full sm:w-auto px-3 py-2 rounded-xl border border-border bg-background text-xs text-foreground focus:outline-hidden focus:ring-1 focus:ring-foreground"
             >
               <option value="ALL">All Services</option>
               <option value="VISIBLE">Visible Only</option>
@@ -625,7 +625,7 @@ export const ServicesManager: React.FC = () => {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as any)}
-                className="bg-transparent text-foreground focus:outline-hidden"
+                className="bg-transparent text-foreground focus:outline-hidden w-full sm:w-auto"
               >
                 <option value="order">Custom Order</option>
                 <option value="title">Title A-Z</option>

@@ -218,19 +218,19 @@ export const PublishReviewModal: React.FC<PublishReviewModalProps> = ({
         </div>
 
         {/* Modal Footer */}
-        <div className="flex items-center justify-between px-6 py-4 border-t border-border bg-surface">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-6 py-4 border-t border-border bg-surface shrink-0">
           <div className="text-xs text-muted font-mono">
             {diffSummary.totalChanges > 0
               ? `${diffSummary.totalChanges} changes ready to push live`
               : 'Zero pending changes'}
           </div>
 
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center justify-end gap-2.5">
             <button
               type="button"
               onClick={onClose}
               disabled={publishing}
-              className="px-4 py-2 rounded-xl border border-border text-xs font-medium text-muted hover:text-foreground hover:bg-background transition-colors disabled:opacity-40"
+              className="px-4 py-2.5 rounded-xl border border-border text-xs font-medium text-muted hover:text-foreground hover:bg-background transition-colors disabled:opacity-40"
             >
               Cancel
             </button>
@@ -238,7 +238,7 @@ export const PublishReviewModal: React.FC<PublishReviewModalProps> = ({
               type="button"
               onClick={handlePublish}
               disabled={publishing || diffSummary.totalChanges === 0}
-              className="px-5 py-2 rounded-xl bg-foreground text-background text-xs font-bold uppercase tracking-wider hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2 shadow-xs"
+              className="px-5 py-2.5 rounded-xl bg-foreground text-background text-xs font-bold uppercase tracking-wider hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2 shadow-xs"
             >
               {publishing ? (
                 <>

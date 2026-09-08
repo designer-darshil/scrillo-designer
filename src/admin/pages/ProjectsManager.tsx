@@ -298,13 +298,13 @@ export const ProjectsManager: React.FC = () => {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Search by title, slug, client, discipline, or role..."
-              className="w-full pl-9 pr-8 py-2 rounded-xl border border-border bg-background text-xs text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
+              className="w-full pl-9 pr-8 py-2.5 rounded-xl border border-border bg-background text-xs text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
             />
             {searchTerm && (
               <button
                 type="button"
                 onClick={() => setSearchTerm('')}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-muted hover:text-foreground"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1.5 text-muted hover:text-foreground"
               >
                 <X className="w-3.5 h-3.5" />
               </button>
@@ -312,12 +312,12 @@ export const ProjectsManager: React.FC = () => {
           </div>
 
           {/* Filter Dropdowns */}
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-3 md:flex md:flex-wrap items-center gap-2">
             {/* Category Filter */}
             <select
               value={categoryFilter}
               onChange={(e) => setCategoryFilter(e.target.value)}
-              className="px-3 py-2 rounded-xl border border-border bg-background text-xs text-foreground focus:outline-hidden focus:ring-1 focus:ring-foreground"
+              className="w-full sm:w-auto px-3 py-2.5 rounded-xl border border-border bg-background text-xs text-foreground focus:outline-hidden focus:ring-1 focus:ring-foreground"
             >
               <option value="ALL">All Categories</option>
               {categories.map((c) => (
@@ -331,7 +331,7 @@ export const ProjectsManager: React.FC = () => {
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value as any)}
-              className="px-3 py-2 rounded-xl border border-border bg-background text-xs text-foreground focus:outline-hidden focus:ring-1 focus:ring-foreground"
+              className="w-full sm:w-auto px-3 py-2.5 rounded-xl border border-border bg-background text-xs text-foreground focus:outline-hidden focus:ring-1 focus:ring-foreground"
             >
               <option value="ALL">All Status</option>
               <option value="PUBLISHED">Published Only</option>
@@ -342,7 +342,7 @@ export const ProjectsManager: React.FC = () => {
             <select
               value={featuredFilter}
               onChange={(e) => setFeaturedFilter(e.target.value as any)}
-              className="px-3 py-2 rounded-xl border border-border bg-background text-xs text-foreground focus:outline-hidden focus:ring-1 focus:ring-foreground"
+              className="w-full sm:w-auto px-3 py-2.5 rounded-xl border border-border bg-background text-xs text-foreground focus:outline-hidden focus:ring-1 focus:ring-foreground"
             >
               <option value="ALL">All Showcases</option>
               <option value="FEATURED">Featured Only</option>
@@ -352,204 +352,347 @@ export const ProjectsManager: React.FC = () => {
         </div>
       </div>
 
-      {/* Projects Table / Drag-and-Drop List */}
-      <div className="rounded-2xl border border-border bg-surface overflow-hidden shadow-xs">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs">
-            <thead className="border-b border-border bg-background/60 font-mono text-[11px] text-muted uppercase">
-              <tr>
-                <th className="py-3.5 px-4 w-12 text-center">Order</th>
-                <th className="py-3.5 px-3 w-16">Thumbnail</th>
-                <th className="py-3.5 px-4">Title & Slug</th>
-                <th className="py-3.5 px-4">Year</th>
-                <th className="py-3.5 px-4">Category</th>
-                <th className="py-3.5 px-3 text-center">Featured</th>
-                <th className="py-3.5 px-3 text-center">Published</th>
-                <th className="py-3.5 px-4 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border">
-              {filteredProjects.length === 0 ? (
-                <tr>
-                  <td colSpan={8} className="py-12 text-center text-muted">
-                    <FolderGit2 className="w-8 h-8 mx-auto opacity-30 mb-2" />
-                    <p className="font-semibold">No projects match the current search or filters.</p>
-                    <p className="text-[11px] mt-1">Try clearing your filters or creating a new project.</p>
-                  </td>
-                </tr>
-              ) : (
-                filteredProjects.map((project, index) => {
-                  const isDraggingThis = draggedIndex === index;
-                  const isDropTarget = dragOverIndex === index;
+      {/* Projects Container: Responsive Cards on Mobile (<md), Dense Table on Desktop (>=md) */}
+      <div className="space-y-4">
+        {/* Mobile View: Cards List */}
+        <div className="block md:hidden space-y-3">
+          {filteredProjects.length === 0 ? (
+            <div className="py-12 px-4 rounded-2xl border border-border bg-surface text-center text-muted">
+              <FolderGit2 className="w-8 h-8 mx-auto opacity-30 mb-2" />
+              <p className="font-semibold text-xs">No projects match your search or filters.</p>
+              <p className="text-[11px] mt-1">Try clearing filters or creating a new project.</p>
+            </div>
+          ) : (
+            filteredProjects.map((project, index) => (
+              <div
+                key={project.id}
+                className="rounded-2xl border border-border bg-surface p-4 space-y-3 shadow-xs"
+              >
+                {/* Header: Thumbnail + Title + Number */}
+                <div className="flex items-start gap-3">
+                  <div className="w-14 h-14 rounded-xl overflow-hidden border border-border bg-background shrink-0">
+                    {project.thumbnail || project.coverImage ? (
+                      <img
+                        src={project.thumbnail || project.coverImage}
+                        alt={project.title}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-muted font-mono text-[10px]">
+                        N/A
+                      </div>
+                    )}
+                  </div>
 
-                  return (
-                    <tr
-                      key={project.id}
-                      draggable={searchTerm === '' && categoryFilter === 'ALL' && statusFilter === 'ALL' && featuredFilter === 'ALL'}
-                      onDragStart={() => handleDragStart(index)}
-                      onDragOver={(e) => handleDragOver(e, index)}
-                      onDrop={() => handleDrop(index)}
-                      onDragEnd={() => {
-                        setDraggedIndex(null);
-                        setDragOverIndex(null);
-                      }}
-                      className={`group transition-colors ${
-                        isDraggingThis ? 'opacity-30 bg-background/50' : isDropTarget ? 'bg-foreground/5 border-t-2 border-foreground' : 'hover:bg-background/40'
-                      }`}
-                    >
-                      {/* Order & Drag Handle */}
-                      <td className="py-3.5 px-4 text-center">
-                        <div className="flex items-center justify-center gap-1">
-                          <button
-                            type="button"
-                            className="cursor-grab active:cursor-grabbing text-muted group-hover:text-foreground p-1 rounded hover:bg-background transition-colors"
-                            title="Drag to reorder"
-                          >
-                            <GripVertical className="w-3.5 h-3.5" />
-                          </button>
-                          <span className="font-mono text-muted text-[11px] font-semibold w-5 text-left">
-                            #{String(project.order || index + 1).padStart(2, '0')}
-                          </span>
-                        </div>
-                      </td>
-
-                      {/* Thumbnail */}
-                      <td className="py-3.5 px-3">
-                        <div className="w-12 h-8 rounded-lg overflow-hidden border border-border bg-background shrink-0">
-                          {project.thumbnail || project.coverImage ? (
-                            <img
-                              src={project.thumbnail || project.coverImage}
-                              alt={project.title}
-                              className="w-full h-full object-cover grayscale contrast-125 group-hover:grayscale-0 transition-all duration-300"
-                            />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center text-muted font-mono text-[9px]">
-                              N/A
-                            </div>
-                          )}
-                        </div>
-                      </td>
-
-                      {/* Title & Slug */}
-                      <td className="py-3.5 px-4">
-                        <div className="space-y-0.5">
-                          <div className="font-bold text-foreground text-sm uppercase tracking-tight group-hover:text-foreground">
-                            {project.title}
-                          </div>
-                          <div className="font-mono text-[10px] text-muted flex items-center gap-2">
-                            <span>/{project.slug}</span>
-                            {project.client && (
-                              <>
-                                <span>•</span>
-                                <span>{project.client}</span>
-                              </>
-                            )}
-                          </div>
-                        </div>
-                      </td>
-
-                      {/* Year */}
-                      <td className="py-3.5 px-4 font-mono text-muted">{project.year || '2026'}</td>
-
-                      {/* Category */}
-                      <td className="py-3.5 px-4">
-                        <span className="px-2 py-0.5 rounded-md border border-border bg-background text-[11px] text-muted whitespace-nowrap">
-                          {project.category || 'General'}
-                        </span>
-                      </td>
-
-                      {/* Featured Toggle */}
-                      <td className="py-3.5 px-3 text-center">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between gap-1">
+                      <span className="font-mono text-muted text-[10px] font-bold">
+                        #{String(project.order || index + 1).padStart(2, '0')}
+                      </span>
+                      <div className="flex items-center gap-1.5">
+                        {/* Featured Star */}
                         <button
                           type="button"
                           onClick={() => handleToggleFeatured(project.id)}
                           className={`p-1.5 rounded-lg border transition-colors ${
                             project.featured
                               ? 'bg-amber-500/10 text-amber-500 border-amber-500/30'
-                              : 'border-transparent text-muted hover:text-foreground hover:bg-background'
+                              : 'border-border text-muted hover:text-foreground'
                           }`}
-                          title={project.featured ? 'Featured Project (Click to unfeature)' : 'Mark as Featured'}
+                          title={project.featured ? 'Featured' : 'Mark as Featured'}
                         >
                           <Star className={`w-3.5 h-3.5 ${project.featured ? 'fill-amber-500' : ''}`} />
                         </button>
-                      </td>
 
-                      {/* Published Status Toggle */}
-                      <td className="py-3.5 px-3 text-center">
+                        {/* Published Toggle */}
                         <button
                           type="button"
                           onClick={() => handleTogglePublish(project.id)}
-                          className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-semibold border transition-all ${
+                          className={`px-2 py-1 rounded-full text-[10px] font-semibold border transition-all ${
                             project.published !== false
-                              ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/20'
-                              : 'bg-zinc-500/10 text-muted border-zinc-500/20 hover:bg-zinc-500/20'
+                              ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/30'
+                              : 'bg-zinc-500/10 text-muted border-zinc-500/20'
                           }`}
-                          title="Click to toggle publish / draft"
                         >
-                          <Globe className="w-3 h-3" />
-                          <span>{project.published !== false ? 'Published' : 'Draft'}</span>
+                          {project.published !== false ? 'Published' : 'Draft'}
                         </button>
-                      </td>
+                      </div>
+                    </div>
 
-                      {/* Actions */}
-                      <td className="py-3.5 px-4 text-right">
-                        <div className="flex items-center justify-end gap-1">
-                          {/* Reorder Arrows (Accessibility fallback) */}
+                    <h3 className="font-bold text-foreground text-sm uppercase truncate mt-0.5">
+                      {project.title}
+                    </h3>
+                    <p className="font-mono text-[10px] text-muted truncate">
+                      /{project.slug} {project.client ? `• ${project.client}` : ''}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Tags row */}
+                <div className="flex flex-wrap items-center gap-1.5 pt-1 border-t border-border text-[10px] text-muted">
+                  <span className="px-2 py-0.5 rounded-md border border-border bg-background">
+                    {project.category || 'General'}
+                  </span>
+                  <span className="font-mono">{project.year || '2026'}</span>
+                </div>
+
+                {/* Mobile Actions Toolbar */}
+                <div className="flex items-center justify-between pt-2 border-t border-border">
+                  {/* Reorder Buttons */}
+                  <div className="flex items-center gap-1">
+                    <button
+                      type="button"
+                      onClick={() => handleMoveOrder(index, 'up')}
+                      disabled={index === 0}
+                      className="min-h-[38px] min-w-[38px] flex items-center justify-center rounded-xl border border-border text-muted hover:text-foreground hover:bg-background disabled:opacity-20 transition-colors"
+                      title="Move Up"
+                    >
+                      <ArrowUp className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleMoveOrder(index, 'down')}
+                      disabled={index === filteredProjects.length - 1}
+                      className="min-h-[38px] min-w-[38px] flex items-center justify-center rounded-xl border border-border text-muted hover:text-foreground hover:bg-background disabled:opacity-20 transition-colors"
+                      title="Move Down"
+                    >
+                      <ArrowDown className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+
+                  {/* Edit, Duplicate, Delete */}
+                  <div className="flex items-center gap-1.5">
+                    <Link
+                      to={`/admin/projects/${project.id}/edit`}
+                      className="min-h-[38px] px-3.5 flex items-center justify-center gap-1.5 rounded-xl bg-foreground text-background text-xs font-semibold hover:opacity-90 transition-opacity"
+                    >
+                      <Edit className="w-3.5 h-3.5" />
+                      <span>Edit</span>
+                    </Link>
+
+                    <button
+                      type="button"
+                      onClick={() => handleDuplicate(project.id)}
+                      className="min-h-[38px] min-w-[38px] flex items-center justify-center rounded-xl border border-border text-muted hover:text-foreground hover:bg-background transition-colors"
+                      title="Duplicate"
+                    >
+                      <Copy className="w-3.5 h-3.5" />
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setProjectToDelete(project)}
+                      className="min-h-[38px] min-w-[38px] flex items-center justify-center rounded-xl border border-red-500/20 text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors"
+                      title="Delete"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+
+        {/* Desktop View: Sortable Table */}
+        <div className="hidden md:block rounded-2xl border border-border bg-surface overflow-hidden shadow-xs">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs">
+              <thead className="border-b border-border bg-background/60 font-mono text-[11px] text-muted uppercase">
+                <tr>
+                  <th className="py-3.5 px-4 w-12 text-center">Order</th>
+                  <th className="py-3.5 px-3 w-16">Thumbnail</th>
+                  <th className="py-3.5 px-4">Title & Slug</th>
+                  <th className="py-3.5 px-4">Year</th>
+                  <th className="py-3.5 px-4">Category</th>
+                  <th className="py-3.5 px-3 text-center">Featured</th>
+                  <th className="py-3.5 px-3 text-center">Published</th>
+                  <th className="py-3.5 px-4 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {filteredProjects.length === 0 ? (
+                  <tr>
+                    <td colSpan={8} className="py-12 text-center text-muted">
+                      <FolderGit2 className="w-8 h-8 mx-auto opacity-30 mb-2" />
+                      <p className="font-semibold">No projects match the current search or filters.</p>
+                      <p className="text-[11px] mt-1">Try clearing your filters or creating a new project.</p>
+                    </td>
+                  </tr>
+                ) : (
+                  filteredProjects.map((project, index) => {
+                    const isDraggingThis = draggedIndex === index;
+                    const isDropTarget = dragOverIndex === index;
+
+                    return (
+                      <tr
+                        key={project.id}
+                        draggable={searchTerm === '' && categoryFilter === 'ALL' && statusFilter === 'ALL' && featuredFilter === 'ALL'}
+                        onDragStart={() => handleDragStart(index)}
+                        onDragOver={(e) => handleDragOver(e, index)}
+                        onDrop={() => handleDrop(index)}
+                        onDragEnd={() => {
+                          setDraggedIndex(null);
+                          setDragOverIndex(null);
+                        }}
+                        className={`group transition-colors ${
+                          isDraggingThis ? 'opacity-30 bg-background/50' : isDropTarget ? 'bg-foreground/5 border-t-2 border-foreground' : 'hover:bg-background/40'
+                        }`}
+                      >
+                        {/* Order & Drag Handle */}
+                        <td className="py-3.5 px-4 text-center">
+                          <div className="flex items-center justify-center gap-1">
+                            <button
+                              type="button"
+                              className="cursor-grab active:cursor-grabbing text-muted group-hover:text-foreground p-1 rounded hover:bg-background transition-colors"
+                              title="Drag to reorder"
+                            >
+                              <GripVertical className="w-3.5 h-3.5" />
+                            </button>
+                            <span className="font-mono text-muted text-[11px] font-semibold w-5 text-left">
+                              #{String(project.order || index + 1).padStart(2, '0')}
+                            </span>
+                          </div>
+                        </td>
+
+                        {/* Thumbnail */}
+                        <td className="py-3.5 px-3">
+                          <div className="w-12 h-8 rounded-lg overflow-hidden border border-border bg-background shrink-0">
+                            {project.thumbnail || project.coverImage ? (
+                              <img
+                                src={project.thumbnail || project.coverImage}
+                                alt={project.title}
+                                className="w-full h-full object-cover grayscale contrast-125 group-hover:grayscale-0 transition-all duration-300"
+                              />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center text-muted font-mono text-[9px]">
+                                N/A
+                              </div>
+                            )}
+                          </div>
+                        </td>
+
+                        {/* Title & Slug */}
+                        <td className="py-3.5 px-4">
+                          <div className="space-y-0.5">
+                            <div className="font-bold text-foreground text-sm uppercase tracking-tight group-hover:text-foreground">
+                              {project.title}
+                            </div>
+                            <div className="font-mono text-[10px] text-muted flex items-center gap-2">
+                              <span>/{project.slug}</span>
+                              {project.client && (
+                                <>
+                                  <span>•</span>
+                                  <span>{project.client}</span>
+                                </>
+                              )}
+                            </div>
+                          </div>
+                        </td>
+
+                        {/* Year */}
+                        <td className="py-3.5 px-4 font-mono text-muted">{project.year || '2026'}</td>
+
+                        {/* Category */}
+                        <td className="py-3.5 px-4">
+                          <span className="px-2 py-0.5 rounded-md border border-border bg-background text-[11px] text-muted whitespace-nowrap">
+                            {project.category || 'General'}
+                          </span>
+                        </td>
+
+                        {/* Featured Toggle */}
+                        <td className="py-3.5 px-3 text-center">
                           <button
                             type="button"
-                            onClick={() => handleMoveOrder(index, 'up')}
-                            disabled={index === 0}
-                            className="p-1.5 rounded-lg border border-border text-muted hover:text-foreground hover:bg-background disabled:opacity-20 transition-colors"
-                            title="Move Up"
+                            onClick={() => handleToggleFeatured(project.id)}
+                            className={`p-1.5 rounded-lg border transition-colors ${
+                              project.featured
+                                ? 'bg-amber-500/10 text-amber-500 border-amber-500/30'
+                                : 'border-transparent text-muted hover:text-foreground hover:bg-background'
+                            }`}
+                            title={project.featured ? 'Featured Project (Click to unfeature)' : 'Mark as Featured'}
                           >
-                            <ArrowUp className="w-3 h-3" />
+                            <Star className={`w-3.5 h-3.5 ${project.featured ? 'fill-amber-500' : ''}`} />
                           </button>
+                        </td>
+
+                        {/* Published Status Toggle */}
+                        <td className="py-3.5 px-3 text-center">
                           <button
                             type="button"
-                            onClick={() => handleMoveOrder(index, 'down')}
-                            disabled={index === filteredProjects.length - 1}
-                            className="p-1.5 rounded-lg border border-border text-muted hover:text-foreground hover:bg-background disabled:opacity-20 transition-colors"
-                            title="Move Down"
+                            onClick={() => handleTogglePublish(project.id)}
+                            className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-semibold border transition-all ${
+                              project.published !== false
+                                ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/20'
+                                : 'bg-zinc-500/10 text-muted border-zinc-500/20 hover:bg-zinc-500/20'
+                            }`}
+                            title="Click to toggle publish / draft"
                           >
-                            <ArrowDown className="w-3 h-3" />
+                            <Globe className="w-3 h-3" />
+                            <span>{project.published !== false ? 'Published' : 'Draft'}</span>
                           </button>
+                        </td>
 
-                          {/* Edit */}
-                          <Link
-                            to={`/admin/projects/${project.id}/edit`}
-                            className="p-1.5 rounded-lg border border-border text-muted hover:text-foreground hover:bg-background transition-colors"
-                            title="Edit Project"
-                          >
-                            <Edit className="w-3.5 h-3.5" />
-                          </Link>
+                        {/* Actions */}
+                        <td className="py-3.5 px-4 text-right">
+                          <div className="flex items-center justify-end gap-1">
+                            {/* Reorder Arrows (Accessibility fallback) */}
+                            <button
+                              type="button"
+                              onClick={() => handleMoveOrder(index, 'up')}
+                              disabled={index === 0}
+                              className="p-1.5 rounded-lg border border-border text-muted hover:text-foreground hover:bg-background disabled:opacity-20 transition-colors"
+                              title="Move Up"
+                            >
+                              <ArrowUp className="w-3 h-3" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleMoveOrder(index, 'down')}
+                              disabled={index === filteredProjects.length - 1}
+                              className="p-1.5 rounded-lg border border-border text-muted hover:text-foreground hover:bg-background disabled:opacity-20 transition-colors"
+                              title="Move Down"
+                            >
+                              <ArrowDown className="w-3 h-3" />
+                            </button>
 
-                          {/* Duplicate */}
-                          <button
-                            type="button"
-                            onClick={() => handleDuplicate(project.id)}
-                            className="p-1.5 rounded-lg border border-border text-muted hover:text-foreground hover:bg-background transition-colors"
-                            title="Duplicate Project"
-                          >
-                            <Copy className="w-3.5 h-3.5" />
-                          </button>
+                            {/* Edit */}
+                            <Link
+                              to={`/admin/projects/${project.id}/edit`}
+                              className="p-1.5 rounded-lg border border-border text-muted hover:text-foreground hover:bg-background transition-colors"
+                              title="Edit Project"
+                            >
+                              <Edit className="w-3.5 h-3.5" />
+                            </Link>
 
-                          {/* Delete */}
-                          <button
-                            type="button"
-                            onClick={() => setProjectToDelete(project)}
-                            className="p-1.5 rounded-lg border border-red-500/20 text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors"
-                            title="Delete Project"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
+                            {/* Duplicate */}
+                            <button
+                              type="button"
+                              onClick={() => handleDuplicate(project.id)}
+                              className="p-1.5 rounded-lg border border-border text-muted hover:text-foreground hover:bg-background transition-colors"
+                              title="Duplicate Project"
+                            >
+                              <Copy className="w-3.5 h-3.5" />
+                            </button>
+
+                            {/* Delete */}
+                            <button
+                              type="button"
+                              onClick={() => setProjectToDelete(project)}
+                              className="p-1.5 rounded-lg border border-red-500/20 text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors"
+                              title="Delete Project"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>

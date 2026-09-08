@@ -485,14 +485,14 @@ export const MediaManager: React.FC = () => {
             )}
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1">
             {/* Format Filter Tabs */}
             {(['ALL', 'WEBP', 'JPG', 'PNG', 'SVG'] as const).map((fmt) => (
               <button
                 key={fmt}
                 type="button"
                 onClick={() => setFormatFilter(fmt)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                className={`px-3 py-2 rounded-xl text-xs font-semibold transition-all whitespace-nowrap shrink-0 ${
                   formatFilter === fmt
                     ? 'bg-foreground text-background shadow-xs'
                     : 'text-muted hover:text-foreground hover:bg-background'

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { NavLink, Outlet, useLocation } from 'react-router-dom';
+import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard,
   FileText,
@@ -14,8 +14,11 @@ import {
   Sun,
   Moon,
   ShieldCheck,
+  LogOut,
+  User as UserIcon,
 } from 'lucide-react';
 import { useTheme } from '../../hooks/useTheme';
+import { useAuth } from '../hooks/useAuth';
 
 const navItems = [
   { path: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -29,10 +32,17 @@ const navItems = [
 
 export const AdminLayout: React.FC = () => {
   const { theme, toggleTheme } = useTheme();
+  const { user, signOut } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
 
   const currentNav = navItems.find((item) => location.pathname.startsWith(item.path)) || navItems[0];
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/admin/login');
+  };
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col md:flex-row transition-colors duration-300">
@@ -50,6 +60,14 @@ export const AdminLayout: React.FC = () => {
             aria-label="Toggle Theme"
           >
             {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+          </button>
+          <button
+            type="button"
+            onClick={handleSignOut}
+            className="p-2 border border-border text-foreground hover:bg-background transition-colors"
+            aria-label="Sign Out"
+          >
+            <LogOut className="w-4 h-4" />
           </button>
           <button
             type="button"
@@ -106,6 +124,14 @@ export const AdminLayout: React.FC = () => {
 
         {/* Sidebar Footer */}
         <div className="space-y-4 pt-6 border-t border-border">
+          {/* User Email Indicator */}
+          {user?.email && (
+            <div className="flex items-center gap-2 px-3 py-1.5 bg-background border border-border font-mono text-[11px] text-muted truncate">
+              <UserIcon className="w-3.5 h-3.5 text-foreground shrink-0" />
+              <span className="truncate">{user.email}</span>
+            </div>
+          )}
+
           {/* Quick link to public website */}
           <a
             href="/"
@@ -120,8 +146,21 @@ export const AdminLayout: React.FC = () => {
             <span className="text-[10px]">↗</span>
           </a>
 
+          {/* Sign Out Button */}
+          <button
+            type="button"
+            onClick={handleSignOut}
+            className="w-full flex items-center justify-between px-3.5 py-2 text-xs font-mono text-red-400 hover:text-red-300 border border-red-500/20 hover:border-red-500/50 bg-red-500/5 transition-colors"
+          >
+            <span className="flex items-center gap-2">
+              <LogOut className="w-3.5 h-3.5" />
+              <span>Sign Out</span>
+            </span>
+            <span className="text-[10px]">EXIT</span>
+          </button>
+
           {/* Theme Switch & Status */}
-          <div className="flex items-center justify-between pt-2 text-xs font-mono text-muted">
+          <div className="flex items-center justify-between pt-1 text-xs font-mono text-muted">
             <span>THEME</span>
             <button
               type="button"
@@ -155,10 +194,14 @@ export const AdminLayout: React.FC = () => {
               <ExternalLink className="w-3 h-3" />
             </a>
 
-            <div className="flex items-center gap-2 px-3 py-1 bg-surface border border-border font-mono text-xs text-muted">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 inline-block animate-pulse" />
-              <span>AUTHENTICATED</span>
-            </div>
+            <button
+              type="button"
+              onClick={handleSignOut}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono text-muted hover:text-red-400 border border-border hover:border-red-500/40 transition-colors"
+            >
+              <LogOut className="w-3 h-3" />
+              <span>Sign Out</span>
+            </button>
           </div>
         </header>
 

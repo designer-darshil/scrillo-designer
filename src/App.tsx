@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider } from './admin/hooks/useAuth';
 import { PortfolioHome } from './pages/PortfolioHome';
 import { AdminLayout } from './admin/layouts/AdminLayout';
 import { ProtectedRoute } from './admin/components/ProtectedRoute';
@@ -14,7 +15,8 @@ import { SettingsManager } from './admin/pages/SettingsManager';
 
 export const App: React.FC = () => {
   return (
-    <BrowserRouter>
+    <AuthProvider>
+      <BrowserRouter>
       <Routes>
         {/* Public Portfolio Route (Exact Unchanged Experience) */}
         <Route path="/" element={<PortfolioHome />} />
@@ -45,6 +47,7 @@ export const App: React.FC = () => {
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
+  </AuthProvider>
   );
 };
 

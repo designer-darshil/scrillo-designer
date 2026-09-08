@@ -6,6 +6,7 @@ import { Marquee } from './components/Marquee/Marquee';
 import { SelectedWorks } from './sections/SelectedWorks/SelectedWorks';
 import { Statement } from './sections/Statement/Statement';
 import { Skills } from './sections/Skills/Skills';
+import { Philosophy } from './sections/Philosophy/Philosophy';
 import { CustomCursor } from './components/CustomCursor/CustomCursor';
 
 export const App: React.FC = () => {
@@ -61,6 +62,9 @@ export const App: React.FC = () => {
 
         {/* 5. Discipline & Skills Section */}
         <Skills />
+
+        {/* 6. Design Philosophy Section */}
+        <Philosophy />
       </main>
 
       {/* Subtle bottom buffer for contact navigation target */}
@@ -68,7 +72,7 @@ export const App: React.FC = () => {
         id="contact"
         className="h-[20vh] bg-background border-t border-border flex items-center justify-between page-container text-meta text-muted"
       >
-        <span>DARSHIL BHUVA · DISCIPLINES & SKILLS EDITION</span>
+        <span>DARSHIL BHUVA · PHILOSOPHY EDITION</span>
         <span>NEXT SECTIONS RESERVED FOR UPCOMING PHASES</span>
       </div>
     </div>

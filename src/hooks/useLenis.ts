@@ -3,7 +3,7 @@ import Lenis from 'lenis';
 import { ScrollTrigger } from '../animations/gsapConfig';
 import gsap from 'gsap';
 
-export function useLenis(enabled: boolean = true) {
+export function useLenis(enabled: boolean = true, isLocked: boolean = false) {
   const lenisRef = useRef<Lenis | null>(null);
 
   useEffect(() => {
@@ -33,6 +33,11 @@ export function useLenis(enabled: boolean = true) {
 
     lenisRef.current = lenis;
 
+    if (isLocked) {
+      lenis.stop();
+      document.documentElement.classList.add('lenis-stopped');
+    }
+
     // Sync Lenis scroll events with GSAP ScrollTrigger updates
     lenis.on('scroll', ScrollTrigger.update);
 
@@ -47,8 +52,20 @@ export function useLenis(enabled: boolean = true) {
       gsap.ticker.remove(tickerCallback);
       lenis.destroy();
       lenisRef.current = null;
+      document.documentElement.classList.remove('lenis-stopped');
     };
-  }, []);
+  }, [enabled]);
+
+  useEffect(() => {
+    if (!lenisRef.current) return;
+    if (isLocked) {
+      lenisRef.current.stop();
+      document.documentElement.classList.add('lenis-stopped');
+    } else {
+      lenisRef.current.start();
+      document.documentElement.classList.remove('lenis-stopped');
+    }
+  }, [isLocked]);
 
   return lenisRef;
 }

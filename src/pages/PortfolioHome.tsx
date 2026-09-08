@@ -13,6 +13,7 @@ import { ExperimentalImage } from '../sections/ExperimentalImage/ExperimentalIma
 import { ContactCTA } from '../sections/ContactCTA/ContactCTA';
 import { Footer } from '../components/Footer/Footer';
 import { CustomCursor } from '../components/CustomCursor/CustomCursor';
+import { Preloader, usePreloader } from '../components/Preloader';
 import { AdminPreviewBanner } from '../components/AdminPreviewBanner/AdminPreviewBanner';
 import { PublishReviewModal } from '../admin/components/PublishReviewModal';
 import { useWebsiteData } from '../hooks/useWebsiteData';
@@ -40,6 +41,18 @@ export const PortfolioHome: React.FC = () => {
   const { sections, colors, animations, seo } = settings;
   const marquee = activeData.marquee;
 
+  // Preloader management for public website (bypassed in preview mode if desired, runs on initial load)
+  const {
+    isReady: isPreloaderReady,
+    isComplete: isPreloaderComplete,
+    shouldShow: shouldShowPreloader,
+    onExitComplete: onPreloaderExitComplete,
+  } = usePreloader({
+    minDuration: 1000,
+    maxTimeout: 2400,
+    heroImageUrl: activeData.hero?.heroImage,
+  });
+
   // Sync admin default theme if no explicit user override is stored
   useEffect(() => {
     const savedTheme = localStorage.getItem('portfolio-theme');
@@ -53,10 +66,10 @@ export const PortfolioHome: React.FC = () => {
     }
   }, [settings?.defaultTheme, setTheme]);
 
-  // Initialize Lenis smooth scroll foundation with settings flag
+  // Initialize Lenis smooth scroll foundation with settings flag and preloader scroll lock
   const isSmoothScrollEnabled =
     animations?.smoothScrollEnabled !== false && settings.enableSmoothScroll !== false;
-  useLenis(isSmoothScrollEnabled);
+  useLenis(isSmoothScrollEnabled, !isPreloaderComplete && shouldShowPreloader);
 
   // Sync Metadata & Custom CSS Variables to DOM
   useEffect(() => {
@@ -182,6 +195,16 @@ export const PortfolioHome: React.FC = () => {
 
   return (
     <div className={`relative min-h-screen bg-background text-foreground selection:bg-foreground selection:text-background ${isPreviewActive ? 'pt-10' : ''}`}>
+      {/* Full-Screen Editorial Preloader */}
+      {!isPreloaderComplete && shouldShowPreloader && (
+        <Preloader
+          brandText={activeData.footer?.brandText || settings.siteTitle || 'DARSHIL BHUVA'}
+          brandSubtitle={activeData.hero?.subEyebrow || settings.siteDescription || 'DIGITAL PRODUCT DESIGNER'}
+          isReady={isPreloaderReady}
+          onExitComplete={onPreloaderExitComplete}
+        />
+      )}
+
       {/* Admin Floating Preview Mode Banner */}
       {isPreviewActive && (
         <AdminPreviewBanner
@@ -198,8 +221,8 @@ export const PortfolioHome: React.FC = () => {
         Skip to main content
       </a>
 
-      {/* Reusable High-Performance Desktop Custom Cursor */}
-      {isCursorEnabled && <CustomCursor />}
+      {/* Reusable High-Performance Desktop Custom Cursor (active after preloader completes) */}
+      {isCursorEnabled && isPreloaderComplete && <CustomCursor />}
 
       {/* Premium Minimalist Fixed Header */}
       <Header

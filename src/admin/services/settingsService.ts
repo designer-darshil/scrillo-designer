@@ -81,37 +81,71 @@ let memorySettingsStore: WebsiteSettings = {
 
 export const settingsService = {
   /**
-   * Fetch website settings
+   * Fetch website settings from Supabase database
    */
   async getSettings(): Promise<WebsiteSettings> {
-    if (!isSupabaseConfigured) return { ...memorySettingsStore };
-    try {
-      const { data, error } = await supabase.from('site_settings').select('*').single();
-      if (error || !data?.settings) return { ...memorySettingsStore };
-
-      const mergedSections = normalizeSectionSettings(data.settings.sections);
-
-      memorySettingsStore = {
-        ...defaultSettings,
-        ...data.settings,
-        sections: mergedSections,
-        colors: {
-          dark: { ...defaultSettings.colors.dark, ...(data.settings.colors?.dark || {}) },
-          light: { ...defaultSettings.colors.light, ...(data.settings.colors?.light || {}) },
-        },
-        animations: {
-          ...defaultSettings.animations,
-          ...(data.settings.animations || {}),
-        },
-      };
+    if (!isSupabaseConfigured) {
+      console.info('[CMS] Supabase not configured. Using local memory settings.');
       return { ...memorySettingsStore };
-    } catch {
+    }
+
+    try {
+      console.info('[CMS] Fetching settings from Supabase (public.site_settings)...');
+      const { data, error } = await supabase
+        .from('site_settings')
+        .select('settings')
+        .eq('id', 1)
+        .maybeSingle();
+
+      if (!error && data?.settings) {
+        console.info('[CMS] Successfully loaded settings from Supabase database.');
+        const mergedSections = normalizeSectionSettings(data.settings.sections);
+        memorySettingsStore = {
+          ...defaultSettings,
+          ...data.settings,
+          sections: mergedSections,
+          colors: {
+            dark: { ...defaultSettings.colors.dark, ...(data.settings.colors?.dark || {}) },
+            light: { ...defaultSettings.colors.light, ...(data.settings.colors?.light || {}) },
+          },
+          animations: {
+            ...defaultSettings.animations,
+            ...(data.settings.animations || {}),
+          },
+        };
+        return { ...memorySettingsStore };
+      }
+
+      // Check section_settings companion table as fallback
+      const { data: sectionRows, error: secError } = await supabase
+        .from('section_settings')
+        .select('*');
+
+      if (!secError && sectionRows && sectionRows.length > 0) {
+        console.info('[CMS] Loaded section layout from section_settings table.');
+        const sectionMap: Partial<SectionSettings> = {};
+        sectionRows.forEach((r: any) => {
+          if (r.section_key) {
+            sectionMap[r.section_key as SectionId] = {
+              id: r.section_key,
+              name: r.name || r.section_key,
+              visible: r.visible !== false,
+              order: r.order || 1,
+            };
+          }
+        });
+        memorySettingsStore.sections = normalizeSectionSettings(sectionMap);
+      }
+
+      return { ...memorySettingsStore };
+    } catch (err) {
+      console.error('[CMS] Error fetching settings:', err);
       return { ...memorySettingsStore };
     }
   },
 
   /**
-   * Save website settings
+   * Save website settings to Supabase database
    */
   async updateSettings(settings: WebsiteSettings): Promise<boolean> {
     const normalizedSections = normalizeSectionSettings(settings.sections);
@@ -133,30 +167,39 @@ export const settingsService = {
       .catch(() => {});
 
     if (!isSupabaseConfigured) return true;
+
     try {
-      // 1. Save to site_settings JSON store
+      console.info('[CMS] Saving settings and section layout to Supabase database...');
+      // 1. Save to site_settings table
       const { error: settingsError } = await supabase
         .from('site_settings')
         .upsert({ id: 1, settings: normalizedSettings, updated_at: new Date().toISOString() });
 
-      // 2. Also keep section_settings relational table in sync if available
+      if (settingsError) {
+        console.warn('[CMS] site_settings upsert note:', settingsError.message);
+      }
+
+      // 2. Also keep section_settings relational table in sync
       try {
         const sectionRows = ALL_CANONICAL_SECTION_IDS.map((id) => ({
           section_key: id,
+          name: normalizedSections[id]?.name || id,
           visible: normalizedSections[id]?.visible !== false,
           order: normalizedSections[id]?.order ?? 1,
+          updated_at: new Date().toISOString(),
         }));
         await supabase.from('section_settings').upsert(sectionRows, { onConflict: 'section_key' });
-      } catch {
-        // Relational section_settings is optional companion
+      } catch (secErr) {
+        console.warn('[CMS] section_settings sync note:', secErr);
       }
 
+      console.info('[CMS] Successfully saved settings and section layout to Supabase.');
       return !settingsError;
-    } catch {
+    } catch (err) {
+      console.error('[CMS] Failed to save settings to Supabase:', err);
       return false;
     }
   },
 };
 
 export default settingsService;
-

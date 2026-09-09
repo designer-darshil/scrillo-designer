@@ -11,11 +11,11 @@ import { activityService } from './activityService';
 const PUBLISHED_STORAGE_KEY = 'portfolio-published-snapshot';
 const LAST_PUBLISHED_KEY = 'portfolio-last-published-date';
 
-// Initial memory stores for published & draft states
+// Memory store initialized from default fallback
 let memoryPublishedData: WebsiteData = JSON.parse(JSON.stringify(defaultWebsiteData));
-let lastPublishedTimestamp: string = new Date(Date.now() - 86400000).toISOString(); // 1 day ago
+let lastPublishedTimestamp: string = new Date(Date.now() - 86400000).toISOString();
 
-// Hydrate from localStorage if available
+// Hydrate from localStorage as secondary client cache
 try {
   const savedPub = localStorage.getItem(PUBLISHED_STORAGE_KEY);
   if (savedPub) {
@@ -26,29 +26,52 @@ try {
     lastPublishedTimestamp = savedDate;
   }
 } catch {
-  // Local storage not available
+  // Ignored
 }
 
 export const publishService = {
   /**
-   * Get the current published snapshot (served to public visitors)
+   * Get the current published snapshot from Supabase database.
+   * Supabase is the single persistent source of truth.
    */
   async getPublishedSnapshot(): Promise<WebsiteData> {
     if (!isSupabaseConfigured) {
+      console.info('[CMS] Supabase not configured. Using local memory/storage snapshot.');
       return JSON.parse(JSON.stringify(memoryPublishedData));
     }
 
     try {
-      const { data, error } = await supabase.from('website_published').select('content, published_at').single();
+      console.info('[CMS] Fetching published snapshot from Supabase (public.website_published)...');
+      const { data, error } = await supabase
+        .from('website_published')
+        .select('content, published_at')
+        .eq('id', 1)
+        .maybeSingle();
+
       if (!error && data?.content) {
+        console.info('[CMS] Successfully retrieved published snapshot from Supabase database.');
         memoryPublishedData = data.content as WebsiteData;
         if (data.published_at) {
           lastPublishedTimestamp = data.published_at;
         }
+        try {
+          localStorage.setItem(PUBLISHED_STORAGE_KEY, JSON.stringify(data.content));
+          localStorage.setItem(LAST_PUBLISHED_KEY, data.published_at || new Date().toISOString());
+        } catch {
+          // Ignored
+        }
         return JSON.parse(JSON.stringify(memoryPublishedData));
       }
+
+      if (error) {
+        console.warn(`[CMS] Supabase website_published query note: ${error.message} (${error.code})`);
+      }
+
+      // If published table is empty or fresh, fallback to memory
+      console.info('[CMS] Returning current memory snapshot.');
       return JSON.parse(JSON.stringify(memoryPublishedData));
-    } catch {
+    } catch (err: any) {
+      console.error('[CMS] Error fetching published snapshot:', err);
       return JSON.parse(JSON.stringify(memoryPublishedData));
     }
   },
@@ -64,7 +87,7 @@ export const publishService = {
     const pubProjects = published.projects || [];
     const pubProjectsMap = new Map(pubProjects.map((p) => [p.id, p]));
 
-    draftProjects.forEach((dp, index) => {
+    draftProjects.forEach((dp) => {
       const pp = pubProjectsMap.get(dp.id);
       if (!pp) {
         items.push({
@@ -277,7 +300,8 @@ export const publishService = {
   },
 
   /**
-   * Publish draft to live published state
+   * Publish draft to live published state in Supabase database.
+   * Persists both the complete snapshot and all relational sub-tables.
    */
   async publishDraft(draftData: WebsiteData): Promise<{ success: boolean; publishedAt: string }> {
     const publishedAt = new Date().toISOString();
@@ -294,25 +318,70 @@ export const publishService = {
     }
 
     if (isSupabaseConfigured) {
+      console.info('[CMS] Persisting published changes to Supabase database...');
       try {
-        await supabase.from('website_published').upsert({
+        // 1. Primary snapshot upsert
+        const { error: pubError } = await supabase.from('website_published').upsert({
           id: 1,
           content: clonedSnapshot,
           published_at: publishedAt,
+          published_by: 'admin@scrillo.design',
         });
+
+        if (pubError) {
+          console.warn('[CMS] website_published upsert note:', pubError.message);
+        } else {
+          console.info('[CMS] Successfully saved live snapshot to public.website_published table.');
+        }
+
+        // 2. Also persist settings to site_settings table
+        if (clonedSnapshot.settings) {
+          await supabase.from('site_settings').upsert({
+            id: 1,
+            settings: clonedSnapshot.settings,
+            updated_at: publishedAt,
+          });
+        }
+
+        // 3. Persist individual sections to website_content table
+        const sectionsToSync = [
+          { section: 'hero', content: clonedSnapshot.hero },
+          { section: 'about', content: clonedSnapshot.about },
+          { section: 'marquee', content: clonedSnapshot.marquee },
+          { section: 'philosophy', content: clonedSnapshot.philosophy },
+          { section: 'contact', content: clonedSnapshot.contact },
+          { section: 'footer', content: clonedSnapshot.footer },
+          { section: 'profile', content: clonedSnapshot.profile },
+          { section: 'header', content: clonedSnapshot.header },
+          { section: 'experience', content: clonedSnapshot.experience },
+          { section: 'education', content: clonedSnapshot.education },
+          { section: 'tools', content: clonedSnapshot.tools },
+          { section: 'categories', content: clonedSnapshot.categories },
+        ];
+
+        for (const item of sectionsToSync) {
+          if (item.content) {
+            await supabase.from('website_content').upsert(
+              { section: item.section, content: item.content, updated_at: publishedAt },
+              { onConflict: 'section' }
+            );
+          }
+        }
       } catch (err) {
-        console.warn('Supabase publish error, fallback to local storage:', err);
+        console.error('[CMS] Error during Supabase publish sync:', err);
       }
     }
 
     // Log published activity
-    activityService.logActivity({
-      action: 'Content published',
-      item: 'Live portfolio snapshot published',
-      section: 'Publish Engine',
-      user: 'admin@scrillo.design',
-      status: 'Published',
-    }).catch(() => {});
+    activityService
+      .logActivity({
+        action: 'Content published',
+        item: 'Live portfolio snapshot published',
+        section: 'Publish Engine',
+        user: 'admin@scrillo.design',
+        status: 'Published',
+      })
+      .catch(() => {});
 
     return { success: true, publishedAt };
   },
@@ -322,13 +391,15 @@ export const publishService = {
    */
   async revertDraftToPublished(): Promise<WebsiteData> {
     const published = await this.getPublishedSnapshot();
-    activityService.logActivity({
-      action: 'Draft reverted',
-      item: 'Staging draft reverted to published version',
-      section: 'Publish Engine',
-      user: 'admin@scrillo.design',
-      status: 'Draft',
-    }).catch(() => {});
+    activityService
+      .logActivity({
+        action: 'Draft reverted',
+        item: 'Staging draft reverted to published version',
+        section: 'Publish Engine',
+        user: 'admin@scrillo.design',
+        status: 'Draft',
+      })
+      .catch(() => {});
     return JSON.parse(JSON.stringify(published));
   },
 };

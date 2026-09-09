@@ -155,30 +155,38 @@ export const WebsiteDataProvider: React.FC<{ children: React.ReactNode }> = ({ c
         publishService.getPublishedSnapshot(),
       ]);
 
-      setData((prev) => ({
-        ...prev,
-        settings: settings || prev.settings,
-        profile: remoteData.profile || prev.profile,
-        header: remoteData.header || prev.header || defaultWebsiteData.header,
-        hero: remoteData.hero || prev.hero,
-        about: remoteData.about || prev.about,
-        marquee: remoteData.marquee || prev.marquee,
-        philosophy: remoteData.philosophy || prev.philosophy,
-        contact: remoteData.contact || prev.contact,
-        footer: remoteData.footer || prev.footer,
-        experience: remoteData.experience || prev.experience,
-        education: remoteData.education || prev.education,
-        tools: remoteData.tools || prev.tools,
-        categories: remoteData.categories && remoteData.categories.length > 0 ? remoteData.categories : prev.categories || defaultWebsiteData.categories,
-        projects: projects && projects.length > 0 ? projects : prev.projects,
-        skills: skills && skills.length > 0 ? skills : prev.skills,
-        services: services && services.length > 0 ? services : prev.services,
-      }));
+      console.info('[CMS] Refreshing website data from Supabase / services...');
+      const resolvedDraft: WebsiteData = {
+        settings: settings || defaultWebsiteData.settings,
+        profile: remoteData.profile || defaultWebsiteData.profile!,
+        header: remoteData.header || defaultWebsiteData.header!,
+        hero: remoteData.hero || defaultWebsiteData.hero,
+        about: remoteData.about || defaultWebsiteData.about,
+        marquee: remoteData.marquee || defaultWebsiteData.marquee,
+        philosophy: remoteData.philosophy || defaultWebsiteData.philosophy,
+        contact: remoteData.contact || defaultWebsiteData.contact,
+        footer: remoteData.footer || defaultWebsiteData.footer,
+        experience: remoteData.experience || defaultWebsiteData.experience || [],
+        education: remoteData.education || defaultWebsiteData.education || [],
+        tools: remoteData.tools || defaultWebsiteData.tools || [],
+        categories: remoteData.categories && remoteData.categories.length > 0 ? remoteData.categories : defaultWebsiteData.categories || [],
+        projects: projects && projects.length > 0 ? projects : defaultWebsiteData.projects,
+        skills: skills && skills.length > 0 ? skills : defaultWebsiteData.skills,
+        services: services && services.length > 0 ? services : defaultWebsiteData.services,
+        image: defaultWebsiteData.image,
+      };
+
+      setData(resolvedDraft);
 
       if (publishedSnapshot) {
+        console.info('[CMS] Setting publishedData from Supabase published snapshot.');
         setPublishedData(publishedSnapshot);
+      } else {
+        console.info('[CMS] No published snapshot found yet; initializing publishedData from live database entities.');
+        setPublishedData(resolvedDraft);
       }
     } catch (err: any) {
+      console.error('[CMS] Error during refreshData:', err);
       setError(err?.message || 'Failed to load website data');
     } finally {
       setLoading(false);

@@ -269,6 +269,10 @@ export const PortfolioHome: React.FC = () => {
       {/* Premium Minimalist Fixed Header */}
       <Header
         activeSection={activeSection}
+        header={activeData.header}
+        profile={activeData.profile}
+        contact={activeData.contact}
+        footer={activeData.footer}
         onNavigate={(id) => {
           setActiveSection(id);
           const el = document.getElementById(id);

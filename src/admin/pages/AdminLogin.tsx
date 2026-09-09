@@ -1,20 +1,33 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import { ShieldCheck, Eye, EyeOff, ArrowRight, KeyRound } from 'lucide-react';
+import { ShieldCheck, Eye, EyeOff, ArrowRight, KeyRound, Clock } from 'lucide-react';
 import { isSupabaseConfigured } from '../../lib/supabase';
 import { Button, Input, Alert, Badge, Card } from '../../design-system';
 
 export const AdminLogin: React.FC = () => {
-  const { user, signIn, loading: authLoading } = useAuth();
+  const { user, signIn, sessionLifetimeHours, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
   const [email, setEmail] = useState('darshilbhuva4322@gmail.com');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [sessionHours, setSessionHours] = useState<24 | 48>((sessionLifetimeHours as 24 | 48) || 24);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [infoMessage, setInfoMessage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Check for session expiry notice on load
+  useEffect(() => {
+    try {
+      const msg = localStorage.getItem('scrillo_auth_message');
+      if (msg) {
+        setInfoMessage(msg);
+        localStorage.removeItem('scrillo_auth_message');
+      }
+    } catch {}
+  }, []);
 
   // If already authenticated, redirect to dashboard
   useEffect(() => {
@@ -39,7 +52,7 @@ export const AdminLogin: React.FC = () => {
     }
 
     setIsSubmitting(true);
-    const { error } = await signIn(email.trim(), password);
+    const { error } = await signIn(email.trim(), password, sessionHours);
     setIsSubmitting(false);
 
     if (error) {
@@ -71,6 +84,13 @@ export const AdminLogin: React.FC = () => {
             Authorized access only. Enter administrative credentials to manage portfolio content and repositories.
           </p>
         </div>
+
+        {/* Info Alert Message (e.g. Session Expiry) */}
+        {infoMessage && (
+          <Alert variant="warning" title="Session Notification">
+            {infoMessage}
+          </Alert>
+        )}
 
         {/* Error Alert Message */}
         {errorMessage && (
@@ -131,6 +151,41 @@ export const AdminLogin: React.FC = () => {
               placeholder="Enter password"
               disabled={isSubmitting}
             />
+          </div>
+
+          {/* Session Lifetime Duration Selector */}
+          <div className="pt-1 space-y-1.5">
+            <label className="text-[11px] font-mono text-[var(--color-text-secondary)] uppercase tracking-wider flex items-center gap-1.5">
+              <Clock className="w-3.5 h-3.5 text-[var(--color-text-tertiary)]" />
+              <span>SESSION LIFETIME</span>
+            </label>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => setSessionHours(24)}
+                className={`py-2 px-3 text-xs font-mono rounded border text-center transition-all cursor-pointer ${
+                  sessionHours === 24
+                    ? 'border-[var(--color-border-focus)] bg-[var(--color-surface-selected)] text-[var(--color-text-primary)] font-bold shadow-sm'
+                    : 'border-[var(--color-border-subtle)] bg-[var(--color-surface-subtle)] text-[var(--color-text-secondary)] hover:border-[var(--color-border-strong)]'
+                }`}
+              >
+                24 HOURS
+              </button>
+              <button
+                type="button"
+                onClick={() => setSessionHours(48)}
+                className={`py-2 px-3 text-xs font-mono rounded border text-center transition-all cursor-pointer ${
+                  sessionHours === 48
+                    ? 'border-[var(--color-border-focus)] bg-[var(--color-surface-selected)] text-[var(--color-text-primary)] font-bold shadow-sm'
+                    : 'border-[var(--color-border-subtle)] bg-[var(--color-surface-subtle)] text-[var(--color-text-secondary)] hover:border-[var(--color-border-strong)]'
+                }`}
+              >
+                48 HOURS
+              </button>
+            </div>
+            <p className="text-[10px] text-[var(--color-text-tertiary)]">
+              After {sessionHours} hours of inactivity/session age, you will be automatically logged out.
+            </p>
           </div>
 
           <Button

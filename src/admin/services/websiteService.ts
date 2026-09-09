@@ -16,7 +16,7 @@ import {
 } from '../../types';
 import { defaultWebsiteData } from '../../data/defaultWebsiteData';
 
-// In-memory cache to ensure state persistence across sessions/transitions even if Supabase is offline/unconfigured
+// In-memory cache to ensure state persistence across sessions/transitions
 const memoryStore: {
   profile: ProfileContent;
   header: HeaderSettings;
@@ -56,10 +56,11 @@ export const defaultHeaderSettings: HeaderSettings = defaultWebsiteData.header!;
 
 export const websiteService = {
   /**
-   * Fetch complete website data with fallback to memory/defaults
+   * Fetch complete website data from Supabase (public.website_content)
    */
   async getWebsiteData(): Promise<Partial<WebsiteData>> {
     if (!isSupabaseConfigured) {
+      console.info('[CMS] Supabase not configured. Using local memory store.');
       return {
         profile: memoryStore.profile,
         header: memoryStore.header,
@@ -72,14 +73,18 @@ export const websiteService = {
         experience: memoryStore.experience,
         education: memoryStore.education,
         tools: memoryStore.tools,
+        categories: memoryStore.categories,
       };
     }
 
     try {
+      console.info('[CMS] Loading website content from Supabase (public.website_content)...');
       const { data, error } = await supabase.from('website_content').select('*');
-      if (error || !data || data.length === 0) {
+      if (error) {
+        console.warn(`[CMS] website_content query note: ${error.message} (${error.code})`);
         return {
           profile: memoryStore.profile,
+          header: memoryStore.header,
           hero: memoryStore.hero,
           about: memoryStore.about,
           marquee: memoryStore.marquee,
@@ -89,40 +94,46 @@ export const websiteService = {
           experience: memoryStore.experience,
           education: memoryStore.education,
           tools: memoryStore.tools,
+          categories: memoryStore.categories,
         };
       }
 
-      const map: Record<string, any> = {};
-      data.forEach((row: { section: string; content: any }) => {
-        map[row.section] = row.content;
-      });
+      if (data && data.length > 0) {
+        console.info(`[CMS] Successfully loaded ${data.length} content sections from Supabase.`);
+        const map: Record<string, any> = {};
+        data.forEach((row: { section: string; content: any }) => {
+          map[row.section] = row.content;
+        });
 
-      if (map.profile) memoryStore.profile = map.profile;
-      if (map.header) memoryStore.header = map.header;
-      if (map.hero) memoryStore.hero = map.hero;
-      if (map.about) memoryStore.about = map.about;
-      if (map.marquee) memoryStore.marquee = map.marquee;
-      if (map.philosophy) memoryStore.philosophy = map.philosophy;
-      if (map.contact) memoryStore.contact = map.contact;
-      if (map.footer) memoryStore.footer = map.footer;
-      if (map.experience) memoryStore.experience = map.experience;
-      if (map.education) memoryStore.education = map.education;
-      if (map.tools) memoryStore.tools = map.tools;
+        if (map.profile) memoryStore.profile = map.profile;
+        if (map.header) memoryStore.header = map.header;
+        if (map.hero) memoryStore.hero = map.hero;
+        if (map.about) memoryStore.about = map.about;
+        if (map.marquee) memoryStore.marquee = map.marquee;
+        if (map.philosophy) memoryStore.philosophy = map.philosophy;
+        if (map.contact) memoryStore.contact = map.contact;
+        if (map.footer) memoryStore.footer = map.footer;
+        if (map.experience) memoryStore.experience = map.experience;
+        if (map.education) memoryStore.education = map.education;
+        if (map.tools) memoryStore.tools = map.tools;
+        if (map.categories) memoryStore.categories = map.categories;
 
-      return {
-        profile: map.profile || memoryStore.profile,
-        header: map.header || memoryStore.header,
-        hero: map.hero || memoryStore.hero,
-        about: map.about || memoryStore.about,
-        marquee: map.marquee || memoryStore.marquee,
-        philosophy: map.philosophy || memoryStore.philosophy,
-        contact: map.contact || memoryStore.contact,
-        footer: map.footer || memoryStore.footer,
-        experience: map.experience || memoryStore.experience,
-        education: map.education || memoryStore.education,
-        tools: map.tools || memoryStore.tools,
-      };
-    } catch {
+        return {
+          profile: map.profile || memoryStore.profile,
+          header: map.header || memoryStore.header,
+          hero: map.hero || memoryStore.hero,
+          about: map.about || memoryStore.about,
+          marquee: map.marquee || memoryStore.marquee,
+          philosophy: map.philosophy || memoryStore.philosophy,
+          contact: map.contact || memoryStore.contact,
+          footer: map.footer || memoryStore.footer,
+          experience: map.experience || memoryStore.experience,
+          education: map.education || memoryStore.education,
+          tools: map.tools || memoryStore.tools,
+          categories: map.categories || memoryStore.categories,
+        };
+      }
+
       return {
         profile: memoryStore.profile,
         header: memoryStore.header,
@@ -135,7 +146,47 @@ export const websiteService = {
         experience: memoryStore.experience,
         education: memoryStore.education,
         tools: memoryStore.tools,
+        categories: memoryStore.categories,
       };
+    } catch (err) {
+      console.error('[CMS] Error fetching website content:', err);
+      return {
+        profile: memoryStore.profile,
+        header: memoryStore.header,
+        hero: memoryStore.hero,
+        about: memoryStore.about,
+        marquee: memoryStore.marquee,
+        philosophy: memoryStore.philosophy,
+        contact: memoryStore.contact,
+        footer: memoryStore.footer,
+        experience: memoryStore.experience,
+        education: memoryStore.education,
+        tools: memoryStore.tools,
+        categories: memoryStore.categories,
+      };
+    }
+  },
+
+  /**
+   * Helper to persist a specific section to Supabase
+   */
+  async persistSection(section: string, content: any): Promise<boolean> {
+    if (!isSupabaseConfigured) return true;
+    try {
+      console.info(`[CMS] Persisting section "${section}" to Supabase...`);
+      const { error } = await supabase
+        .from('website_content')
+        .upsert({ section, content, updated_at: new Date().toISOString() }, { onConflict: 'section' });
+
+      if (error) {
+        console.warn(`[CMS] Failed to persist section "${section}":`, error.message);
+        return false;
+      }
+      console.info(`[CMS] Successfully persisted section "${section}" to database.`);
+      return true;
+    } catch (err) {
+      console.error(`[CMS] Error persisting section "${section}":`, err);
+      return false;
     }
   },
 
@@ -145,7 +196,7 @@ export const websiteService = {
   async getHeaderSettings(): Promise<HeaderSettings> {
     if (!isSupabaseConfigured) return memoryStore.header;
     try {
-      const { data, error } = await supabase.from('website_content').select('content').eq('section', 'header').single();
+      const { data, error } = await supabase.from('website_content').select('content').eq('section', 'header').maybeSingle();
       if (error || !data?.content) return memoryStore.header;
       memoryStore.header = data.content as HeaderSettings;
       return memoryStore.header;
@@ -156,15 +207,7 @@ export const websiteService = {
 
   async updateHeaderSettings(content: HeaderSettings): Promise<boolean> {
     memoryStore.header = { ...content };
-    if (!isSupabaseConfigured) return true;
-    try {
-      const { error } = await supabase
-        .from('website_content')
-        .upsert({ section: 'header', content, updated_at: new Date().toISOString() }, { onConflict: 'section' });
-      return !error;
-    } catch {
-      return false;
-    }
+    return this.persistSection('header', content);
   },
 
   /**
@@ -173,7 +216,7 @@ export const websiteService = {
   async getProfileContent(): Promise<ProfileContent> {
     if (!isSupabaseConfigured) return memoryStore.profile;
     try {
-      const { data, error } = await supabase.from('website_content').select('content').eq('section', 'profile').single();
+      const { data, error } = await supabase.from('website_content').select('content').eq('section', 'profile').maybeSingle();
       if (error || !data?.content) return memoryStore.profile;
       memoryStore.profile = data.content as ProfileContent;
       return memoryStore.profile;
@@ -184,15 +227,7 @@ export const websiteService = {
 
   async updateProfileContent(content: ProfileContent): Promise<boolean> {
     memoryStore.profile = { ...content };
-    if (!isSupabaseConfigured) return true;
-    try {
-      const { error } = await supabase
-        .from('website_content')
-        .upsert({ section: 'profile', content, updated_at: new Date().toISOString() }, { onConflict: 'section' });
-      return !error;
-    } catch {
-      return false;
-    }
+    return this.persistSection('profile', content);
   },
 
   /**
@@ -201,7 +236,7 @@ export const websiteService = {
   async getExperience(): Promise<ExperienceItem[]> {
     if (!isSupabaseConfigured) return memoryStore.experience;
     try {
-      const { data, error } = await supabase.from('website_content').select('content').eq('section', 'experience').single();
+      const { data, error } = await supabase.from('website_content').select('content').eq('section', 'experience').maybeSingle();
       if (error || !data?.content) return memoryStore.experience;
       memoryStore.experience = data.content as ExperienceItem[];
       return memoryStore.experience;
@@ -212,15 +247,7 @@ export const websiteService = {
 
   async updateExperience(content: ExperienceItem[]): Promise<boolean> {
     memoryStore.experience = [...content];
-    if (!isSupabaseConfigured) return true;
-    try {
-      const { error } = await supabase
-        .from('website_content')
-        .upsert({ section: 'experience', content, updated_at: new Date().toISOString() }, { onConflict: 'section' });
-      return !error;
-    } catch {
-      return false;
-    }
+    return this.persistSection('experience', content);
   },
 
   /**
@@ -229,7 +256,7 @@ export const websiteService = {
   async getEducation(): Promise<EducationItem[]> {
     if (!isSupabaseConfigured) return memoryStore.education;
     try {
-      const { data, error } = await supabase.from('website_content').select('content').eq('section', 'education').single();
+      const { data, error } = await supabase.from('website_content').select('content').eq('section', 'education').maybeSingle();
       if (error || !data?.content) return memoryStore.education;
       memoryStore.education = data.content as EducationItem[];
       return memoryStore.education;
@@ -240,15 +267,7 @@ export const websiteService = {
 
   async updateEducation(content: EducationItem[]): Promise<boolean> {
     memoryStore.education = [...content];
-    if (!isSupabaseConfigured) return true;
-    try {
-      const { error } = await supabase
-        .from('website_content')
-        .upsert({ section: 'education', content, updated_at: new Date().toISOString() }, { onConflict: 'section' });
-      return !error;
-    } catch {
-      return false;
-    }
+    return this.persistSection('education', content);
   },
 
   /**
@@ -257,7 +276,7 @@ export const websiteService = {
   async getTools(): Promise<ToolItem[]> {
     if (!isSupabaseConfigured) return memoryStore.tools;
     try {
-      const { data, error } = await supabase.from('website_content').select('content').eq('section', 'tools').single();
+      const { data, error } = await supabase.from('website_content').select('content').eq('section', 'tools').maybeSingle();
       if (error || !data?.content) return memoryStore.tools;
       memoryStore.tools = data.content as ToolItem[];
       return memoryStore.tools;
@@ -268,15 +287,7 @@ export const websiteService = {
 
   async updateTools(content: ToolItem[]): Promise<boolean> {
     memoryStore.tools = [...content];
-    if (!isSupabaseConfigured) return true;
-    try {
-      const { error } = await supabase
-        .from('website_content')
-        .upsert({ section: 'tools', content, updated_at: new Date().toISOString() }, { onConflict: 'section' });
-      return !error;
-    } catch {
-      return false;
-    }
+    return this.persistSection('tools', content);
   },
 
   /**
@@ -285,7 +296,7 @@ export const websiteService = {
   async getCategories(): Promise<PortfolioCategory[]> {
     if (!isSupabaseConfigured) return memoryStore.categories;
     try {
-      const { data, error } = await supabase.from('website_content').select('content').eq('section', 'categories').single();
+      const { data, error } = await supabase.from('website_content').select('content').eq('section', 'categories').maybeSingle();
       if (error || !data?.content) return memoryStore.categories;
       memoryStore.categories = data.content as PortfolioCategory[];
       return memoryStore.categories;
@@ -296,15 +307,7 @@ export const websiteService = {
 
   async updateCategories(content: PortfolioCategory[]): Promise<boolean> {
     memoryStore.categories = [...content];
-    if (!isSupabaseConfigured) return true;
-    try {
-      const { error } = await supabase
-        .from('website_content')
-        .upsert({ section: 'categories', content, updated_at: new Date().toISOString() }, { onConflict: 'section' });
-      return !error;
-    } catch {
-      return false;
-    }
+    return this.persistSection('categories', content);
   },
 
   /**
@@ -313,7 +316,7 @@ export const websiteService = {
   async getHeroContent(): Promise<HeroContent> {
     if (!isSupabaseConfigured) return memoryStore.hero;
     try {
-      const { data, error } = await supabase.from('website_content').select('content').eq('section', 'hero').single();
+      const { data, error } = await supabase.from('website_content').select('content').eq('section', 'hero').maybeSingle();
       if (error || !data?.content) return memoryStore.hero;
       memoryStore.hero = data.content as HeroContent;
       return memoryStore.hero;
@@ -324,15 +327,7 @@ export const websiteService = {
 
   async updateHeroContent(content: HeroContent): Promise<boolean> {
     memoryStore.hero = { ...content };
-    if (!isSupabaseConfigured) return true;
-    try {
-      const { error } = await supabase
-        .from('website_content')
-        .upsert({ section: 'hero', content, updated_at: new Date().toISOString() }, { onConflict: 'section' });
-      return !error;
-    } catch {
-      return false;
-    }
+    return this.persistSection('hero', content);
   },
 
   /**
@@ -341,7 +336,7 @@ export const websiteService = {
   async getAboutContent(): Promise<AboutContent> {
     if (!isSupabaseConfigured) return memoryStore.about;
     try {
-      const { data, error } = await supabase.from('website_content').select('content').eq('section', 'about').single();
+      const { data, error } = await supabase.from('website_content').select('content').eq('section', 'about').maybeSingle();
       if (error || !data?.content) return memoryStore.about;
       memoryStore.about = data.content as AboutContent;
       return memoryStore.about;
@@ -352,15 +347,7 @@ export const websiteService = {
 
   async updateAboutContent(content: AboutContent): Promise<boolean> {
     memoryStore.about = { ...content };
-    if (!isSupabaseConfigured) return true;
-    try {
-      const { error } = await supabase
-        .from('website_content')
-        .upsert({ section: 'about', content, updated_at: new Date().toISOString() }, { onConflict: 'section' });
-      return !error;
-    } catch {
-      return false;
-    }
+    return this.persistSection('about', content);
   },
 
   /**
@@ -369,7 +356,7 @@ export const websiteService = {
   async getMarqueeContent(): Promise<MarqueeContent> {
     if (!isSupabaseConfigured) return memoryStore.marquee;
     try {
-      const { data, error } = await supabase.from('website_content').select('content').eq('section', 'marquee').single();
+      const { data, error } = await supabase.from('website_content').select('content').eq('section', 'marquee').maybeSingle();
       if (error || !data?.content) return memoryStore.marquee;
       memoryStore.marquee = data.content as MarqueeContent;
       return memoryStore.marquee;
@@ -380,15 +367,7 @@ export const websiteService = {
 
   async updateMarqueeContent(content: MarqueeContent): Promise<boolean> {
     memoryStore.marquee = { ...content };
-    if (!isSupabaseConfigured) return true;
-    try {
-      const { error } = await supabase
-        .from('website_content')
-        .upsert({ section: 'marquee', content, updated_at: new Date().toISOString() }, { onConflict: 'section' });
-      return !error;
-    } catch {
-      return false;
-    }
+    return this.persistSection('marquee', content);
   },
 
   /**
@@ -397,7 +376,7 @@ export const websiteService = {
   async getPhilosophyContent(): Promise<PhilosophyContent> {
     if (!isSupabaseConfigured) return memoryStore.philosophy;
     try {
-      const { data, error } = await supabase.from('website_content').select('content').eq('section', 'philosophy').single();
+      const { data, error } = await supabase.from('website_content').select('content').eq('section', 'philosophy').maybeSingle();
       if (error || !data?.content) return memoryStore.philosophy;
       memoryStore.philosophy = data.content as PhilosophyContent;
       return memoryStore.philosophy;
@@ -408,15 +387,7 @@ export const websiteService = {
 
   async updatePhilosophyContent(content: PhilosophyContent): Promise<boolean> {
     memoryStore.philosophy = { ...content };
-    if (!isSupabaseConfigured) return true;
-    try {
-      const { error } = await supabase
-        .from('website_content')
-        .upsert({ section: 'philosophy', content, updated_at: new Date().toISOString() }, { onConflict: 'section' });
-      return !error;
-    } catch {
-      return false;
-    }
+    return this.persistSection('philosophy', content);
   },
 
   /**
@@ -425,7 +396,7 @@ export const websiteService = {
   async getContactCTAContent(): Promise<ContactCTA> {
     if (!isSupabaseConfigured) return memoryStore.contact;
     try {
-      const { data, error } = await supabase.from('website_content').select('content').eq('section', 'contact').single();
+      const { data, error } = await supabase.from('website_content').select('content').eq('section', 'contact').maybeSingle();
       if (error || !data?.content) return memoryStore.contact;
       memoryStore.contact = data.content as ContactCTA;
       return memoryStore.contact;
@@ -436,15 +407,7 @@ export const websiteService = {
 
   async updateContactCTAContent(content: ContactCTA): Promise<boolean> {
     memoryStore.contact = { ...content };
-    if (!isSupabaseConfigured) return true;
-    try {
-      const { error } = await supabase
-        .from('website_content')
-        .upsert({ section: 'contact', content, updated_at: new Date().toISOString() }, { onConflict: 'section' });
-      return !error;
-    } catch {
-      return false;
-    }
+    return this.persistSection('contact', content);
   },
 
   async getStatementContent(): Promise<AboutContent> {
@@ -454,7 +417,7 @@ export const websiteService = {
   async getFooterContent(): Promise<FooterContent> {
     if (!isSupabaseConfigured) return memoryStore.footer;
     try {
-      const { data, error } = await supabase.from('website_content').select('content').eq('section', 'footer').single();
+      const { data, error } = await supabase.from('website_content').select('content').eq('section', 'footer').maybeSingle();
       if (error || !data?.content) return memoryStore.footer;
       memoryStore.footer = data.content as FooterContent;
       return memoryStore.footer;
@@ -465,15 +428,7 @@ export const websiteService = {
 
   async updateFooterContent(content: FooterContent): Promise<boolean> {
     memoryStore.footer = { ...content };
-    if (!isSupabaseConfigured) return true;
-    try {
-      const { error } = await supabase
-        .from('website_content')
-        .upsert({ section: 'footer', content, updated_at: new Date().toISOString() }, { onConflict: 'section' });
-      return !error;
-    } catch {
-      return false;
-    }
+    return this.persistSection('footer', content);
   },
 };
 

@@ -5,16 +5,24 @@ import { ArrowUpRight } from 'lucide-react';
 import { useTheme } from '../../hooks/useTheme';
 import { useWebsiteData } from '../../hooks/useWebsiteData';
 import { defaultWebsiteData } from '../../data/defaultWebsiteData';
-import { HeaderNavItem } from '../../types';
+import { HeaderNavItem, HeaderSettings, ProfileContent, ContactCTA, FooterContent } from '../../types';
 
 interface HeaderProps {
   activeSection?: string;
   onNavigate?: (id: string) => void;
+  header?: HeaderSettings;
+  profile?: ProfileContent;
+  contact?: ContactCTA;
+  footer?: FooterContent;
 }
 
 export const Header: React.FC<HeaderProps> = ({
   activeSection = 'home',
   onNavigate,
+  header: propHeader,
+  profile: propProfile,
+  contact: propContact,
+  footer: propFooter,
 }) => {
   const { data } = useWebsiteData();
   const { theme, toggleTheme } = useTheme();
@@ -131,8 +139,10 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   // Data-driven values with fallback cascade
-  const headerConfig = data?.header;
-  const profileConfig = data?.profile;
+  const headerConfig = propHeader || data?.header;
+  const profileConfig = propProfile || data?.profile;
+  const contactConfig = propContact || data?.contact;
+  const footerConfig = propFooter || data?.footer;
 
   // Visibility toggles
   const showHeader = headerConfig?.showHeader !== false;
@@ -173,9 +183,9 @@ export const Header: React.FC<HeaderProps> = ({
     .filter((item) => item.visible !== false)
     .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 
-  const email = profileConfig?.email || data?.contact?.email || defaultProfile.email;
-  const availability = data?.contact?.availabilityStatus || defaultWebsiteData.contact.availabilityStatus || 'AVAILABLE FOR COMMISSIONS';
-  const socialList = (data?.footer?.socialLinks || defaultWebsiteData.footer.socialLinks || [])
+  const email = profileConfig?.email || contactConfig?.email || defaultProfile.email;
+  const availability = contactConfig?.availabilityStatus || defaultWebsiteData.contact.availabilityStatus || 'AVAILABLE FOR COMMISSIONS';
+  const socialList = (footerConfig?.socialLinks || defaultWebsiteData.footer.socialLinks || [])
     .filter((s) => s.visible !== false)
     .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 

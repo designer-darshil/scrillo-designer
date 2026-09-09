@@ -751,21 +751,22 @@ export const ProjectEditor: React.FC<ProjectEditorProps> = ({ mode }) => {
 
                 {form.thumbnail && (
                   <div className="absolute top-2 right-2 flex items-center gap-1.5">
-                    <button
+                    <Button
                       type="button"
+                      variant="secondary"
+                      size="xs"
                       onClick={() => setMediaPickerTarget('thumbnail')}
-                      className="px-2.5 py-1 rounded-lg bg-surface/90 backdrop-blur-xs border border-border text-[10px] font-semibold text-foreground hover:bg-surface transition-colors"
                     >
                       Replace
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       type="button"
+                      variant="destructive"
+                      size="xs"
                       onClick={() => handleFieldChange('thumbnail', '')}
-                      className="p-1 rounded-lg bg-red-500/80 text-white hover:bg-red-500 transition-colors"
                       aria-label="Remove thumbnail"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
+                      icon={<Trash2 className="w-3.5 h-3.5" />}
+                    />
                   </div>
                 )}
               </div>
@@ -812,21 +813,22 @@ export const ProjectEditor: React.FC<ProjectEditorProps> = ({ mode }) => {
 
                 {form.coverImage && (
                   <div className="absolute top-2 right-2 flex items-center gap-1.5">
-                    <button
+                    <Button
                       type="button"
+                      variant="secondary"
+                      size="xs"
                       onClick={() => setMediaPickerTarget('coverImage')}
-                      className="px-2.5 py-1 rounded-lg bg-surface/90 backdrop-blur-xs border border-border text-[10px] font-semibold text-foreground hover:bg-surface transition-colors"
                     >
                       Replace
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       type="button"
+                      variant="destructive"
+                      size="xs"
                       onClick={() => handleFieldChange('coverImage', '')}
-                      className="p-1 rounded-lg bg-red-500/80 text-white hover:bg-red-500 transition-colors"
                       aria-label="Remove cover image"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
+                      icon={<Trash2 className="w-3.5 h-3.5" />}
+                    />
                   </div>
                 )}
               </div>
@@ -911,34 +913,37 @@ export const ProjectEditor: React.FC<ProjectEditorProps> = ({ mode }) => {
 
                   <div className="flex items-center justify-between border-t border-border pt-2 px-1">
                     <div className="flex items-center gap-1">
-                      <button
+                      <Button
                         type="button"
+                        variant="icon"
+                        size="xs"
                         onClick={() => handleMoveGalleryImage(index, 'up')}
                         disabled={index === 0}
-                        className="p-1 rounded-md border border-border text-muted hover:text-foreground disabled:opacity-30 transition-colors"
+                        aria-label="Move Earlier"
                         title="Move Earlier"
-                      >
-                        <ArrowUp className="w-3 h-3" />
-                      </button>
-                      <button
+                        icon={<ArrowUp className="w-3 h-3" />}
+                      />
+                      <Button
                         type="button"
+                        variant="icon"
+                        size="xs"
                         onClick={() => handleMoveGalleryImage(index, 'down')}
                         disabled={index === (form.gallery?.length || 1) - 1}
-                        className="p-1 rounded-md border border-border text-muted hover:text-foreground disabled:opacity-30 transition-colors"
+                        aria-label="Move Later"
                         title="Move Later"
-                      >
-                        <ArrowDown className="w-3 h-3" />
-                      </button>
+                        icon={<ArrowDown className="w-3 h-3" />}
+                      />
                     </div>
 
-                    <button
+                    <Button
                       type="button"
+                      variant="destructive"
+                      size="xs"
                       onClick={() => handleRemoveGalleryImage(index)}
-                      className="p-1 rounded-md border border-red-500/20 text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors"
+                      aria-label="Remove From Gallery"
                       title="Remove From Gallery"
-                    >
-                      <Trash2 className="w-3 h-3" />
-                    </button>
+                      icon={<Trash2 className="w-3 h-3" />}
+                    />
                   </div>
                 </div>
               ))}

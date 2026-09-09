@@ -128,7 +128,7 @@ export const AdminLayout: React.FC = () => {
             <Menu className="w-5 h-5" />
           </Button>
           <div className="flex items-center gap-1.5 min-w-0">
-            <span className={`w-2 h-2 rounded-full shrink-0 ${isDraftModified ? 'bg-amber-400 animate-pulse' : 'bg-emerald-500'}`} />
+            <span className={`w-2 h-2 rounded-full shrink-0 ${isDraftModified ? 'bg-status-warning animate-pulse' : 'bg-status-success'}`} />
             <span className="font-bold text-xs sm:text-sm tracking-tight truncate">SCRiLLO</span>
           </div>
         </div>
@@ -145,7 +145,7 @@ export const AdminLayout: React.FC = () => {
             >
               <UploadCloud className="w-3.5 h-3.5" />
               <span className="hidden xs:inline">Publish</span>
-              <span className="px-1.5 py-0.2 rounded-full bg-amber-400 text-black text-[9px] font-mono font-extrabold">
+              <span className="px-1.5 py-0.2 rounded-full bg-status-warning text-black text-[9px] font-mono font-extrabold">
                 {diffSummary.totalChanges}
               </span>
             </Button>
@@ -159,7 +159,7 @@ export const AdminLayout: React.FC = () => {
             title="Preview Draft Website"
             aria-label="Preview Draft Website"
           >
-            <Eye className="w-4 h-4 text-amber-500" />
+            <Eye className="w-4 h-4 text-status-warning" />
           </a>
 
           <Button
@@ -168,7 +168,7 @@ export const AdminLayout: React.FC = () => {
             onClick={toggleTheme}
             aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
           >
-            {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-indigo-400" />}
+            {theme === 'dark' ? <Sun className="w-4 h-4 text-status-warning" /> : <Moon className="w-4 h-4 text-[var(--color-text-primary)]" />}
           </Button>
         </div>
       </div>
@@ -193,7 +193,7 @@ export const AdminLayout: React.FC = () => {
                 <div className="flex flex-col min-w-0">
                   <span className="font-bold text-sm tracking-tight text-[var(--color-text-primary)] truncate">SCRiLLO Panel</span>
                   <div className="flex items-center gap-1.5">
-                    <span className={`w-1.5 h-1.5 rounded-full ${isDraftModified ? 'bg-amber-400 animate-pulse' : 'bg-emerald-500'}`} />
+                    <span className={`w-1.5 h-1.5 rounded-full ${isDraftModified ? 'bg-status-warning animate-pulse' : 'bg-status-success'}`} />
                     <span className="text-[10px] text-[var(--color-text-tertiary)] uppercase font-mono truncate">
                       {isDraftModified ? `${diffSummary.totalChanges} Changes Pending` : 'Live Synced'}
                     </span>
@@ -448,14 +448,14 @@ export const AdminLayout: React.FC = () => {
                 aria-label="Notifications"
               >
                 <Bell className="w-4 h-4" />
-                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-emerald-500 rounded-full ring-2 ring-[var(--color-background-secondary)]" />
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-status-success rounded-full ring-2 ring-[var(--color-background-secondary)]" />
               </Button>
 
               {showNotifications && (
                 <div className="absolute right-0 mt-2 w-80 rounded-xl border border-[var(--color-border-default)] bg-[var(--color-background-secondary)] p-4 shadow-xl text-xs space-y-3 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
                   <div className="flex items-center justify-between border-b border-[var(--color-border-default)] pb-2.5">
                     <span className="font-semibold text-[var(--color-text-primary)] flex items-center gap-1.5">
-                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+                      <CheckCircle2 className="w-3.5 h-3.5 text-status-success" />
                       Publication Status
                     </span>
                     <Badge variant={isDraftModified ? 'warning' : 'success'} size="sm">

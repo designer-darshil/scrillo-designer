@@ -206,7 +206,7 @@ export const Header: React.FC<HeaderProps> = ({
                 type="button"
                 onClick={toggleTheme}
                 data-cursor="link"
-                className="flex items-center gap-1.5 px-2.5 py-1 font-mono text-[11px] uppercase tracking-widest text-foreground/80 hover:text-foreground border border-border/80 hover:border-foreground transition-all duration-200 focus-visible:outline focus-visible:outline-1 focus-visible:outline-foreground"
+                className="flex items-center gap-1.5 px-2.5 py-1 font-mono text-[11px] uppercase tracking-widest text-foreground/80 hover:text-foreground border border-border/80 hover:border-foreground transition-all duration-200 focus-visible:outline-2 focus-visible:outline-[var(--color-focus-default)] focus-visible:outline-offset-2"
                 aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
               >
                 <span className={theme === 'dark' ? 'text-foreground font-bold' : 'text-muted/60'}>DARK</span>
@@ -220,7 +220,7 @@ export const Header: React.FC<HeaderProps> = ({
               <button
                 type="button"
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="min-h-[44px] min-w-[44px] flex items-center justify-end gap-2 py-2 px-1 text-xs font-mono uppercase tracking-widest text-foreground/90 hover:text-foreground focus-visible:outline focus-visible:outline-1 focus-visible:outline-foreground"
+                className="min-h-[44px] min-w-[44px] flex items-center justify-end gap-2 py-2 px-1 text-xs font-mono uppercase tracking-widest text-foreground/90 hover:text-foreground focus-visible:outline-2 focus-visible:outline-[var(--color-focus-default)] focus-visible:outline-offset-2"
                 aria-label={isMobileMenuOpen ? 'Close Menu' : 'Open Menu'}
                 aria-expanded={isMobileMenuOpen}
               >
@@ -300,7 +300,7 @@ export const Header: React.FC<HeaderProps> = ({
                   <button
                     type="button"
                     onClick={toggleTheme}
-                    className="min-h-[44px] flex items-center gap-2 px-3 py-1.5 font-mono text-xs uppercase tracking-widest text-foreground border border-border focus-visible:outline focus-visible:outline-1 focus-visible:outline-foreground"
+                    className="min-h-[44px] flex items-center gap-2 px-3 py-1.5 font-mono text-xs uppercase tracking-widest text-foreground border border-border focus-visible:outline-2 focus-visible:outline-[var(--color-focus-default)] focus-visible:outline-offset-2"
                     aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
                   >
                     <span className={theme === 'dark' ? 'font-bold underline underline-offset-4' : 'text-muted'}>DARK</span>

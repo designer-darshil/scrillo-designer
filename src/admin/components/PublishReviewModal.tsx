@@ -160,7 +160,7 @@ export const PublishReviewModal: React.FC<PublishReviewModalProps> = ({
 
           {diffSummary.items.length === 0 ? (
             <div className="py-8 text-center border border-dashed border-[var(--color-border-default)] rounded-xl space-y-1 bg-[var(--color-background-primary)]/50">
-              <CheckCircle2 className="w-6 h-6 mx-auto text-emerald-500" />
+              <CheckCircle2 className="w-6 h-6 mx-auto text-status-success" />
               <p className="text-xs font-semibold text-[var(--color-text-primary)]">Draft is in sync with Published</p>
               <p className="text-[11px] text-[var(--color-text-tertiary)]">No unpublished changes found to deploy.</p>
             </div>

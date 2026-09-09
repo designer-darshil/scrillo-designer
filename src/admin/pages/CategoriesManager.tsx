@@ -264,9 +264,10 @@ export const CategoriesManager: React.FC = () => {
                   <div className="flex flex-wrap items-center gap-2.5">
                     <input
                       type="text"
+                      aria-label={`Category name for ${cat.name || 'new category'}`}
                       value={cat.name}
                       onChange={(e) => handleEditCategory(cat.id, 'name', e.target.value)}
-                      className="font-bold text-sm text-foreground bg-transparent border-b border-transparent hover:border-border focus:border-foreground focus:outline-hidden uppercase tracking-tight py-0.5"
+                      className="font-bold text-sm text-foreground bg-transparent border-b border-transparent hover:border-border focus:border-foreground focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-focus-default uppercase tracking-tight py-0.5"
                     />
                     <Badge variant="neutral">
                       slug: {cat.slug}
@@ -281,10 +282,11 @@ export const CategoriesManager: React.FC = () => {
 
                   <input
                     type="text"
+                    aria-label={`Category description for ${cat.name || 'new category'}`}
                     value={cat.description || ''}
                     onChange={(e) => handleEditCategory(cat.id, 'description', e.target.value)}
                     placeholder="Describe category..."
-                    className="w-full text-xs text-muted bg-transparent border-b border-transparent hover:border-border focus:border-foreground focus:outline-hidden py-0.5"
+                    className="w-full text-xs text-muted bg-transparent border-b border-transparent hover:border-border focus:border-foreground focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-focus-default py-0.5"
                   />
                 </div>
               </div>

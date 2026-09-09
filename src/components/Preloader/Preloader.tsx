@@ -198,7 +198,7 @@ export const Preloader: React.FC<PreloaderProps> = ({
         </div>
 
         <div className="flex items-center gap-2 text-foreground font-medium text-[11px]">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+          <span className="w-1.5 h-1.5 rounded-full bg-status-success animate-pulse" />
           <span className="hidden sm:inline">SYSTEM READY</span>
         </div>
       </div>

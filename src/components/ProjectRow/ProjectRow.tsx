@@ -25,7 +25,7 @@ export const ProjectRow: React.FC<ProjectRowProps> = ({
       data-cursor-text="VIEW"
       onMouseEnter={(e) => onHoverStart?.(project, e)}
       onMouseLeave={() => onHoverEnd?.()}
-      className="group relative border-t border-border py-8 sm:py-10 md:py-12 transition-colors duration-300 hover:bg-surface/40 select-none focus-visible:outline focus-visible:outline-1 focus-visible:outline-foreground"
+      className="group relative border-t border-border py-8 sm:py-10 md:py-12 transition-colors duration-300 hover:bg-surface/40 select-none focus-visible:outline-2 focus-visible:outline-[var(--color-focus-default)] focus-visible:outline-offset-2"
     >
       {/* Animated Bottom Underline Accent */}
       <span className="absolute left-0 bottom-0 w-full h-[1px] bg-foreground scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-500 ease-out pointer-events-none z-10" />

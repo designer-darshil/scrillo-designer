@@ -187,7 +187,7 @@ export const Footer: React.FC<FooterProps> = ({ content: propContent }) => {
                 type="button"
                 onClick={scrollToTop}
                 data-cursor="link"
-                className="group flex items-center gap-2.5 px-4 py-2.5 border border-border font-mono text-xs uppercase tracking-widest text-foreground hover:bg-foreground hover:text-background transition-all duration-300 focus-visible:outline focus-visible:outline-1 focus-visible:outline-foreground"
+                className="group flex items-center gap-2.5 px-4 py-2.5 border border-border font-mono text-xs uppercase tracking-widest text-foreground hover:bg-foreground hover:text-background transition-all duration-300 focus-visible:outline-2 focus-visible:outline-[var(--color-focus-default)] focus-visible:outline-offset-2"
               >
                 <span>BACK TO TOP</span>
                 <ArrowUp className="w-3.5 h-3.5 group-hover:-translate-y-0.5 transition-transform" />

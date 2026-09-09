@@ -54,7 +54,7 @@ export const AdminPreviewBanner: React.FC<AdminPreviewBannerProps> = ({
         {/* Right: Actions */}
         <div className="flex items-center gap-2 shrink-0">
           {publishedSuccess && (
-            <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-400 font-mono">
+            <span className="inline-flex items-center gap-1 text-xs font-semibold text-status-success font-mono">
               <CheckCircle2 className="w-3.5 h-3.5" />
               <span>Published Live!</span>
             </span>
@@ -72,7 +72,7 @@ export const AdminPreviewBanner: React.FC<AdminPreviewBannerProps> = ({
             type="button"
             onClick={handleQuickPublish}
             disabled={publishing}
-            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-amber-400 text-black font-mono text-[11px] font-bold uppercase hover:bg-amber-300 transition-colors disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-[var(--color-focus-default)] cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-status-warning text-black font-mono text-[11px] font-bold uppercase hover:opacity-90 transition-opacity disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-[var(--color-focus-default)] cursor-pointer"
           >
             <UploadCloud className="w-3.5 h-3.5" />
             <span>{publishing ? 'Publishing...' : 'Publish Draft'}</span>

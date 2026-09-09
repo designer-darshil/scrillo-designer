@@ -564,7 +564,7 @@ export const FooterContactManager: React.FC = () => {
                       setNewLabel(plat.toUpperCase());
                     }
                   }}
-                  className="w-full px-3 py-2.5 rounded-xl border border-border bg-background text-xs text-foreground font-medium focus:outline-hidden focus:ring-1 focus:ring-foreground"
+                  className="w-full px-3 py-2.5 rounded-xl border border-border bg-background text-xs text-foreground font-medium focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-focus-default"
                 >
                   {PLATFORM_OPTIONS.map((p) => (
                     <option key={p} value={p}>

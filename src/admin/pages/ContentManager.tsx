@@ -644,7 +644,7 @@ export const ContentManager: React.FC = () => {
       )}
 
       {/* Navigation Subsections (10 Tabs) */}
-      <div className="flex items-center gap-1.5 p-1.5 rounded-2xl bg-surface border border-border overflow-x-auto no-scrollbar">
+      <div className="flex items-center gap-1.5 p-1.5 rounded-2xl bg-surface border border-border overflow-x-auto no-scrollbar" role="tablist" aria-label="Content sections">
         {navTabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
@@ -652,6 +652,8 @@ export const ContentManager: React.FC = () => {
             <button
               key={tab.id}
               type="button"
+              role="tab"
+              aria-selected={isActive}
               onClick={() => setActiveTab(tab.id)}
               className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-mono text-xs uppercase tracking-wider transition-all whitespace-nowrap min-h-[44px] ${
                 isActive
@@ -922,48 +924,45 @@ export const ContentManager: React.FC = () => {
                   </div>
 
                   <div className="flex items-center gap-1.5 self-end sm:self-auto">
-                    <button
+                    <Button
                       type="button"
+                      variant="icon"
+                      size="xs"
                       onClick={() => handleMoveExperience(index, 'up')}
                       disabled={index === 0}
-                      className="p-1.5 rounded-lg border border-border text-muted hover:text-foreground disabled:opacity-30"
                       title="Move Up"
                       aria-label="Move Up"
-                    >
-                      <ArrowUp className="w-3.5 h-3.5" />
-                    </button>
-                    <button
+                      icon={<ArrowUp className="w-3.5 h-3.5" />}
+                    />
+                    <Button
                       type="button"
+                      variant="icon"
+                      size="xs"
                       onClick={() => handleMoveExperience(index, 'down')}
                       disabled={index === experienceList.length - 1}
-                      className="p-1.5 rounded-lg border border-border text-muted hover:text-foreground disabled:opacity-30"
                       title="Move Down"
                       aria-label="Move Down"
-                    >
-                      <ArrowDown className="w-3.5 h-3.5" />
-                    </button>
-                    <button
+                      icon={<ArrowDown className="w-3.5 h-3.5" />}
+                    />
+                    <Button
                       type="button"
+                      variant={exp.visible !== false ? 'icon' : 'outline'}
+                      size="xs"
                       onClick={() => handleExperienceChange(exp.id, 'visible', !exp.visible)}
-                      className={`p-1.5 rounded-lg border text-xs ${
-                        exp.visible !== false
-                          ? 'border-border text-emerald-500'
-                          : 'border-border text-muted opacity-50'
-                      }`}
+                      className={exp.visible !== false ? 'text-status-success' : 'text-muted opacity-50'}
                       title={exp.visible !== false ? 'Visible' : 'Hidden'}
                       aria-label={exp.visible !== false ? 'Visible' : 'Hidden'}
-                    >
-                      {exp.visible !== false ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
-                    </button>
-                    <button
+                      icon={exp.visible !== false ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
+                    />
+                    <Button
                       type="button"
+                      variant="destructive"
+                      size="xs"
                       onClick={() => handleDeleteExperience(exp.id)}
-                      className="p-1.5 rounded-lg border border-red-500/30 text-red-400 hover:bg-red-500/10"
                       title="Delete"
                       aria-label="Delete"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
+                      icon={<Trash2 className="w-3.5 h-3.5" />}
+                    />
                   </div>
                 </div>
 
@@ -1093,48 +1092,45 @@ export const ContentManager: React.FC = () => {
                   </div>
 
                   <div className="flex items-center gap-1.5 self-end sm:self-auto">
-                    <button
+                    <Button
                       type="button"
+                      variant="icon"
+                      size="xs"
                       onClick={() => handleMoveEducation(index, 'up')}
                       disabled={index === 0}
-                      className="p-1.5 rounded-lg border border-border text-muted hover:text-foreground disabled:opacity-30"
                       title="Move Up"
                       aria-label="Move Up"
-                    >
-                      <ArrowUp className="w-3.5 h-3.5" />
-                    </button>
-                    <button
+                      icon={<ArrowUp className="w-3.5 h-3.5" />}
+                    />
+                    <Button
                       type="button"
+                      variant="icon"
+                      size="xs"
                       onClick={() => handleMoveEducation(index, 'down')}
                       disabled={index === educationList.length - 1}
-                      className="p-1.5 rounded-lg border border-border text-muted hover:text-foreground disabled:opacity-30"
                       title="Move Down"
                       aria-label="Move Down"
-                    >
-                      <ArrowDown className="w-3.5 h-3.5" />
-                    </button>
-                    <button
+                      icon={<ArrowDown className="w-3.5 h-3.5" />}
+                    />
+                    <Button
                       type="button"
+                      variant={edu.visible !== false ? 'icon' : 'outline'}
+                      size="xs"
                       onClick={() => handleEducationChange(edu.id, 'visible', !edu.visible)}
-                      className={`p-1.5 rounded-lg border text-xs ${
-                        edu.visible !== false
-                          ? 'border-border text-emerald-500'
-                          : 'border-border text-muted opacity-50'
-                      }`}
+                      className={edu.visible !== false ? 'text-status-success' : 'text-muted opacity-50'}
                       title={edu.visible !== false ? 'Visible' : 'Hidden'}
                       aria-label={edu.visible !== false ? 'Visible' : 'Hidden'}
-                    >
-                      {edu.visible !== false ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
-                    </button>
-                    <button
+                      icon={edu.visible !== false ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
+                    />
+                    <Button
                       type="button"
+                      variant="destructive"
+                      size="xs"
                       onClick={() => handleDeleteEducation(edu.id)}
-                      className="p-1.5 rounded-lg border border-red-500/30 text-red-400 hover:bg-red-500/10"
                       title="Delete"
                       aria-label="Delete"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
+                      icon={<Trash2 className="w-3.5 h-3.5" />}
+                    />
                   </div>
                 </div>
 
@@ -1267,46 +1263,45 @@ export const ContentManager: React.FC = () => {
                   </div>
 
                   <div className="flex items-center gap-1 shrink-0">
-                    <button
+                    <Button
                       type="button"
+                      variant="icon"
+                      size="xs"
                       onClick={() => handleMoveDesignSkill(index, 'up')}
                       disabled={index === 0}
-                      className="p-1 text-muted hover:text-foreground disabled:opacity-20"
                       title="Move Up"
                       aria-label="Move Up"
-                    >
-                      <ArrowUp className="w-3.5 h-3.5" />
-                    </button>
-                    <button
+                      icon={<ArrowUp className="w-3.5 h-3.5" />}
+                    />
+                    <Button
                       type="button"
+                      variant="icon"
+                      size="xs"
                       onClick={() => handleMoveDesignSkill(index, 'down')}
                       disabled={index === (designCategory?.items || designCategory?.skills || []).length - 1}
-                      className="p-1 text-muted hover:text-foreground disabled:opacity-20"
                       title="Move Down"
                       aria-label="Move Down"
-                    >
-                      <ArrowDown className="w-3.5 h-3.5" />
-                    </button>
-                    <button
+                      icon={<ArrowDown className="w-3.5 h-3.5" />}
+                    />
+                    <Button
                       type="button"
+                      variant="icon"
+                      size="xs"
                       onClick={() => handleToggleSkillVisibility(skill.name)}
-                      className={`p-1 text-xs ${
-                        skill.visible !== false ? 'text-emerald-500' : 'text-muted opacity-40'
-                      }`}
+                      className={skill.visible !== false ? 'text-status-success' : 'text-muted opacity-40'}
                       title={skill.visible !== false ? 'Visible' : 'Hidden'}
                       aria-label={skill.visible !== false ? 'Visible' : 'Hidden'}
-                    >
-                      {skill.visible !== false ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
-                    </button>
-                    <button
+                      icon={skill.visible !== false ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
+                    />
+                    <Button
                       type="button"
+                      variant="destructive"
+                      size="xs"
                       onClick={() => handleDeleteDesignSkill(skill.name)}
-                      className="p-1 text-muted hover:text-red-400 opacity-60 group-hover:opacity-100 transition-opacity"
                       title="Remove"
                       aria-label="Remove"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
+                      icon={<Trash2 className="w-3.5 h-3.5" />}
+                    />
                   </div>
                 </div>
               ))}
@@ -1374,35 +1369,35 @@ export const ContentManager: React.FC = () => {
                   </div>
 
                   <div className="flex items-center gap-1 shrink-0">
-                    <button
+                    <Button
                       type="button"
+                      variant="icon"
+                      size="xs"
                       onClick={() => handleMoveTool(idx, 'up')}
                       disabled={idx === 0}
-                      className="p-1 text-muted hover:text-foreground disabled:opacity-20"
                       title="Move Up"
                       aria-label="Move Up"
-                    >
-                      <ArrowUp className="w-3.5 h-3.5" />
-                    </button>
-                    <button
+                      icon={<ArrowUp className="w-3.5 h-3.5" />}
+                    />
+                    <Button
                       type="button"
+                      variant="icon"
+                      size="xs"
                       onClick={() => handleMoveTool(idx, 'down')}
                       disabled={idx === toolsList.length - 1}
-                      className="p-1 text-muted hover:text-foreground disabled:opacity-20"
                       title="Move Down"
                       aria-label="Move Down"
-                    >
-                      <ArrowDown className="w-3.5 h-3.5" />
-                    </button>
-                    <button
+                      icon={<ArrowDown className="w-3.5 h-3.5" />}
+                    />
+                    <Button
                       type="button"
+                      variant="destructive"
+                      size="xs"
                       onClick={() => handleDeleteTool(tool.id)}
-                      className="p-1 text-muted hover:text-red-400 opacity-60 group-hover:opacity-100 transition-opacity"
                       title="Remove"
                       aria-label="Remove"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
+                      icon={<Trash2 className="w-3.5 h-3.5" />}
+                    />
                   </div>
                 </div>
               ))}
@@ -1479,46 +1474,45 @@ export const ContentManager: React.FC = () => {
                   </div>
 
                   <div className="flex items-center gap-1.5 shrink-0">
-                    <button
+                    <Button
                       type="button"
+                      variant="icon"
+                      size="xs"
                       onClick={() => handleMoveSocialLink(idx, 'up')}
                       disabled={idx === 0}
-                      className="p-1.5 rounded-lg border border-border text-muted hover:text-foreground disabled:opacity-20"
                       title="Move Up"
                       aria-label="Move Up"
-                    >
-                      <ArrowUp className="w-3.5 h-3.5" />
-                    </button>
-                    <button
+                      icon={<ArrowUp className="w-3.5 h-3.5" />}
+                    />
+                    <Button
                       type="button"
+                      variant="icon"
+                      size="xs"
                       onClick={() => handleMoveSocialLink(idx, 'down')}
                       disabled={idx === socialLinks.length - 1}
-                      className="p-1.5 rounded-lg border border-border text-muted hover:text-foreground disabled:opacity-20"
                       title="Move Down"
                       aria-label="Move Down"
-                    >
-                      <ArrowDown className="w-3.5 h-3.5" />
-                    </button>
-                    <button
+                      icon={<ArrowDown className="w-3.5 h-3.5" />}
+                    />
+                    <Button
                       type="button"
+                      variant={soc.visible !== false ? 'icon' : 'outline'}
+                      size="xs"
                       onClick={() => handleToggleSocialVisibility(idx)}
-                      className={`p-1.5 rounded-lg border text-xs ${
-                        soc.visible !== false ? 'border-border text-emerald-500' : 'border-border text-muted opacity-40'
-                      }`}
+                      className={soc.visible !== false ? 'text-status-success' : 'text-muted opacity-40'}
                       title={soc.visible !== false ? 'Visible' : 'Hidden'}
                       aria-label={soc.visible !== false ? 'Visible' : 'Hidden'}
-                    >
-                      {soc.visible !== false ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
-                    </button>
-                    <button
+                      icon={soc.visible !== false ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
+                    />
+                    <Button
                       type="button"
+                      variant="destructive"
+                      size="xs"
                       onClick={() => handleDeleteSocialLink(idx)}
-                      className="p-1.5 rounded-lg border border-red-500/30 text-red-400 hover:bg-red-500/10"
                       title="Delete"
                       aria-label="Delete"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
+                      icon={<Trash2 className="w-3.5 h-3.5" />}
+                    />
                   </div>
                 </div>
               ))}
@@ -1838,8 +1832,10 @@ export const ContentManager: React.FC = () => {
                     {idx + 1}. {item}
                   </span>
                   <div className="flex items-center gap-1 shrink-0">
-                    <button
+                    <Button
                       type="button"
+                      variant="icon"
+                      size="xs"
                       onClick={() => {
                         if (idx === 0) return;
                         markDirty();
@@ -1850,14 +1846,14 @@ export const ContentManager: React.FC = () => {
                         setMarqueeForm((prev) => ({ ...prev, items: copy }));
                       }}
                       disabled={idx === 0}
-                      className="p-1 rounded-md border border-border text-muted hover:text-foreground disabled:opacity-20"
                       title="Move Up"
                       aria-label="Move Up"
-                    >
-                      <ArrowUp className="w-3.5 h-3.5" />
-                    </button>
-                    <button
+                      icon={<ArrowUp className="w-3.5 h-3.5" />}
+                    />
+                    <Button
                       type="button"
+                      variant="icon"
+                      size="xs"
                       onClick={() => {
                         if (idx === marqueeForm.items.length - 1) return;
                         markDirty();
@@ -1868,14 +1864,14 @@ export const ContentManager: React.FC = () => {
                         setMarqueeForm((prev) => ({ ...prev, items: copy }));
                       }}
                       disabled={idx === marqueeForm.items.length - 1}
-                      className="p-1 rounded-md border border-border text-muted hover:text-foreground disabled:opacity-20"
                       title="Move Down"
                       aria-label="Move Down"
-                    >
-                      <ArrowDown className="w-3.5 h-3.5" />
-                    </button>
-                    <button
+                      icon={<ArrowDown className="w-3.5 h-3.5" />}
+                    />
+                    <Button
                       type="button"
+                      variant="destructive"
+                      size="xs"
                       onClick={() => {
                         markDirty();
                         setMarqueeForm((prev) => ({
@@ -1883,12 +1879,10 @@ export const ContentManager: React.FC = () => {
                           items: prev.items.filter((_, i) => i !== idx),
                         }));
                       }}
-                      className="p-1 rounded-md border border-red-500/20 text-red-400 hover:text-red-500 hover:bg-red-500/10"
                       title="Remove Item"
                       aria-label="Remove Item"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
+                      icon={<Trash2 className="w-3.5 h-3.5" />}
+                    />
                   </div>
                 </div>
               ))}

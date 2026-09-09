@@ -188,7 +188,7 @@ export const ContactCTA: React.FC<ContactCTAProps> = ({ content: propContent }) 
                 href={ctaLink}
                 data-cursor="cta"
                 data-cursor-text="OPEN →"
-                className="group w-full sm:w-auto min-h-[52px] inline-flex items-center justify-between sm:justify-center gap-4 sm:gap-6 px-8 sm:px-12 py-5 sm:py-7 bg-foreground text-background border border-foreground font-mono text-xs sm:text-base font-bold uppercase tracking-widest hover:bg-transparent hover:text-foreground transition-all duration-300 focus-visible:outline focus-visible:outline-1 focus-visible:outline-foreground"
+                className="group w-full sm:w-auto min-h-[52px] inline-flex items-center justify-between sm:justify-center gap-4 sm:gap-6 px-8 sm:px-12 py-5 sm:py-7 bg-foreground text-background border border-foreground font-mono text-xs sm:text-base font-bold uppercase tracking-widest hover:bg-transparent hover:text-foreground transition-all duration-300 focus-visible:outline-2 focus-visible:outline-[var(--color-focus-default)] focus-visible:outline-offset-2"
               >
                 <span>{ctaText}</span>
                 <div className="w-6 h-6 flex items-center justify-center text-background group-hover:text-foreground group-hover:translate-x-2 transition-all duration-300 shrink-0">
@@ -207,7 +207,7 @@ export const ContactCTA: React.FC<ContactCTAProps> = ({ content: propContent }) 
           className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 font-mono text-meta text-muted"
         >
           <div className="flex items-center gap-3">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 inline-block animate-pulse" />
+            <span className="w-2 h-2 rounded-full bg-status-success inline-block animate-pulse" />
             <span className="text-foreground/90">{availability}</span>
           </div>
 

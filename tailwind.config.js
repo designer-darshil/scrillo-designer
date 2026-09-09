@@ -8,12 +8,23 @@ export default {
   theme: {
     extend: {
       colors: {
-        background: 'var(--bg)',
-        surface: 'var(--surface)',
-        foreground: 'var(--text)',
-        muted: 'var(--text-muted)',
-        border: 'var(--border)',
-        accent: 'var(--accent)',
+        background: 'var(--color-background-primary)',
+        'background-secondary': 'var(--color-background-secondary)',
+        'background-elevated': 'var(--color-background-elevated)',
+        surface: 'var(--color-background-secondary)',
+        foreground: 'var(--color-text-primary)',
+        'text-primary': 'var(--color-text-primary)',
+        'text-secondary': 'var(--color-text-secondary)',
+        'text-tertiary': 'var(--color-text-tertiary)',
+        'text-disabled': 'var(--color-text-disabled)',
+        muted: 'var(--color-text-tertiary)',
+        border: 'var(--color-border-default)',
+        'border-subtle': 'var(--color-border-subtle)',
+        'border-strong': 'var(--color-border-strong)',
+        accent: 'var(--color-action-primary)',
+        'action-primary': 'var(--color-action-primary)',
+        'action-secondary': 'var(--color-action-secondary)',
+        'focus-ring': 'var(--color-focus-default)',
       },
       fontFamily: {
         sans: ['"General Sans"', '"Inter"', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'sans-serif'],
@@ -21,33 +32,32 @@ export default {
         mono: ['"JetBrains Mono"', 'monospace'],
       },
       fontSize: {
-        // Display: clamp(2.5rem, 7.5vw, 9rem) line-height: 0.88-0.95, letter-spacing: -0.05em
-        display: ['clamp(2.5rem, 7.5vw, 9rem)', { lineHeight: '0.9', letterSpacing: '-0.05em' }],
-        
-        // Section headings: clamp(2.25rem, 6vw, 7rem)
-        'heading-section': ['clamp(2.25rem, 6vw, 7rem)', { lineHeight: '0.92', letterSpacing: '-0.04em' }],
-        
-        // Project headings: clamp(1.75rem, 4.5vw, 5rem)
-        'heading-project': ['clamp(1.75rem, 4.5vw, 5rem)', { lineHeight: '0.95', letterSpacing: '-0.03em' }],
-        
-        // Body: 18-24px
-        'body-editorial': ['clamp(1.125rem, 1.25vw, 1.5rem)', { lineHeight: '1.5', letterSpacing: '-0.01em' }],
-        
-        // Metadata: 11-14px
-        metadata: ['clamp(0.6875rem, 0.8vw, 0.875rem)', { lineHeight: '1.4', letterSpacing: '0.08em' }],
+        display: ['var(--font-size-display-xl)', { lineHeight: 'var(--line-height-display-xl)', letterSpacing: 'var(--letter-spacing-display)' }],
+        'heading-section': ['var(--font-size-display-lg)', { lineHeight: 'var(--line-height-display-lg)', letterSpacing: 'var(--letter-spacing-heading)' }],
+        'heading-project': ['var(--font-size-display-md)', { lineHeight: 'var(--line-height-display-md)', letterSpacing: 'var(--letter-spacing-subheading)' }],
+        'body-editorial': ['var(--font-size-body-editorial)', { lineHeight: 'var(--line-height-body-editorial)', letterSpacing: '-0.015em' }],
+        metadata: ['var(--font-size-metadata)', { lineHeight: 'var(--line-height-metadata)', letterSpacing: 'var(--letter-spacing-meta-wide)' }],
       },
       letterSpacing: {
-        'display': '-0.05em',
-        'heading': '-0.04em',
-        'subheading': '-0.03em',
+        'display': 'var(--letter-spacing-display)',
+        'heading': 'var(--letter-spacing-heading)',
+        'subheading': 'var(--letter-spacing-subheading)',
         'normal': '0em',
         'meta': '0.08em',
         'meta-wide': '0.14em',
       },
+      borderRadius: {
+        'xs': 'var(--radius-xs)',
+        'sm': 'var(--radius-sm)',
+        'md': 'var(--radius-md)',
+        'lg': 'var(--radius-lg)',
+        'xl': 'var(--radius-xl)',
+        'full': 'var(--radius-full)',
+      },
       spacing: {
-        'gutter': '24px',
-        'page-desktop': '5vw',
-        'page-mobile': '20px',
+        'gutter': 'var(--grid-gutter)',
+        'page-desktop': 'var(--page-padding-desktop)',
+        'page-mobile': 'var(--page-padding-mobile)',
       },
       gridTemplateColumns: {
         'desktop-12': 'repeat(12, minmax(0, 1fr))',
@@ -58,5 +68,3 @@ export default {
   },
   plugins: [],
 }
-
-

@@ -1,0 +1,42 @@
+/**
+ * SCRiLLO Design System - Spacing & Sizing Tokens (4px Base Grid)
+ */
+
+:root {
+  /* Spacing Scale (4px Base Grid) */
+  --spacing-0: 0px;
+  --spacing-1: 4px;
+  --spacing-2: 8px;
+  --spacing-3: 12px;
+  --spacing-4: 16px;
+  --spacing-5: 20px;
+  --spacing-6: 24px;
+  --spacing-8: 32px;
+  --spacing-10: 40px;
+  --spacing-12: 48px;
+  --spacing-16: 64px;
+  --spacing-20: 80px;
+  --spacing-24: 96px;
+  --spacing-32: 128px;
+
+  /* Layout Containers */
+  --page-padding-desktop: 5vw;
+  --page-padding-mobile: 20px;
+  --container-max-width: 1440px;
+  --admin-content-max-width: 1400px;
+  --grid-gutter: 24px;
+
+  /* Radius Tokens */
+  --radius-none: 0px;
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+
+  /* Border Widths */
+  --border-width-none: 0px;
+  --border-width-thin: 1px;
+  --border-width-strong: 2px;
+}

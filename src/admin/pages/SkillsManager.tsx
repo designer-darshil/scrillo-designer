@@ -24,6 +24,27 @@ import { useWebsiteData } from '../../hooks/useWebsiteData';
 import { SkillCategory, SkillItem } from '../../types';
 import { MediaPickerModal } from '../components/MediaPickerModal';
 import { validators } from '../utils/validators';
+import {
+  Button,
+  Input,
+  Textarea,
+  Toggle,
+  Checkbox,
+  Badge,
+  Modal,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter,
+  Alert,
+  EmptyState,
+  useToast,
+} from '../../design-system';
 
 export const SkillsManager: React.FC = () => {
   const {
@@ -300,7 +321,6 @@ export const SkillsManager: React.FC = () => {
       showToast(validators.formatFriendlyError(err));
     }
   };
-
   // --- Category Drag & Drop ---
   const handleCategoryDragStart = (index: number) => {
     setDraggedCatIndex(index);
@@ -319,17 +339,16 @@ export const SkillsManager: React.FC = () => {
       return;
     }
 
-    const reordered = [...sortedCategories];
-    const [moved] = reordered.splice(draggedCatIndex, 1);
-    reordered.splice(targetIndex, 0, moved);
+    const items = [...sortedCategories];
+    const [moved] = items.splice(draggedCatIndex, 1);
+    items.splice(targetIndex, 0, moved);
 
     setDraggedCatIndex(null);
     setDragOverCatIndex(null);
 
-    const orderedIds = reordered.map((c) => c.id);
-    const success = await reorderSkillCategories(orderedIds);
+    const success = await reorderSkillCategories(items.map((c) => c.id));
     if (success) {
-      showToast('Category sequence updated.');
+      showToast('Category ordering updated.');
     }
   };
 
@@ -337,14 +356,14 @@ export const SkillsManager: React.FC = () => {
     const targetIndex = direction === 'up' ? index - 1 : index + 1;
     if (targetIndex < 0 || targetIndex >= sortedCategories.length) return;
 
-    const reordered = [...sortedCategories];
-    const temp = reordered[index];
-    reordered[index] = reordered[targetIndex];
-    reordered[targetIndex] = temp;
+    const items = [...sortedCategories];
+    const temp = items[index];
+    items[index] = items[targetIndex];
+    items[targetIndex] = temp;
 
-    const success = await reorderSkillCategories(reordered.map((c) => c.id));
+    const success = await reorderSkillCategories(items.map((c) => c.id));
     if (success) {
-      showToast('Category order updated.');
+      showToast('Category ordering updated.');
     }
   };
 
@@ -415,315 +434,208 @@ export const SkillsManager: React.FC = () => {
         title="Select Skill Visual Preview Asset"
       />
 
-      {/* Toast Notification */}
-      {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 rounded-xl border border-emerald-500/30 bg-surface p-4 shadow-xl flex items-center gap-3 text-xs text-foreground animate-in fade-in slide-in-from-bottom-2 duration-200">
-          <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-          <span className="font-medium">{toastMessage}</span>
-        </div>
-      )}
-
       {/* Delete Confirmation Modal */}
-      {deleteModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="w-full max-w-md rounded-2xl border border-border bg-surface p-6 sm:p-8 space-y-6 shadow-2xl">
-            <div className="flex items-center gap-3 text-red-500">
-              <div className="p-2.5 rounded-xl bg-red-500/10 border border-red-500/20">
-                <AlertTriangle className="w-6 h-6" />
-              </div>
-              <div>
-                <h3 className="text-base font-bold uppercase tracking-wide text-foreground">
-                  Confirm {deleteModal.type === 'category' ? 'Category' : 'Skill'} Deletion
-                </h3>
-                <p className="text-xs text-muted">
-                  {deleteModal.type === 'category'
-                    ? 'All skills nested in this category will be removed.'
-                    : 'This skill discipline will be removed from the matrix.'}
-                </p>
-              </div>
-            </div>
+      <Modal
+        isOpen={Boolean(deleteModal)}
+        onClose={() => setDeleteModal(null)}
+        title={`Confirm ${deleteModal?.type === 'category' ? 'Category' : 'Skill'} Deletion`}
+        size="sm"
+      >
+        <div className="space-y-4">
+          <Alert variant="error" title="Irreversible Action">
+            {deleteModal?.type === 'category'
+              ? 'All skills nested in this category will be permanently removed from your portfolio.'
+              : 'This skill discipline will be removed from your public capabilities matrix.'}
+          </Alert>
 
-            <div className="p-4 rounded-xl bg-background border border-border text-xs">
-              <p className="text-muted">Target Item:</p>
-              <p className="font-bold text-foreground text-sm uppercase mt-0.5">{deleteModal.title}</p>
-            </div>
-
-            <div className="flex items-center justify-end gap-2.5 pt-2">
-              <button
-                type="button"
-                onClick={() => setDeleteModal(null)}
-                className="px-4 py-2 rounded-xl border border-border text-xs font-medium text-muted hover:text-foreground hover:bg-background transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={handleConfirmDelete}
-                className="px-5 py-2 rounded-xl bg-red-500 text-white text-xs font-bold uppercase tracking-wider hover:bg-red-600 transition-colors"
-              >
-                Delete Item
-              </button>
-            </div>
+          <div className="p-3.5 rounded-xl bg-background border border-border text-xs">
+            <span className="text-muted">Target Item: </span>
+            <span className="font-bold text-foreground uppercase">{deleteModal?.title}</span>
           </div>
+
+          <ModalFooter className="px-0 pb-0">
+            <Button variant="secondary" onClick={() => setDeleteModal(null)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={handleConfirmDelete}>
+              Delete Item
+            </Button>
+          </ModalFooter>
         </div>
-      )}
+      </Modal>
 
       {/* Category Create/Edit Modal */}
-      {categoryModal.isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="w-full max-w-lg rounded-2xl border border-border bg-surface shadow-2xl overflow-hidden flex flex-col max-h-[90dvh]">
-            <form onSubmit={handleSaveCategory} className="flex flex-col flex-1 overflow-hidden">
-              <div className="flex items-center justify-between px-6 py-4 border-b border-border bg-surface shrink-0">
-                <div className="flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-foreground" />
-                  <h3 className="text-sm font-bold uppercase tracking-wider text-foreground">
-                    {categoryModal.mode === 'create' ? 'Create Skill Category' : 'Edit Category'}
-                  </h3>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setCategoryModal({ isOpen: false, mode: 'create', category: {} })}
-                  className="p-1 rounded-lg text-muted hover:text-foreground hover:bg-background transition-colors"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-
-              <div className="p-5 sm:p-6 space-y-4 overflow-y-auto flex-1">
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  <div className="space-y-1.5 sm:col-span-2">
-                    <label htmlFor="cat-title-input" className="block text-xs font-semibold text-foreground">
-                      Category Title <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      id="cat-title-input"
-                      type="text"
-                      required
-                      value={categoryModal.category.title || ''}
-                      onChange={(e) =>
-                        setCategoryModal((prev) => ({
-                          ...prev,
-                          category: { ...prev.category, title: e.target.value.toUpperCase() },
-                        }))
-                      }
-                      placeholder="e.g. UI DESIGN"
-                      className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-background text-xs font-bold uppercase text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
-                    />
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <label htmlFor="cat-number-input" className="block text-xs font-semibold text-foreground">
-                      Number Index
-                    </label>
-                    <input
-                      id="cat-number-input"
-                      type="text"
-                      value={categoryModal.category.number || ''}
-                      onChange={(e) =>
-                        setCategoryModal((prev) => ({
-                          ...prev,
-                          category: { ...prev.category, number: e.target.value },
-                        }))
-                      }
-                      placeholder="e.g. 01"
-                      className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-background text-xs font-mono text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-1.5">
-                  <label htmlFor="cat-desc-input" className="block text-xs font-semibold text-foreground">
-                    Description & Narrative
-                  </label>
-                  <textarea
-                    id="cat-desc-input"
-                    rows={3}
-                    value={categoryModal.category.description || ''}
-                    onChange={(e) =>
-                      setCategoryModal((prev) => ({
-                        ...prev,
-                        category: { ...prev.category, description: e.target.value },
-                      }))
-                    }
-                    placeholder="Precision typography, mathematical spatial scales, design tokens..."
-                    className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-background text-xs text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
-                  />
-                </div>
-
-                <div className="pt-2">
-                  <label className="flex items-center gap-2 text-xs font-semibold text-foreground cursor-pointer select-none">
-                    <input
-                      type="checkbox"
-                      checked={categoryModal.category.visible !== false}
-                      onChange={(e) =>
-                        setCategoryModal((prev) => ({
-                          ...prev,
-                          category: { ...prev.category, visible: e.target.checked },
-                        }))
-                      }
-                      className="w-4 h-4 rounded border-border text-foreground accent-foreground"
-                    />
-                    <span>Category Visible on Public Website</span>
-                  </label>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-end gap-2 px-6 py-4 border-t border-border bg-surface shrink-0">
-                <button
-                  type="button"
-                  onClick={() => setCategoryModal({ isOpen: false, mode: 'create', category: {} })}
-                  className="px-4 py-2 rounded-xl border border-border text-xs font-medium text-muted hover:text-foreground hover:bg-background transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-5 py-2 rounded-xl bg-foreground text-background text-xs font-semibold hover:opacity-90 transition-opacity"
-                >
-                  {categoryModal.mode === 'create' ? 'Create Category' : 'Save Changes'}
-                </button>
-              </div>
-            </form>
+      <Modal
+        isOpen={categoryModal.isOpen}
+        onClose={() => setCategoryModal({ isOpen: false, mode: 'create', category: {} })}
+        title={categoryModal.mode === 'create' ? 'Create Skill Category' : 'Edit Skill Category'}
+        size="md"
+      >
+        <form onSubmit={handleSaveCategory} className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="sm:col-span-2">
+              <Input
+                label="Category Title *"
+                required
+                value={categoryModal.category.title || ''}
+                onChange={(e) =>
+                  setCategoryModal((prev) => ({
+                    ...prev,
+                    category: { ...prev.category, title: e.target.value.toUpperCase() },
+                  }))
+                }
+                placeholder="e.g. UI DESIGN"
+              />
+            </div>
+            <div>
+              <Input
+                label="Number Index"
+                value={categoryModal.category.number || ''}
+                onChange={(e) =>
+                  setCategoryModal((prev) => ({
+                    ...prev,
+                    category: { ...prev.category, number: e.target.value },
+                  }))
+                }
+                placeholder="e.g. 01"
+              />
+            </div>
           </div>
-        </div>
-      )}
+
+          <Textarea
+            label="Description & Narrative"
+            rows={3}
+            value={categoryModal.category.description || ''}
+            onChange={(e) =>
+              setCategoryModal((prev) => ({
+                ...prev,
+                category: { ...prev.category, description: e.target.value },
+              }))
+            }
+            placeholder="Precision typography, mathematical spatial scales, design tokens..."
+          />
+
+          <Checkbox
+            label="Category Visible on Public Website"
+            checked={categoryModal.category.visible !== false}
+            onChange={(e) =>
+              setCategoryModal((prev) => ({
+                ...prev,
+                category: { ...prev.category, visible: e.target.checked },
+              }))
+            }
+          />
+
+          <ModalFooter className="px-0 pb-0 pt-3">
+            <Button
+              variant="secondary"
+              type="button"
+              onClick={() => setCategoryModal({ isOpen: false, mode: 'create', category: {} })}
+            >
+              Cancel
+            </Button>
+            <Button variant="primary" type="submit">
+              {categoryModal.mode === 'create' ? 'Create Category' : 'Save Changes'}
+            </Button>
+          </ModalFooter>
+        </form>
+      </Modal>
 
       {/* Skill Item Create/Edit Modal */}
-      {skillModal.isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="w-full max-w-lg rounded-2xl border border-border bg-surface shadow-2xl overflow-hidden flex flex-col max-h-[90dvh]">
-            <form onSubmit={handleSaveSkill} className="flex flex-col flex-1 overflow-hidden">
-              <div className="flex items-center justify-between px-6 py-4 border-b border-border bg-surface shrink-0">
-                <div className="flex items-center gap-2">
-                  <Layers className="w-4 h-4 text-foreground" />
-                  <h3 className="text-sm font-bold uppercase tracking-wider text-foreground">
-                    {skillModal.mode === 'create' ? 'Add Skill Discipline' : 'Edit Skill Discipline'}
-                  </h3>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setSkillModal({ isOpen: false, mode: 'create', categoryId: '', skill: {} })}
-                  className="p-1 rounded-lg text-muted hover:text-foreground hover:bg-background transition-colors"
-                >
-                  <X className="w-4 h-4" />
-                </button>
+      <Modal
+        isOpen={skillModal.isOpen}
+        onClose={() => setSkillModal({ isOpen: false, mode: 'create', categoryId: '', skill: {} })}
+        title={skillModal.mode === 'create' ? 'Add Skill Discipline' : 'Edit Skill Discipline'}
+        size="md"
+      >
+        <form onSubmit={handleSaveSkill} className="space-y-4">
+          <Input
+            label="Discipline Title *"
+            required
+            value={skillModal.skill.name || skillModal.skill.title || ''}
+            onChange={(e) =>
+              setSkillModal((prev) => ({
+                ...prev,
+                skill: { ...prev.skill, name: e.target.value, title: e.target.value },
+              }))
+            }
+            placeholder="e.g. Visual Direction"
+          />
+
+          <Textarea
+            label="Description (Optional)"
+            rows={2}
+            value={skillModal.skill.description || ''}
+            onChange={(e) =>
+              setSkillModal((prev) => ({
+                ...prev,
+                skill: { ...prev.skill, description: e.target.value },
+              }))
+            }
+            placeholder="Editorial typography, mathematical layouts..."
+          />
+
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <label className="block text-xs font-semibold text-foreground">
+                Hover Visual Preview Asset
+              </label>
+              <Button
+                variant="text"
+                size="sm"
+                type="button"
+                onClick={() => setMediaPickerOpen(true)}
+              >
+                Pick from Media Library
+              </Button>
+            </div>
+            <Input
+              value={skillModal.skill.image || ''}
+              onChange={(e) =>
+                setSkillModal((prev) => ({
+                  ...prev,
+                  skill: { ...prev.skill, image: e.target.value },
+                }))
+              }
+              placeholder="https://images.unsplash.com/..."
+            />
+
+            {skillModal.skill.image && (
+              <div className="w-32 aspect-[4/3] rounded-lg overflow-hidden border border-border mt-2">
+                <img
+                  src={skillModal.skill.image}
+                  alt="Preview"
+                  className="w-full h-full object-cover grayscale contrast-125"
+                />
               </div>
-
-              <div className="p-5 sm:p-6 space-y-4 overflow-y-auto flex-1">
-                <div className="space-y-1.5">
-                  <label htmlFor="skill-name-input" className="block text-xs font-semibold text-foreground">
-                    Discipline Title <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    id="skill-name-input"
-                    type="text"
-                    required
-                    value={skillModal.skill.name || skillModal.skill.title || ''}
-                    onChange={(e) =>
-                      setSkillModal((prev) => ({
-                        ...prev,
-                        skill: { ...prev.skill, name: e.target.value, title: e.target.value },
-                      }))
-                    }
-                    placeholder="e.g. Visual Direction"
-                    className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-background text-xs font-bold text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <label htmlFor="skill-desc-input" className="block text-xs font-semibold text-foreground">
-                    Description (Optional)
-                  </label>
-                  <textarea
-                    id="skill-desc-input"
-                    rows={2}
-                    value={skillModal.skill.description || ''}
-                    onChange={(e) =>
-                      setSkillModal((prev) => ({
-                        ...prev,
-                        skill: { ...prev.skill, description: e.target.value },
-                      }))
-                    }
-                    placeholder="Editorial typography, mathematical layouts..."
-                    className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-background text-xs text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <label htmlFor="skill-img-input" className="block text-xs font-semibold text-foreground">
-                      Hover Visual Preview Asset
-                    </label>
-                    <button
-                      type="button"
-                      onClick={() => setMediaPickerOpen(true)}
-                      className="text-xs font-semibold text-foreground hover:underline"
-                    >
-                      Pick Asset
-                    </button>
-                  </div>
-                  <input
-                    id="skill-img-input"
-                    type="text"
-                    value={skillModal.skill.image || ''}
-                    onChange={(e) =>
-                      setSkillModal((prev) => ({
-                        ...prev,
-                        skill: { ...prev.skill, image: e.target.value },
-                      }))
-                    }
-                    placeholder="https://images.unsplash.com/..."
-                    className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-background text-xs font-mono text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
-                  />
-
-                  {skillModal.skill.image && (
-                    <div className="w-32 aspect-[4/3] rounded-lg overflow-hidden border border-border mt-2">
-                      <img
-                        src={skillModal.skill.image}
-                        alt="Preview"
-                        className="w-full h-full object-cover grayscale contrast-125"
-                      />
-                    </div>
-                  )}
-                </div>
-
-                <div className="pt-2">
-                  <label className="flex items-center gap-2 text-xs font-semibold text-foreground cursor-pointer select-none">
-                    <input
-                      type="checkbox"
-                      checked={skillModal.skill.visible !== false}
-                      onChange={(e) =>
-                        setSkillModal((prev) => ({
-                          ...prev,
-                          skill: { ...prev.skill, visible: e.target.checked },
-                        }))
-                      }
-                      className="w-4 h-4 rounded border-border text-foreground accent-foreground"
-                    />
-                    <span>Skill Visible in Category</span>
-                  </label>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-end gap-2 px-6 py-4 border-t border-border bg-surface shrink-0">
-                <button
-                  type="button"
-                  onClick={() => setSkillModal({ isOpen: false, mode: 'create', categoryId: '', skill: {} })}
-                  className="px-4 py-2 rounded-xl border border-border text-xs font-medium text-muted hover:text-foreground hover:bg-background transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-5 py-2 rounded-xl bg-foreground text-background text-xs font-semibold hover:opacity-90 transition-opacity"
-                >
-                  {skillModal.mode === 'create' ? 'Add Skill' : 'Save Changes'}
-                </button>
-              </div>
-            </form>
+            )}
           </div>
-        </div>
-      )}
+
+          <Checkbox
+            label="Skill Visible in Category"
+            checked={skillModal.skill.visible !== false}
+            onChange={(e) =>
+              setSkillModal((prev) => ({
+                ...prev,
+                skill: { ...prev.skill, visible: e.target.checked },
+              }))
+            }
+          />
+
+          <ModalFooter className="px-0 pb-0 pt-3">
+            <Button
+              variant="secondary"
+              type="button"
+              onClick={() => setSkillModal({ isOpen: false, mode: 'create', categoryId: '', skill: {} })}
+            >
+              Cancel
+            </Button>
+            <Button variant="primary" type="submit">
+              {skillModal.mode === 'create' ? 'Add Skill' : 'Save Changes'}
+            </Button>
+          </ModalFooter>
+        </form>
+      </Modal>
 
       {/* Header Bar */}
       <div className="rounded-2xl border border-border bg-surface p-6 sm:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-xs">

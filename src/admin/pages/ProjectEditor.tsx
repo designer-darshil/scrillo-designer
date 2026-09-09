@@ -9,8 +9,6 @@ import {
   ArrowUp,
   ArrowDown,
   Image as ImageIcon,
-  CheckCircle2,
-  AlertCircle,
   Sparkles,
   Layers,
   Star,
@@ -24,6 +22,12 @@ import { MediaPickerModal } from '../components/MediaPickerModal';
 import { validators } from '../utils/validators';
 import { useUnsavedChanges } from '../hooks/useUnsavedChanges';
 import { defaultWebsiteData } from '../../data/defaultWebsiteData';
+import { Button } from '../../design-system/components/Button';
+import { Input, Textarea } from '../../design-system/components/Input';
+import { Badge } from '../../design-system/components/Badge';
+import { Alert } from '../../design-system/components/Alert';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '../../design-system/components/Card';
+import { useToast } from '../../design-system/hooks/useToast';
 
 interface ProjectEditorProps {
   mode: 'create' | 'edit';
@@ -55,6 +59,7 @@ export const ProjectEditor: React.FC<ProjectEditorProps> = ({ mode }) => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { data, createProject, updateProject } = useWebsiteData();
+  const toast = useToast();
 
   const managedCategories = (data.categories && data.categories.length > 0 ? data.categories : defaultWebsiteData.categories || [])
     .filter((c) => c.visible !== false)
@@ -156,6 +161,7 @@ export const ProjectEditor: React.FC<ProjectEditorProps> = ({ mode }) => {
     if (!urlValidation.isValid) {
       setStatus('error');
       setErrorMessage(urlValidation.error || 'Invalid gallery image URL');
+      toast.error('Invalid gallery image URL');
       return;
     }
 
@@ -214,6 +220,7 @@ export const ProjectEditor: React.FC<ProjectEditorProps> = ({ mode }) => {
     if (!titleCheck.isValid) {
       setStatus('error');
       setErrorMessage(titleCheck.error || 'Project title is required.');
+      toast.error(titleCheck.error || 'Project title is required.');
       return;
     }
 
@@ -222,6 +229,7 @@ export const ProjectEditor: React.FC<ProjectEditorProps> = ({ mode }) => {
     if (!slugCheck.isValid) {
       setStatus('error');
       setErrorMessage(slugCheck.error || 'A valid URL slug is required.');
+      toast.error(slugCheck.error || 'A valid URL slug is required.');
       return;
     }
 
@@ -239,6 +247,7 @@ export const ProjectEditor: React.FC<ProjectEditorProps> = ({ mode }) => {
     if (!uniqueSlugCheck.isValid) {
       setStatus('error');
       setErrorMessage(uniqueSlugCheck.error || 'Slug must be unique.');
+      toast.error(uniqueSlugCheck.error || 'Slug must be unique.');
       return;
     }
 
@@ -248,6 +257,7 @@ export const ProjectEditor: React.FC<ProjectEditorProps> = ({ mode }) => {
       if (!thumbCheck.isValid) {
         setStatus('error');
         setErrorMessage(thumbCheck.error || 'Unsafe thumbnail URL detected.');
+        toast.error(thumbCheck.error || 'Unsafe thumbnail URL detected.');
         return;
       }
     }
@@ -257,6 +267,7 @@ export const ProjectEditor: React.FC<ProjectEditorProps> = ({ mode }) => {
       if (!coverCheck.isValid) {
         setStatus('error');
         setErrorMessage(coverCheck.error || 'Unsafe cover image URL detected.');
+        toast.error(coverCheck.error || 'Unsafe cover image URL detected.');
         return;
       }
     }
@@ -267,6 +278,7 @@ export const ProjectEditor: React.FC<ProjectEditorProps> = ({ mode }) => {
         if (!galleryCheck.isValid) {
           setStatus('error');
           setErrorMessage(galleryCheck.error || `Unsafe gallery image URL at position #${idx + 1}.`);
+          toast.error(`Unsafe gallery image URL at position #${idx + 1}.`);
           return;
         }
       }
@@ -278,6 +290,7 @@ export const ProjectEditor: React.FC<ProjectEditorProps> = ({ mode }) => {
       if (!orderCheck.isValid) {
         setStatus('error');
         setErrorMessage(orderCheck.error || 'Order must be a valid positive integer.');
+        toast.error(orderCheck.error || 'Order must be a valid positive integer.');
         return;
       }
     }
@@ -291,27 +304,33 @@ export const ProjectEditor: React.FC<ProjectEditorProps> = ({ mode }) => {
         if (created) {
           setStatus('saved');
           setIsDirty(false);
+          toast.success('Project created successfully!');
           setTimeout(() => {
             navigate('/admin/projects');
           }, 800);
         } else {
           setStatus('error');
           setErrorMessage('Failed to create project repository.');
+          toast.error('Failed to create project repository.');
         }
       } else if (mode === 'edit' && id) {
         const success = await updateProject(id, form);
         if (success) {
           setStatus('saved');
           setIsDirty(false);
+          toast.success('Project updated and saved!');
           setTimeout(() => setStatus('idle'), 3000);
         } else {
           setStatus('error');
           setErrorMessage('Failed to update project repository.');
+          toast.error('Failed to update project repository.');
         }
       }
     } catch (err: any) {
       setStatus('error');
-      setErrorMessage(validators.formatFriendlyError(err));
+      const formatted = validators.formatFriendlyError(err);
+      setErrorMessage(formatted);
+      toast.error(formatted);
     }
   };
 
@@ -342,78 +361,88 @@ export const ProjectEditor: React.FC<ProjectEditorProps> = ({ mode }) => {
       />
 
       {/* Top Navigation & Action Bar */}
-      <div className="rounded-2xl border border-border bg-surface p-6 sm:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-xs">
-        <div className="space-y-1.5">
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={handleCancel}
-              className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted hover:text-foreground transition-colors group"
-            >
-              <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" />
-              <span>Back to Projects</span>
-            </button>
-            <span className="text-muted">/</span>
-            <span className="font-mono text-xs uppercase tracking-wider text-muted">
-              {mode === 'create' ? 'New Repository' : `Edit #${form.number || '01'}`}
-            </span>
-            {isDirty && (
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 animate-pulse">
-                Unsaved Changes
+      <Card className="p-6 sm:p-8">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="space-y-1.5">
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={handleCancel}
+                className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted hover:text-foreground transition-colors group"
+              >
+                <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" />
+                <span>Back to Projects</span>
+              </button>
+              <span className="text-muted">/</span>
+              <span className="font-mono text-xs uppercase tracking-wider text-muted">
+                {mode === 'create' ? 'New Repository' : `Edit #${form.number || '01'}`}
               </span>
-            )}
+              {isDirty && (
+                <Badge variant="warning" size="sm" className="animate-pulse">
+                  Unsaved Changes
+                </Badge>
+              )}
+            </div>
+
+            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
+              {mode === 'create' ? 'Create New Project' : form.title || 'Edit Project'}
+            </h2>
+            <p className="text-xs sm:text-sm text-muted">
+              Configure metadata, category, typography descriptors, client roles, and image assets.
+            </p>
           </div>
 
-          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
-            {mode === 'create' ? 'Create New Project' : form.title || 'Edit Project'}
-          </h2>
-          <p className="text-xs sm:text-sm text-muted">
-            Configure metadata, category, typography descriptors, client roles, and image assets.
-          </p>
-        </div>
+          {/* Action Buttons */}
+          <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleCancel}
+              leftIcon={<Undo2 className="w-3.5 h-3.5" />}
+            >
+              Cancel
+            </Button>
 
-        {/* Action Buttons */}
-        <div className="flex flex-wrap items-center gap-2.5 shrink-0">
-          <button
-            type="button"
-            onClick={handleCancel}
-            className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl border border-border text-xs font-medium text-muted hover:text-foreground hover:bg-background transition-colors"
-          >
-            <Undo2 className="w-3.5 h-3.5" />
-            <span>Cancel</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => handleSave()}
-            disabled={status === 'saving'}
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-foreground text-background font-semibold text-xs hover:opacity-90 transition-opacity shadow-xs disabled:opacity-50"
-          >
-            <Save className="w-4 h-4" />
-            <span>{status === 'saving' ? 'Saving...' : mode === 'create' ? 'Create Project' : 'Save Changes'}</span>
-          </button>
+            <Button
+              type="button"
+              variant="primary"
+              size="sm"
+              onClick={() => handleSave()}
+              isLoading={status === 'saving'}
+              leftIcon={<Save className="w-4 h-4" />}
+            >
+              {mode === 'create' ? 'Create Project' : 'Save Changes'}
+            </Button>
+          </div>
         </div>
-      </div>
+      </Card>
 
       {/* Status Feedback Banners */}
       {status === 'saved' && (
-        <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-4 flex items-center gap-3 text-xs text-emerald-600 dark:text-emerald-400 animate-in fade-in slide-in-from-top-1 duration-200">
-          <CheckCircle2 className="w-4 h-4 shrink-0" />
-          <div className="flex-1 font-medium">
-            {mode === 'create' ? 'Project created successfully! Redirecting...' : 'Project updated and saved!'}
+        <Alert
+          variant="success"
+          title={mode === 'create' ? 'Project created successfully!' : 'Project updated and saved!'}
+          onClose={() => setStatus('idle')}
+        >
+          <div className="flex items-center justify-between gap-2 mt-1">
+            <span>Changes have been saved live to database.</span>
+            <Link to="/#works" target="_blank" className="underline inline-flex items-center gap-1 font-semibold text-xs">
+              <span>Preview in Selected Works</span>
+              <Eye className="w-3.5 h-3.5" />
+            </Link>
           </div>
-          <Link to="/#works" target="_blank" className="underline inline-flex items-center gap-1 font-semibold">
-            <span>Preview in Selected Works</span>
-            <Eye className="w-3.5 h-3.5" />
-          </Link>
-        </div>
+        </Alert>
       )}
 
       {status === 'error' && (
-        <div className="rounded-xl border border-red-500/30 bg-red-500/10 p-4 flex items-center gap-3 text-xs text-red-500 animate-in fade-in slide-in-from-top-1 duration-200">
-          <AlertCircle className="w-4 h-4 shrink-0" />
-          <div className="flex-1 font-medium">{errorMessage || 'An error occurred while saving.'}</div>
-        </div>
+        <Alert
+          variant="error"
+          title="Save Error"
+          onClose={() => setStatus('idle')}
+        >
+          {errorMessage || 'An error occurred while saving.'}
+        </Alert>
       )}
 
       {/* Main Form Body */}
@@ -421,14 +450,16 @@ export const ProjectEditor: React.FC<ProjectEditorProps> = ({ mode }) => {
         {/* ================================================== */}
         {/* 1. PRIMARY METADATA & IDENTITY */}
         {/* ================================================== */}
-        <div className="rounded-2xl border border-border bg-surface p-5 sm:p-8 space-y-6 shadow-xs">
+        <Card className="p-5 sm:p-8 space-y-6">
           <div className="border-b border-border pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
-              <h3 className="font-bold text-base text-foreground flex items-center gap-2">
+              <CardTitle className="flex items-center gap-2 text-base">
                 <FileCode className="w-4 h-4" />
                 <span>Primary Project Identity</span>
-              </h3>
-              <p className="text-xs text-muted">Title, slug, temporal year, and public visibility states</p>
+              </CardTitle>
+              <CardDescription className="text-xs">
+                Title, slug, temporal year, and public visibility states
+              </CardDescription>
             </div>
             <div className="flex flex-wrap items-center gap-2.5">
               {/* Placeholder Template Toggle */}
@@ -439,9 +470,9 @@ export const ProjectEditor: React.FC<ProjectEditorProps> = ({ mode }) => {
                   onChange={(e) => handleFieldChange('placeholder', e.target.checked)}
                   className="w-4 h-4 rounded border-border text-amber-500 accent-amber-500"
                 />
-                <span className={`text-[11px] font-mono px-2 py-0.5 rounded border ${form.placeholder ? 'border-amber-500/40 bg-amber-500/10 text-amber-500' : 'border-border text-muted'}`}>
+                <Badge variant={form.placeholder ? 'warning' : 'neutral'} size="sm">
                   {form.placeholder ? 'Template / Placeholder' : 'Verified Real Project'}
-                </span>
+                </Badge>
               </label>
 
               {/* Featured Toggle */}
@@ -480,79 +511,57 @@ export const ProjectEditor: React.FC<ProjectEditorProps> = ({ mode }) => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Title */}
-            <div className="space-y-2 md:col-span-2">
-              <label htmlFor="project-title" className="block text-xs font-semibold text-foreground">
-                Project Title <span className="text-red-500">*</span>
-              </label>
-              <input
-                id="project-title"
-                type="text"
+            <div className="md:col-span-2">
+              <Input
+                label="Project Title"
                 required
                 value={form.title}
                 onChange={(e) => handleTitleChange(e.target.value)}
                 placeholder="e.g. AURORA CRM PLATFORM"
-                className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-background text-sm font-bold text-foreground uppercase placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
+                className="uppercase font-bold"
               />
             </div>
 
             {/* Short Title */}
-            <div className="space-y-2">
-              <label htmlFor="project-short-title" className="block text-xs font-semibold text-foreground">
-                Short Display Title
-              </label>
-              <input
-                id="project-short-title"
-                type="text"
+            <div>
+              <Input
+                label="Short Display Title"
                 value={form.shortTitle || ''}
                 onChange={(e) => handleFieldChange('shortTitle', e.target.value)}
                 placeholder="e.g. Aurora"
-                className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-background text-xs text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
+                helperText="Compact label used in mobile drawer and tight typographic rows."
               />
-              <p className="text-[11px] text-muted">Compact label used in mobile drawer and tight typographic rows.</p>
             </div>
 
             {/* URL Slug */}
-            <div className="space-y-2">
-              <label htmlFor="project-slug" className="block text-xs font-semibold text-foreground">
-                URL Identifier / Slug
-              </label>
-              <input
-                id="project-slug"
-                type="text"
+            <div>
+              <Input
+                label="URL Identifier / Slug"
                 value={form.slug}
                 onChange={(e) => handleFieldChange('slug', e.target.value)}
                 placeholder="e.g. aurora-crm"
-                className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-background text-xs text-foreground font-mono placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
+                className="font-mono text-xs"
               />
             </div>
 
             {/* Year */}
-            <div className="space-y-2">
-              <label htmlFor="project-year" className="block text-xs font-semibold text-foreground">
-                Year Created
-              </label>
-              <input
-                id="project-year"
-                type="text"
+            <div>
+              <Input
+                label="Year Created"
                 value={form.year}
                 onChange={(e) => handleFieldChange('year', e.target.value)}
                 placeholder="e.g. 2026"
-                className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-background text-xs text-foreground font-mono placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
+                className="font-mono text-xs"
               />
             </div>
 
             {/* Category */}
             <div className="space-y-2">
-              <label htmlFor="project-category" className="block text-xs font-semibold text-foreground">
-                Discipline / Category
-              </label>
-              <input
-                id="project-category"
-                type="text"
+              <Input
+                label="Discipline / Category"
                 value={form.category}
                 onChange={(e) => handleFieldChange('category', e.target.value)}
                 placeholder="e.g. Product Design"
-                className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-background text-xs text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
               />
               <div className="flex flex-wrap gap-1.5 pt-1">
                 {managedCategories.map((cat) => (
@@ -573,89 +582,78 @@ export const ProjectEditor: React.FC<ProjectEditorProps> = ({ mode }) => {
             </div>
 
             {/* Client */}
-            <div className="space-y-2">
-              <label htmlFor="project-client" className="block text-xs font-semibold text-foreground">
-                Client / Commission Entity
-              </label>
-              <input
-                id="project-client"
-                type="text"
+            <div>
+              <Input
+                label="Client / Commission Entity"
                 value={form.client}
                 onChange={(e) => handleFieldChange('client', e.target.value)}
                 placeholder="e.g. Aurora Systems Berlin"
-                className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-background text-xs text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
               />
             </div>
 
             {/* Role */}
-            <div className="space-y-2">
-              <label htmlFor="project-role" className="block text-xs font-semibold text-foreground">
-                Creative Role / Discipline
-              </label>
-              <input
-                id="project-role"
-                type="text"
+            <div>
+              <Input
+                label="Creative Role / Discipline"
                 value={form.role || ''}
                 onChange={(e) => handleFieldChange('role', e.target.value)}
                 placeholder="e.g. Lead Product Designer & Frontend Architect"
-                className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-background text-xs text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
               />
             </div>
 
             {/* Description */}
-            <div className="space-y-2 md:col-span-2">
-              <label htmlFor="project-desc" className="block text-xs font-semibold text-foreground">
-                Case Study Narrative / Overview
-              </label>
-              <textarea
-                id="project-desc"
+            <div className="md:col-span-2">
+              <Textarea
+                label="Case Study Narrative / Overview"
                 rows={4}
                 value={form.description}
                 onChange={(e) => handleFieldChange('description', e.target.value)}
                 placeholder="Autonomous customer relationship platform with fluid typographic dashboards and real-time interaction pipelines..."
-                className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-background text-xs text-foreground leading-relaxed placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
               />
             </div>
           </div>
-        </div>
+        </Card>
 
         {/* ================================================== */}
         {/* 2. SERVICES & TAGS */}
         {/* ================================================== */}
-        <div className="rounded-2xl border border-border bg-surface p-6 sm:p-8 space-y-6 shadow-xs">
+        <Card className="p-6 sm:p-8 space-y-6">
           <div className="border-b border-border pb-4">
-            <h3 className="font-bold text-base text-foreground flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-base">
               <Layers className="w-4 h-4" />
               <span>Services Scope & Disciplines</span>
-            </h3>
-            <p className="text-xs text-muted">Tag pills displayed on hover preview and project details</p>
+            </CardTitle>
+            <CardDescription className="text-xs">
+              Tag pills displayed on hover preview and project details
+            </CardDescription>
           </div>
 
           <div className="space-y-4">
             {/* Tag Input */}
             <div className="flex items-center gap-2">
-              <input
-                type="text"
-                value={newServiceTag}
-                onChange={(e) => setNewServiceTag(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    handleAddService();
-                  }
-                }}
-                placeholder="Add service tag (e.g. WebGL Shaders)..."
-                className="flex-1 px-3.5 py-2 rounded-xl border border-border bg-background text-xs text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
-              />
-              <button
+              <div className="flex-1">
+                <Input
+                  value={newServiceTag}
+                  onChange={(e) => setNewServiceTag(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      handleAddService();
+                    }
+                  }}
+                  placeholder="Add service tag (e.g. WebGL Shaders)..."
+                />
+              </div>
+              <Button
                 type="button"
+                variant="primary"
+                size="sm"
                 onClick={() => handleAddService()}
                 disabled={!newServiceTag.trim()}
-                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-foreground text-background text-xs font-semibold hover:opacity-90 transition-opacity disabled:opacity-40"
+                leftIcon={<Plus className="w-3.5 h-3.5" />}
               >
-                <Plus className="w-3.5 h-3.5" />
-                <span>Add Tag</span>
-              </button>
+                Add Tag
+              </Button>
             </div>
 
             {/* Active Tags */}
@@ -669,7 +667,8 @@ export const ProjectEditor: React.FC<ProjectEditorProps> = ({ mode }) => {
                   <button
                     type="button"
                     onClick={() => handleRemoveService(service)}
-                    className="text-muted hover:text-red-400 transition-colors"
+                    className="text-muted hover:text-red-400 transition-colors p-0.5 rounded"
+                    aria-label={`Remove ${service}`}
                   >
                     <Trash2 className="w-3 h-3" />
                   </button>
@@ -694,18 +693,20 @@ export const ProjectEditor: React.FC<ProjectEditorProps> = ({ mode }) => {
               </div>
             </div>
           </div>
-        </div>
+        </Card>
 
         {/* ================================================== */}
         {/* 3. MEDIA ASSETS (THUMBNAIL & COVER IMAGE) */}
         {/* ================================================== */}
-        <div className="rounded-2xl border border-border bg-surface p-6 sm:p-8 space-y-6 shadow-xs">
+        <Card className="p-6 sm:p-8 space-y-6">
           <div className="border-b border-border pb-4">
-            <h3 className="font-bold text-base text-foreground flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-base">
               <ImageIcon className="w-4 h-4" />
               <span>Project Visuals & Media Showcase</span>
-            </h3>
-            <p className="text-xs text-muted">Thumbnail for floating preview and Cover Image for project header</p>
+            </CardTitle>
+            <CardDescription className="text-xs">
+              Thumbnail for floating preview and Cover Image for project header
+            </CardDescription>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -715,22 +716,22 @@ export const ProjectEditor: React.FC<ProjectEditorProps> = ({ mode }) => {
                 <label className="block text-xs font-semibold text-foreground">
                   Thumbnail Asset (Selected Works Row Preview)
                 </label>
-                <button
+                <Button
                   type="button"
+                  variant="ghost"
+                  size="xs"
                   onClick={() => setMediaPickerTarget('thumbnail')}
-                  className="inline-flex items-center gap-1 text-xs font-semibold text-foreground hover:underline"
+                  leftIcon={<Sparkles className="w-3 h-3" />}
                 >
-                  <Sparkles className="w-3 h-3" />
-                  <span>Media Library</span>
-                </button>
+                  Media Library
+                </Button>
               </div>
 
-              <input
-                type="text"
+              <Input
                 value={form.thumbnail}
                 onChange={(e) => handleFieldChange('thumbnail', e.target.value)}
                 placeholder="https://images.unsplash.com/..."
-                className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-background text-xs text-foreground font-mono placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
+                className="font-mono text-xs"
               />
 
               {/* Thumbnail Live Preview */}
@@ -761,6 +762,7 @@ export const ProjectEditor: React.FC<ProjectEditorProps> = ({ mode }) => {
                       type="button"
                       onClick={() => handleFieldChange('thumbnail', '')}
                       className="p-1 rounded-lg bg-red-500/80 text-white hover:bg-red-500 transition-colors"
+                      aria-label="Remove thumbnail"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
@@ -775,22 +777,22 @@ export const ProjectEditor: React.FC<ProjectEditorProps> = ({ mode }) => {
                 <label className="block text-xs font-semibold text-foreground">
                   Cover Image Asset (Full Showcase Header)
                 </label>
-                <button
+                <Button
                   type="button"
+                  variant="ghost"
+                  size="xs"
                   onClick={() => setMediaPickerTarget('coverImage')}
-                  className="inline-flex items-center gap-1 text-xs font-semibold text-foreground hover:underline"
+                  leftIcon={<Sparkles className="w-3 h-3" />}
                 >
-                  <Sparkles className="w-3 h-3" />
-                  <span>Media Library</span>
-                </button>
+                  Media Library
+                </Button>
               </div>
 
-              <input
-                type="text"
+              <Input
                 value={form.coverImage}
                 onChange={(e) => handleFieldChange('coverImage', e.target.value)}
                 placeholder="https://images.unsplash.com/..."
-                className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-background text-xs text-foreground font-mono placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
+                className="font-mono text-xs"
               />
 
               {/* Cover Live Preview */}
@@ -821,6 +823,7 @@ export const ProjectEditor: React.FC<ProjectEditorProps> = ({ mode }) => {
                       type="button"
                       onClick={() => handleFieldChange('coverImage', '')}
                       className="p-1 rounded-lg bg-red-500/80 text-white hover:bg-red-500 transition-colors"
+                      aria-label="Remove cover image"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
@@ -829,53 +832,58 @@ export const ProjectEditor: React.FC<ProjectEditorProps> = ({ mode }) => {
               </div>
             </div>
           </div>
-        </div>
+        </Card>
 
         {/* ================================================== */}
         {/* 4. GALLERY IMAGES */}
         {/* ================================================== */}
-        <div className="rounded-2xl border border-border bg-surface p-5 sm:p-8 space-y-6 shadow-xs">
+        <Card className="p-5 sm:p-8 space-y-6">
           <div className="border-b border-border pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
-              <h3 className="font-bold text-base text-foreground flex items-center gap-2">
+              <CardTitle className="flex items-center gap-2 text-base">
                 <Layers className="w-4 h-4" />
                 <span>Gallery & Multi-Image Showcase ({form.gallery?.length || 0})</span>
-              </h3>
-              <p className="text-xs text-muted">Additional project photography with reordering and asset picker</p>
+              </CardTitle>
+              <CardDescription className="text-xs">
+                Additional project photography with reordering and asset picker
+              </CardDescription>
             </div>
-            <button
+            <Button
               type="button"
+              variant="outline"
+              size="sm"
               onClick={() => setMediaPickerTarget('gallery')}
-              className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl border border-border bg-background text-xs font-semibold text-foreground hover:border-foreground/40 transition-colors shrink-0"
+              leftIcon={<Plus className="w-3.5 h-3.5" />}
             >
-              <Plus className="w-3.5 h-3.5" />
-              <span>Add From Library</span>
-            </button>
+              Add From Library
+            </Button>
           </div>
 
           {/* Quick URL Add */}
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-            <input
-              type="text"
-              value={newGalleryUrl}
-              onChange={(e) => setNewGalleryUrl(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  e.preventDefault();
-                  handleAddGalleryImage(newGalleryUrl);
-                }
-              }}
-              placeholder="Paste image URL to append to gallery..."
-              className="flex-1 px-3.5 py-2.5 rounded-xl border border-border bg-background text-xs text-foreground font-mono placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
-            />
-            <button
+            <div className="flex-1">
+              <Input
+                value={newGalleryUrl}
+                onChange={(e) => setNewGalleryUrl(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleAddGalleryImage(newGalleryUrl);
+                  }
+                }}
+                placeholder="Paste image URL to append to gallery..."
+                className="font-mono text-xs"
+              />
+            </div>
+            <Button
               type="button"
+              variant="primary"
+              size="sm"
               onClick={() => handleAddGalleryImage(newGalleryUrl)}
               disabled={!newGalleryUrl.trim()}
-              className="px-4 py-2.5 rounded-xl bg-foreground text-background text-xs font-semibold hover:opacity-90 transition-opacity disabled:opacity-40 shrink-0"
             >
               Add Image
-            </button>
+            </Button>
           </div>
 
           {/* Gallery Items List */}
@@ -936,7 +944,7 @@ export const ProjectEditor: React.FC<ProjectEditorProps> = ({ mode }) => {
               ))}
             </div>
           )}
-        </div>
+        </Card>
       </form>
     </div>
   );

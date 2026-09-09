@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Sparkles, ArrowLeft, UploadCloud, Eye, X, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, UploadCloud, X, CheckCircle2 } from 'lucide-react';
 import { useWebsiteData } from '../../hooks/useWebsiteData';
+import { Button } from '../../design-system';
 
 interface AdminPreviewBannerProps {
   onExitPreview: () => void;
@@ -11,7 +12,7 @@ export const AdminPreviewBanner: React.FC<AdminPreviewBannerProps> = ({
   onExitPreview,
   onOpenPublishModal,
 }) => {
-  const { data, publishDraft } = useWebsiteData();
+  const { publishDraft } = useWebsiteData();
   const [publishing, setPublishing] = useState(false);
   const [publishedSuccess, setPublishedSuccess] = useState(false);
 
@@ -34,7 +35,7 @@ export const AdminPreviewBanner: React.FC<AdminPreviewBannerProps> = ({
   };
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-[10000] bg-foreground text-background py-2.5 px-4 shadow-xl select-none animate-in slide-in-from-top duration-300">
+    <div className="fixed top-0 left-0 right-0 z-[10000] bg-[var(--color-text-primary)] text-[var(--color-background-primary)] py-2 px-4 shadow-xl select-none animate-in slide-in-from-top duration-300 border-b border-[var(--color-border-strong)]">
       <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2.5">
         {/* Left: Preview Status Badge */}
         <div className="flex items-center gap-2.5">
@@ -61,7 +62,7 @@ export const AdminPreviewBanner: React.FC<AdminPreviewBannerProps> = ({
 
           <a
             href="/admin/dashboard"
-            className="inline-flex items-center gap-1 px-3 py-1 rounded-md bg-background text-foreground font-mono text-[11px] font-bold uppercase hover:opacity-90 transition-opacity"
+            className="inline-flex items-center gap-1 px-3 py-1 rounded-lg bg-[var(--color-background-primary)] text-[var(--color-text-primary)] font-mono text-[11px] font-bold uppercase hover:opacity-90 transition-opacity focus-visible:outline-2 focus-visible:outline-[var(--color-focus-default)]"
           >
             <ArrowLeft className="w-3 h-3" />
             <span>Admin Panel</span>
@@ -71,7 +72,7 @@ export const AdminPreviewBanner: React.FC<AdminPreviewBannerProps> = ({
             type="button"
             onClick={handleQuickPublish}
             disabled={publishing}
-            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-amber-400 text-black font-mono text-[11px] font-bold uppercase hover:bg-amber-300 transition-colors disabled:opacity-50"
+            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-amber-400 text-black font-mono text-[11px] font-bold uppercase hover:bg-amber-300 transition-colors disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-[var(--color-focus-default)] cursor-pointer"
           >
             <UploadCloud className="w-3.5 h-3.5" />
             <span>{publishing ? 'Publishing...' : 'Publish Draft'}</span>
@@ -80,8 +81,9 @@ export const AdminPreviewBanner: React.FC<AdminPreviewBannerProps> = ({
           <button
             type="button"
             onClick={onExitPreview}
-            className="p-1 rounded-md hover:bg-background/20 transition-colors text-background"
+            className="p-1 rounded-md hover:bg-[var(--color-background-primary)]/20 transition-colors text-[var(--color-background-primary)] focus-visible:outline-2 focus-visible:outline-[var(--color-focus-default)]"
             title="Exit Preview Mode"
+            aria-label="Exit Preview Mode"
           >
             <X className="w-4 h-4" />
           </button>

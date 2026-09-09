@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './admin/hooks/useAuth';
 import { WebsiteDataProvider } from './context/WebsiteDataContext';
+import { ToastProvider } from './design-system';
 import { PortfolioHome } from './pages/PortfolioHome';
 import { AdminLayout } from './admin/layouts/AdminLayout';
 import { ProtectedRoute } from './admin/components/ProtectedRoute';
@@ -18,61 +19,65 @@ import { MediaManager } from './admin/pages/MediaManager';
 import { CategoriesManager } from './admin/pages/CategoriesManager';
 import { SettingsManager } from './admin/pages/SettingsManager';
 import { ProfileOverview } from './admin/pages/ProfileOverview';
-
+import { DesignSystemDocs } from './admin/pages/DesignSystemDocs';
 import { AccessDenied } from './admin/pages/AccessDenied';
 
 export const App: React.FC = () => {
   return (
     <AuthProvider>
       <WebsiteDataProvider>
-        <BrowserRouter>
-          <Routes>
-            {/* Public Portfolio Route (Exact Unchanged Experience) */}
-            <Route path="/" element={<PortfolioHome />} />
+        <ToastProvider>
+          <BrowserRouter>
+            <Routes>
+              {/* Public Portfolio Route (Exact Unchanged Experience) */}
+              <Route path="/" element={<PortfolioHome />} />
 
-            {/* Admin Login Route */}
-            <Route path="/admin/login" element={<AdminLogin />} />
+              {/* Admin Login Route */}
+              <Route path="/admin/login" element={<AdminLogin />} />
 
-            {/* Explicit Access Denied Page */}
-            <Route path="/admin/access-denied" element={<AccessDenied />} />
+              {/* Explicit Access Denied Page */}
+              <Route path="/admin/access-denied" element={<AccessDenied />} />
 
-            {/* Protected Admin Routes (Requires 'editor' or 'admin' role) */}
-            <Route
-              path="/admin"
-              element={
-                <ProtectedRoute requiredRole="editor">
-                  <AdminLayout />
-                </ProtectedRoute>
-              }
-            >
-              <Route index element={<AdminDashboard />} />
-              <Route path="dashboard" element={<AdminDashboard />} />
-              <Route path="profile" element={<ProfileOverview />} />
-              <Route path="content" element={<ContentManager />} />
-              <Route path="content/sections" element={<SectionsManager />} />
-              <Route path="content/footer" element={<FooterContactManager />} />
-              <Route path="categories" element={<CategoriesManager />} />
-              <Route path="projects" element={<ProjectsManager />} />
-              <Route path="projects/new" element={<ProjectEditor mode="create" />} />
-              <Route path="projects/:id/edit" element={<ProjectEditor mode="edit" />} />
-              <Route path="skills" element={<SkillsManager />} />
-              <Route path="services" element={<ServicesManager />} />
-              <Route path="media" element={<MediaManager />} />
-              {/* Settings Route explicitly requires 'admin' role */}
+              {/* Protected Admin Routes (Requires 'editor' or 'admin' role) */}
               <Route
-                path="settings"
+                path="/admin"
                 element={
-                  <ProtectedRoute requiredRole="admin">
-                    <SettingsManager />
+                  <ProtectedRoute requiredRole="editor">
+                    <AdminLayout />
                   </ProtectedRoute>
                 }
-              />
-            </Route>
+              >
+                <Route index element={<AdminDashboard />} />
+                <Route path="dashboard" element={<AdminDashboard />} />
+                <Route path="profile" element={<ProfileOverview />} />
+                <Route path="content" element={<ContentManager />} />
+                <Route path="content/sections" element={<SectionsManager />} />
+                <Route path="content/footer" element={<FooterContactManager />} />
+                <Route path="categories" element={<CategoriesManager />} />
+                <Route path="projects" element={<ProjectsManager />} />
+                <Route path="projects/new" element={<ProjectEditor mode="create" />} />
+                <Route path="projects/:id/edit" element={<ProjectEditor mode="edit" />} />
+                <Route path="skills" element={<SkillsManager />} />
+                <Route path="services" element={<ServicesManager />} />
+                <Route path="media" element={<MediaManager />} />
+                {/* Design System Living Documentation */}
+                <Route path="design-system" element={<DesignSystemDocs />} />
+                {/* Settings Route explicitly requires 'admin' role */}
+                <Route
+                  path="settings"
+                  element={
+                    <ProtectedRoute requiredRole="admin">
+                      <SettingsManager />
+                    </ProtectedRoute>
+                  }
+                />
+              </Route>
 
-            {/* Fallback to Public Home */}
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </BrowserRouter>
+              {/* Fallback to Public Home */}
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </BrowserRouter>
+        </ToastProvider>
       </WebsiteDataProvider>
     </AuthProvider>
   );

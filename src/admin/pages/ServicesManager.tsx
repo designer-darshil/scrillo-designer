@@ -10,7 +10,7 @@ import {
   ArrowDown,
   Eye,
   EyeOff,
-  Search,
+  Search as SearchIcon,
   CheckCircle2,
   AlertTriangle,
   X,
@@ -24,6 +24,29 @@ import { Service } from '../../types';
 import { IconPicker, RenderLucideIcon } from '../components/IconPicker';
 import { validators } from '../utils/validators';
 import { defaultWebsiteData } from '../../data/defaultWebsiteData';
+import {
+  Button,
+  Input,
+  Textarea,
+  Select,
+  Checkbox,
+  Badge,
+  Modal,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter,
+  Alert,
+  EmptyState,
+  Skeleton,
+  Search,
+  useToast,
+} from '../../design-system';
 
 export const ServicesManager: React.FC = () => {
   const {
@@ -37,6 +60,11 @@ export const ServicesManager: React.FC = () => {
     reorderServices,
     toggleServiceVisibility,
   } = useWebsiteData();
+
+  const { success: toastSuccess } = useToast();
+  const showToast = (msg: string) => {
+    toastSuccess(msg);
+  };
 
   const deliverablePresets = (data.categories && data.categories.length > 0 ? data.categories : defaultWebsiteData.categories || [])
     .filter((c) => c.visible !== false)
@@ -67,12 +95,6 @@ export const ServicesManager: React.FC = () => {
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
 
-  // Toast State
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
-  const showToast = (msg: string) => {
-    setToastMessage(msg);
-    setTimeout(() => setToastMessage(null), 3500);
-  };
 
   // Filtered and Sorted Services
   const filteredServices = useMemo(() => {
@@ -290,253 +312,176 @@ export const ServicesManager: React.FC = () => {
 
   return (
     <div className="max-w-6xl mx-auto space-y-8 pb-16">
-      {/* Toast Notification */}
-      {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 rounded-xl border border-emerald-500/30 bg-surface p-4 shadow-xl flex items-center gap-3 text-xs text-foreground animate-in fade-in slide-in-from-bottom-2 duration-200">
-          <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-          <span className="font-medium">{toastMessage}</span>
-        </div>
-      )}
-
       {/* Delete Confirmation Modal */}
-      {deleteModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="w-full max-w-md rounded-2xl border border-border bg-surface p-6 sm:p-8 space-y-6 shadow-2xl">
-            <div className="flex items-center gap-3 text-red-500">
-              <div className="p-2.5 rounded-xl bg-red-500/10 border border-red-500/20">
-                <AlertTriangle className="w-6 h-6" />
-              </div>
-              <div>
-                <h3 className="text-base font-bold uppercase tracking-wide text-foreground">Confirm Service Deletion</h3>
-                <p className="text-xs text-muted">This action will remove the service package from commission offerings.</p>
-              </div>
-            </div>
+      <Modal
+        isOpen={Boolean(deleteModal)}
+        onClose={() => setDeleteModal(null)}
+        title="Confirm Service Deletion"
+        size="sm"
+      >
+        <div className="space-y-4">
+          <Alert variant="error" title="Irreversible Action">
+            This action will permanently remove this service package from commission offerings.
+          </Alert>
 
-            <div className="p-4 rounded-xl bg-background border border-border text-xs">
-              <p className="text-muted">Target Service:</p>
-              <p className="font-bold text-foreground text-sm uppercase mt-0.5">{deleteModal.title}</p>
-            </div>
-
-            <div className="flex items-center justify-end gap-2.5 pt-2">
-              <button
-                type="button"
-                onClick={() => setDeleteModal(null)}
-                className="px-4 py-2 rounded-xl border border-border text-xs font-medium text-muted hover:text-foreground hover:bg-background transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={handleConfirmDelete}
-                className="px-5 py-2 rounded-xl bg-red-500 text-white text-xs font-bold uppercase tracking-wider hover:bg-red-600 transition-colors"
-              >
-                Delete Service
-              </button>
-            </div>
+          <div className="p-3.5 rounded-xl bg-background border border-border text-xs">
+            <span className="text-muted">Target Service: </span>
+            <span className="font-bold text-foreground uppercase">{deleteModal?.title}</span>
           </div>
+
+          <ModalFooter className="px-0 pb-0">
+            <Button variant="secondary" onClick={() => setDeleteModal(null)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={handleConfirmDelete}>
+              Delete Service
+            </Button>
+          </ModalFooter>
         </div>
-      )}
+      </Modal>
 
       {/* Create / Edit Service Modal */}
-      {serviceModal.isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="w-full max-w-2xl rounded-2xl border border-border bg-surface shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
-            <form onSubmit={handleSaveService} className="flex flex-col flex-1 overflow-hidden">
-              <div className="flex items-center justify-between px-6 py-4 border-b border-border bg-surface">
-                <div className="flex items-center gap-2">
-                  <Briefcase className="w-4 h-4 text-foreground" />
-                  <h3 className="text-sm font-bold uppercase tracking-wider text-foreground">
-                    {serviceModal.mode === 'create' ? 'Create Commission Service' : 'Edit Service Offering'}
-                  </h3>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setServiceModal({ isOpen: false, mode: 'create', service: {} })}
-                  className="p-1 rounded-lg text-muted hover:text-foreground hover:bg-background transition-colors"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-
-              <div className="p-6 overflow-y-auto space-y-6 flex-1">
-                {/* Number & Title */}
-                <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 sm:gap-4">
-                  <div className="space-y-1.5 sm:col-span-3">
-                    <label htmlFor="svc-title-input" className="block text-xs font-semibold text-foreground">
-                      Service Title <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      id="svc-title-input"
-                      type="text"
-                      required
-                      value={serviceModal.service.title || ''}
-                      onChange={(e) =>
-                        setServiceModal((prev) => ({
-                          ...prev,
-                          service: { ...prev.service, title: e.target.value.toUpperCase() },
-                        }))
-                      }
-                      placeholder="e.g. PRODUCT DESIGN"
-                      className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-background text-xs font-bold uppercase text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
-                    />
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <label htmlFor="svc-number-input" className="block text-xs font-semibold text-foreground">
-                      Index No.
-                    </label>
-                    <input
-                      id="svc-number-input"
-                      type="text"
-                      value={serviceModal.service.number || ''}
-                      onChange={(e) =>
-                        setServiceModal((prev) => ({
-                          ...prev,
-                          service: { ...prev.service, number: e.target.value },
-                        }))
-                      }
-                      placeholder="e.g. 01"
-                      className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-background text-xs font-mono text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
-                    />
-                  </div>
-                </div>
-
-                {/* Description */}
-                <div className="space-y-1.5">
-                  <label htmlFor="svc-desc-input" className="block text-xs font-semibold text-foreground">
-                    Editorial Scope Narrative
-                  </label>
-                  <textarea
-                    id="svc-desc-input"
-                    rows={3}
-                    value={serviceModal.service.description || ''}
-                    onChange={(e) =>
-                      setServiceModal((prev) => ({
-                        ...prev,
-                        service: { ...prev.service, description: e.target.value },
-                      }))
-                    }
-                    placeholder="End-to-end digital product design from initial concept through high-fidelity interactive prototypes..."
-                    className="w-full px-3.5 py-2.5 rounded-lg border border-border bg-background text-xs text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
-                  />
-                </div>
-
-                {/* Lucide Icon Selector */}
-                <IconPicker
-                  value={serviceModal.service.icon || 'Briefcase'}
-                  onChange={(iconName) =>
-                    setServiceModal((prev) => ({
-                      ...prev,
-                      service: { ...prev.service, icon: iconName },
-                    }))
-                  }
-                />
-
-                {/* Deliverables Scope Chips */}
-                <div className="space-y-3">
-                  <label className="block text-xs font-semibold text-foreground">Deliverables Scope Tags</label>
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="text"
-                      value={newDeliverableTag}
-                      onChange={(e) => setNewDeliverableTag(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                          e.preventDefault();
-                          handleAddDeliverable();
-                        }
-                      }}
-                      placeholder="Type deliverable (e.g. Design Systems)..."
-                      className="flex-1 px-3.5 py-2 rounded-xl border border-border bg-background text-xs text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => handleAddDeliverable()}
-                      disabled={!newDeliverableTag.trim()}
-                      className="px-4 py-2 rounded-xl bg-foreground text-background text-xs font-semibold hover:opacity-90 transition-opacity disabled:opacity-40"
-                    >
-                      Add Tag
-                    </button>
-                  </div>
-
-                  {/* Active Tags */}
-                  <div className="flex flex-wrap gap-1.5">
-                    {(serviceModal.service.deliverables || []).map((tag) => (
-                      <span
-                        key={tag}
-                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-border bg-background text-[11px] font-mono uppercase text-foreground"
-                      >
-                        <span>{tag}</span>
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveDeliverable(tag)}
-                          className="text-muted hover:text-red-400 transition-colors"
-                        >
-                          <X className="w-3 h-3" />
-                        </button>
-                      </span>
-                    ))}
-                  </div>
-
-                  {/* Quick Presets */}
-                  <div className="pt-1">
-                    <p className="text-[10px] font-mono text-muted mb-1.5 uppercase">Managed category scope suggestions:</p>
-                    <div className="flex flex-wrap gap-1">
-                      {deliverablePresets.map((preset) => (
-                        <button
-                          key={preset}
-                          type="button"
-                          onClick={() => handleAddDeliverable(preset)}
-                          className="text-[10px] font-mono uppercase px-2 py-0.5 rounded-md border border-border bg-background/50 text-muted hover:text-foreground hover:bg-background transition-colors"
-                        >
-                          + {preset}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Visible Toggle */}
-                <div className="pt-2 border-t border-border">
-                  <label className="flex items-center gap-2 text-xs font-semibold text-foreground cursor-pointer select-none">
-                    <input
-                      type="checkbox"
-                      checked={serviceModal.service.visible !== false}
-                      onChange={(e) =>
-                        setServiceModal((prev) => ({
-                          ...prev,
-                          service: { ...prev.service, visible: e.target.checked },
-                        }))
-                      }
-                      className="w-4 h-4 rounded border-border text-foreground accent-foreground"
-                    />
-                    <span>Service Visible in Commission Scope</span>
-                  </label>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-end gap-2 px-6 py-4 border-t border-border bg-surface">
-                <button
-                  type="button"
-                  onClick={() => setServiceModal({ isOpen: false, mode: 'create', service: {} })}
-                  className="px-4 py-2 rounded-xl border border-border text-xs font-medium text-muted hover:text-foreground hover:bg-background transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-5 py-2 rounded-xl bg-foreground text-background text-xs font-semibold hover:opacity-90 transition-opacity"
-                >
-                  {serviceModal.mode === 'create' ? 'Create Service' : 'Save Changes'}
-                </button>
-              </div>
-            </form>
+      <Modal
+        isOpen={serviceModal.isOpen}
+        onClose={() => setServiceModal({ isOpen: false, mode: 'create', service: {} })}
+        title={serviceModal.mode === 'create' ? 'Create Commission Service' : 'Edit Service Offering'}
+        size="lg"
+      >
+        <form onSubmit={handleSaveService} className="space-y-5">
+          <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
+            <div className="sm:col-span-3">
+              <Input
+                label="Service Title *"
+                required
+                value={serviceModal.service.title || ''}
+                onChange={(e) =>
+                  setServiceModal((prev) => ({
+                    ...prev,
+                    service: { ...prev.service, title: e.target.value.toUpperCase() },
+                  }))
+                }
+                placeholder="e.g. PRODUCT DESIGN"
+              />
+            </div>
+            <div>
+              <Input
+                label="Index No."
+                value={serviceModal.service.number || ''}
+                onChange={(e) =>
+                  setServiceModal((prev) => ({
+                    ...prev,
+                    service: { ...prev.service, number: e.target.value },
+                  }))
+                }
+                placeholder="e.g. 01"
+              />
+            </div>
           </div>
-        </div>
-      )}
+
+          <Textarea
+            label="Editorial Scope Narrative"
+            rows={3}
+            value={serviceModal.service.description || ''}
+            onChange={(e) =>
+              setServiceModal((prev) => ({
+                ...prev,
+                service: { ...prev.service, description: e.target.value },
+              }))
+            }
+            placeholder="End-to-end digital product design from initial concept through high-fidelity interactive prototypes..."
+          />
+
+          <IconPicker
+            value={serviceModal.service.icon || 'Briefcase'}
+            onChange={(iconName) =>
+              setServiceModal((prev) => ({
+                ...prev,
+                service: { ...prev.service, icon: iconName },
+              }))
+            }
+          />
+
+          <div className="space-y-3">
+            <label className="block text-xs font-semibold text-foreground">Deliverables Scope Tags</label>
+            <div className="flex items-center gap-2">
+              <Input
+                value={newDeliverableTag}
+                onChange={(e) => setNewDeliverableTag(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleAddDeliverable();
+                  }
+                }}
+                placeholder="Type deliverable (e.g. Design Systems)..."
+                className="flex-1"
+              />
+              <Button type="button" variant="secondary" onClick={() => handleAddDeliverable()}>
+                Add Tag
+              </Button>
+            </div>
+
+            {deliverablePresets.length > 0 && (
+              <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                <span className="text-[11px] text-muted">Suggestions:</span>
+                {deliverablePresets.map((preset) => (
+                  <button
+                    key={preset}
+                    type="button"
+                    onClick={() => handleAddDeliverable(preset)}
+                    className="text-[11px] font-mono px-2 py-0.5 rounded-md border border-border bg-background hover:bg-surface text-muted hover:text-foreground transition-colors"
+                  >
+                    + {preset}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            <div className="flex flex-wrap gap-2 pt-2">
+              {(serviceModal.service.deliverables || []).map((tag, idx) => (
+                <Badge key={idx} variant="neutral" className="gap-1.5 py-1">
+                  <span>{tag}</span>
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveDeliverable(tag)}
+                    className="text-muted hover:text-foreground"
+                    aria-label={`Remove ${tag}`}
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </Badge>
+              ))}
+            </div>
+          </div>
+
+          <Checkbox
+            label="Service Visible in Commission Scope"
+            checked={serviceModal.service.visible !== false}
+            onChange={(e) =>
+              setServiceModal((prev) => ({
+                ...prev,
+                service: { ...prev.service, visible: e.target.checked },
+              }))
+            }
+          />
+
+          <ModalFooter className="px-0 pb-0 pt-3">
+            <Button
+              variant="secondary"
+              type="button"
+              onClick={() => setServiceModal({ isOpen: false, mode: 'create', service: {} })}
+            >
+              Cancel
+            </Button>
+            <Button variant="primary" type="submit">
+              {serviceModal.mode === 'create' ? 'Create Service' : 'Save Changes'}
+            </Button>
+          </ModalFooter>
+        </form>
+      </Modal>
 
       {/* Page Header */}
-      <div className="rounded-2xl border border-border bg-surface p-6 sm:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-xs">
+      <Card className="p-6 sm:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-xs">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <span className="font-mono text-xs font-semibold uppercase tracking-wider text-muted flex items-center gap-1.5">
@@ -557,121 +502,90 @@ export const ServicesManager: React.FC = () => {
             href="/#services"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl border border-border bg-background hover:bg-surface text-xs font-medium text-foreground transition-colors"
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border border-border bg-background hover:bg-surface text-xs font-medium text-foreground transition-colors"
           >
             <span>Live Section</span>
             <ExternalLink className="w-3.5 h-3.5" />
           </a>
 
-          <button
-            type="button"
+          <Button
+            variant="primary"
             onClick={handleOpenCreateService}
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-foreground text-background font-semibold text-xs hover:opacity-90 transition-opacity shadow-xs"
+            icon={<Plus className="w-4 h-4" />}
           >
-            <Plus className="w-4 h-4" />
-            <span>New Service</span>
-          </button>
+            New Service
+          </Button>
         </div>
-      </div>
+      </Card>
 
       {/* Editable Default Content Notice */}
-      <div className="rounded-2xl border border-blue-500/20 bg-blue-500/5 p-4 sm:p-5 flex items-start gap-3.5 text-xs text-foreground">
-        <div className="p-2 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 shrink-0">
-          <Briefcase className="w-4 h-4" />
-        </div>
-        <div className="space-y-1">
-          <p className="font-bold text-foreground">Editable Default Services</p>
-          <p className="text-muted leading-relaxed">
-            Initial default service offerings (<span className="text-foreground font-semibold">Website Design</span>, <span className="text-foreground font-semibold">UI/UX Design</span>, <span className="text-foreground font-semibold">Web Design</span>, <span className="text-foreground font-semibold">Prototyping & Wireframing</span>) are editable defaults based on core disciplines. You can edit any service title, deliverables, icons, or add custom service offerings at any time.
-          </p>
-        </div>
-      </div>
+      <Alert variant="info" title="Editable Default Services">
+        Initial default service offerings (<span className="text-foreground font-semibold">Website Design</span>, <span className="text-foreground font-semibold">UI/UX Design</span>, <span className="text-foreground font-semibold">Web Design</span>, <span className="text-foreground font-semibold">Prototyping & Wireframing</span>) are editable defaults based on core disciplines. You can edit any service title, deliverables, icons, or add custom service offerings at any time.
+      </Alert>
 
       {/* Filter & Search Bar */}
-      <div className="rounded-2xl border border-border bg-surface p-4 sm:p-5 space-y-4 shadow-xs">
+      <Card className="p-4 sm:p-5 shadow-xs">
         <div className="flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
-          <div className="relative flex-1">
-            <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-muted" />
-            <input
-              type="text"
+          <div className="flex-1">
+            <Search
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
+              onClear={() => setSearchTerm('')}
               placeholder="Search services by title, description, or deliverables..."
-              className="w-full pl-9 pr-8 py-2 rounded-xl border border-border bg-background text-xs text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
             />
-            {searchTerm && (
-              <button
-                type="button"
-                onClick={() => setSearchTerm('')}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-muted hover:text-foreground"
-              >
-                <X className="w-3.5 h-3.5" />
-              </button>
-            )}
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:flex md:items-center gap-2">
-            {/* Visibility Filter */}
-            <select
+            <Select
               value={visibilityFilter}
               onChange={(e) => setVisibilityFilter(e.target.value as any)}
-              className="w-full sm:w-auto px-3 py-2 rounded-xl border border-border bg-background text-xs text-foreground focus:outline-hidden focus:ring-1 focus:ring-foreground"
-            >
-              <option value="ALL">All Services</option>
-              <option value="VISIBLE">Visible Only</option>
-              <option value="HIDDEN">Hidden Only</option>
-            </select>
+              options={[
+                { value: 'ALL', label: 'All Services' },
+                { value: 'VISIBLE', label: 'Visible Only' },
+                { value: 'HIDDEN', label: 'Hidden Only' },
+              ]}
+            />
 
-            {/* Sort Dropdown */}
-            <div className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-border bg-background text-xs text-muted">
-              <ArrowUpDown className="w-3.5 h-3.5" />
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as any)}
-                className="bg-transparent text-foreground focus:outline-hidden w-full sm:w-auto"
-              >
-                <option value="order">Custom Order</option>
-                <option value="title">Title A-Z</option>
-                <option value="status">Visibility Status</option>
-              </select>
-            </div>
+            <Select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as any)}
+              options={[
+                { value: 'order', label: 'Custom Order' },
+                { value: 'title', label: 'Title A-Z' },
+                { value: 'status', label: 'Visibility Status' },
+              ]}
+            />
           </div>
         </div>
-      </div>
+      </Card>
 
       {/* Loading State */}
       {loading && (
-        <div className="p-12 text-center rounded-2xl border border-border bg-surface text-muted text-xs">
-          <div className="w-6 h-6 border-2 border-foreground border-t-transparent rounded-full animate-spin mx-auto mb-2" />
-          <span>Loading service offerings...</span>
+        <div className="space-y-4">
+          <Skeleton variant="card" className="h-32" />
+          <Skeleton variant="card" className="h-32" />
         </div>
       )}
 
       {/* Error State */}
       {error && (
-        <div className="p-4 rounded-xl border border-red-500/30 bg-red-500/10 text-red-500 text-xs flex items-center gap-2">
-          <AlertTriangle className="w-4 h-4 shrink-0" />
-          <span>{error}</span>
-        </div>
+        <Alert variant="error" title="Error Loading Services">
+          {error}
+        </Alert>
       )}
 
       {/* Empty State */}
       {!loading && filteredServices.length === 0 && (
-        <div className="p-12 text-center rounded-2xl border border-dashed border-border bg-surface text-muted space-y-3">
-          <Briefcase className="w-8 h-8 mx-auto opacity-30" />
-          <div>
-            <p className="text-sm font-semibold text-foreground">No service offerings found</p>
-            <p className="text-xs text-muted">Try adjusting your search criteria or add a new service package.</p>
-          </div>
-          <button
-            type="button"
-            onClick={handleOpenCreateService}
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-foreground text-background text-xs font-semibold hover:opacity-90"
-          >
-            <Plus className="w-3.5 h-3.5" />
-            <span>Create First Service</span>
-          </button>
-        </div>
+        <EmptyState
+          icon={<Briefcase className="w-8 h-8" />}
+          title="No service offerings found"
+          description="Try adjusting your search criteria or add a new service package."
+          primaryAction={
+            <Button variant="primary" onClick={handleOpenCreateService} icon={<Plus className="w-4 h-4" />}>
+              Create First Service
+            </Button>
+          }
+        />
       )}
 
       {/* Services List / Reorderable Cards */}
@@ -682,7 +596,7 @@ export const ServicesManager: React.FC = () => {
           const deliverables = svc.deliverables || [];
 
           return (
-            <div
+            <Card
               key={svc.id}
               draggable={searchTerm === '' && visibilityFilter === 'ALL' && sortBy === 'order'}
               onDragStart={() => handleDragStart(index)}
@@ -692,31 +606,21 @@ export const ServicesManager: React.FC = () => {
                 setDraggedIndex(null);
                 setDragOverIndex(null);
               }}
-              className={`group rounded-2xl border bg-surface p-6 space-y-4 transition-all shadow-xs ${
+              className={`group p-6 space-y-4 transition-all shadow-xs ${
                 isDragging
-                  ? 'opacity-30 border-dashed border-foreground'
+                  ? 'opacity-30 border-dashed border-[var(--color-border-strong)]'
                   : isDropTarget
-                  ? 'border-foreground ring-2 ring-foreground/20'
-                  : 'border-border hover:border-foreground/30'
+                  ? 'border-[var(--color-border-strong)] ring-2 ring-foreground/20'
+                  : 'hover:border-foreground/30'
               }`}
             >
               {/* Header Row */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-4">
                 <div className="flex items-center gap-3">
-                  {/* Drag Handle */}
-                  <button
-                    type="button"
-                    className="cursor-grab active:cursor-grabbing text-muted group-hover:text-foreground p-1 rounded hover:bg-background transition-colors"
-                    title="Drag to reorder service"
-                  >
-                    <GripVertical className="w-4 h-4" />
-                  </button>
-
                   <span className="font-mono text-xs font-bold text-foreground px-2 py-0.5 rounded-md bg-background border border-border">
                     [{svc.number || String(index + 1).padStart(2, '0')}]
                   </span>
 
-                  {/* Icon Badge */}
                   <div className="w-8 h-8 rounded-lg bg-background border border-border flex items-center justify-center text-foreground shrink-0">
                     <RenderLucideIcon name={svc.icon} className="w-4 h-4" />
                   </div>
@@ -725,9 +629,7 @@ export const ServicesManager: React.FC = () => {
                     <div className="flex items-center gap-2">
                       <h3 className="font-bold text-lg uppercase tracking-tight text-foreground">{svc.title}</h3>
                       {!svc.visible && (
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-500/10 text-amber-500 border border-amber-500/20">
-                          Hidden
-                        </span>
+                        <Badge variant="warning">Hidden</Badge>
                       )}
                     </div>
                   </div>
@@ -735,69 +637,50 @@ export const ServicesManager: React.FC = () => {
 
                 {/* Actions Toolbar */}
                 <div className="flex items-center gap-1.5 shrink-0 self-end sm:self-center">
-                  {/* Reorder Buttons */}
-                  <button
-                    type="button"
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    icon={<ArrowUp className="w-3.5 h-3.5" />}
                     onClick={() => handleMoveOrder(index, 'up')}
                     disabled={index === 0}
-                    className="p-1.5 rounded-lg border border-border text-muted hover:text-foreground hover:bg-background disabled:opacity-20 transition-colors"
-                    title="Move Service Up"
-                  >
-                    <ArrowUp className="w-3.5 h-3.5" />
-                  </button>
-                  <button
-                    type="button"
+                    aria-label="Move Service Up"
+                  />
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    icon={<ArrowDown className="w-3.5 h-3.5" />}
                     onClick={() => handleMoveOrder(index, 'down')}
                     disabled={index === filteredServices.length - 1}
-                    className="p-1.5 rounded-lg border border-border text-muted hover:text-foreground hover:bg-background disabled:opacity-20 transition-colors"
-                    title="Move Service Down"
-                  >
-                    <ArrowDown className="w-3.5 h-3.5" />
-                  </button>
-
-                  {/* Toggle Visibility */}
-                  <button
-                    type="button"
+                    aria-label="Move Service Down"
+                  />
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    icon={svc.visible ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
                     onClick={() => toggleServiceVisibility(svc.id)}
-                    className={`p-1.5 rounded-lg border transition-colors ${
-                      svc.visible
-                        ? 'border-border text-muted hover:text-foreground hover:bg-background'
-                        : 'border-amber-500/30 bg-amber-500/10 text-amber-500'
-                    }`}
-                    title={svc.visible ? 'Hide Service' : 'Show Service'}
-                  >
-                    {svc.visible ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
-                  </button>
-
-                  {/* Edit */}
-                  <button
-                    type="button"
+                    aria-label={svc.visible ? 'Hide Service' : 'Show Service'}
+                  />
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    icon={<Edit className="w-3.5 h-3.5" />}
                     onClick={() => handleOpenEditService(svc)}
-                    className="p-1.5 rounded-lg border border-border text-muted hover:text-foreground hover:bg-background transition-colors"
-                    title="Edit Service"
-                  >
-                    <Edit className="w-3.5 h-3.5" />
-                  </button>
-
-                  {/* Duplicate */}
-                  <button
-                    type="button"
+                    aria-label="Edit Service"
+                  />
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    icon={<Copy className="w-3.5 h-3.5" />}
                     onClick={() => handleDuplicate(svc.id)}
-                    className="p-1.5 rounded-lg border border-border text-muted hover:text-foreground hover:bg-background transition-colors"
-                    title="Duplicate Service"
-                  >
-                    <Copy className="w-3.5 h-3.5" />
-                  </button>
-
-                  {/* Delete */}
-                  <button
-                    type="button"
+                    aria-label="Duplicate Service"
+                  />
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    icon={<Trash2 className="w-3.5 h-3.5" />}
                     onClick={() => setDeleteModal(svc)}
-                    className="p-1.5 rounded-lg border border-red-500/20 text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors"
-                    title="Delete Service"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
+                    aria-label="Delete Service"
+                  />
                 </div>
               </div>
 
@@ -808,16 +691,13 @@ export const ServicesManager: React.FC = () => {
               {deliverables.length > 0 && (
                 <div className="flex flex-wrap gap-2 pt-1">
                   {deliverables.map((item, idx) => (
-                    <span
-                      key={idx}
-                      className="font-mono text-[11px] uppercase tracking-wider text-muted bg-background border border-border/80 px-2.5 py-1 rounded-md"
-                    >
+                    <Badge key={idx} variant="neutral" className="font-mono text-[11px] tracking-wider uppercase">
                       {item}
-                    </span>
+                    </Badge>
                   ))}
                 </div>
               )}
-            </div>
+            </Card>
           );
         })}
       </div>

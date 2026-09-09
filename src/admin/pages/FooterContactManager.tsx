@@ -3,8 +3,6 @@ import {
   Save,
   RotateCcw,
   Undo2,
-  CheckCircle2,
-  AlertCircle,
   Plus,
   Trash2,
   ArrowUp,
@@ -29,6 +27,12 @@ import { FooterContent, ContactCTA, SocialLink } from '../../types';
 import { defaultWebsiteData } from '../../data/defaultWebsiteData';
 import { validators } from '../utils/validators';
 import { useUnsavedChanges } from '../hooks/useUnsavedChanges';
+import { Button } from '../../design-system/components/Button';
+import { Input } from '../../design-system/components/Input';
+import { Badge } from '../../design-system/components/Badge';
+import { Alert } from '../../design-system/components/Alert';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '../../design-system/components/Card';
+import { useToast } from '../../design-system/hooks/useToast';
 
 const PLATFORM_OPTIONS: Array<SocialLink['platform']> = [
   'LinkedIn',
@@ -42,6 +46,7 @@ const PLATFORM_OPTIONS: Array<SocialLink['platform']> = [
 
 export const FooterContactManager: React.FC = () => {
   const { data, updateFooter, updateContactCTA } = useWebsiteData();
+  const toast = useToast();
 
   // Local form states
   const [footerForm, setFooterForm] = useState<FooterContent>(data.footer);
@@ -103,6 +108,7 @@ export const FooterContactManager: React.FC = () => {
     if (!urlCheck.isValid) {
       setErrorMessage(urlCheck.error || 'Unsafe URL detected! Javascript and data URLs are strictly prohibited.');
       setStatus('error');
+      toast.error(urlCheck.error || 'Unsafe URL detected!');
       return;
     }
 
@@ -123,6 +129,7 @@ export const FooterContactManager: React.FC = () => {
     setNewLabel('');
     setNewHref('');
     setNewPlatform('LinkedIn');
+    toast.success(`Added ${newLink.label} channel`);
   };
 
   const handleUpdateSocialLink = (index: number, field: keyof SocialLink, value: any) => {
@@ -142,6 +149,7 @@ export const FooterContactManager: React.FC = () => {
     const updated = socialLinks.filter((_, i) => i !== index);
     setSocialLinks(updated);
     setFooterForm((prev) => ({ ...prev, socialLinks: updated }));
+    toast.info('Social link removed');
   };
 
   const handleMoveSocialLink = (index: number, direction: 'up' | 'down') => {
@@ -181,6 +189,7 @@ export const FooterContactManager: React.FC = () => {
       if (!emailCheck.isValid) {
         setStatus('error');
         setErrorMessage(emailCheck.error || 'Please enter a valid Primary Contact Email address.');
+        toast.error(emailCheck.error || 'Please enter a valid Primary Contact Email address.');
         return;
       }
     }
@@ -190,6 +199,7 @@ export const FooterContactManager: React.FC = () => {
       if (!emailCheck.isValid) {
         setStatus('error');
         setErrorMessage(emailCheck.error || 'Please enter a valid Footer Email address.');
+        toast.error(emailCheck.error || 'Please enter a valid Footer Email address.');
         return;
       }
     }
@@ -199,6 +209,7 @@ export const FooterContactManager: React.FC = () => {
       if (!linkCheck.isValid) {
         setStatus('error');
         setErrorMessage(linkCheck.error || 'Unsafe CTA Link URL detected.');
+        toast.error(linkCheck.error || 'Unsafe CTA Link URL detected.');
         return;
       }
     }
@@ -209,6 +220,7 @@ export const FooterContactManager: React.FC = () => {
         if (!linkCheck.isValid) {
           setStatus('error');
           setErrorMessage(linkCheck.error || `Invalid or unsafe URL found for social link "${link.label}".`);
+          toast.error(`Invalid URL for "${link.label}".`);
           return;
         }
       }
@@ -231,14 +243,18 @@ export const FooterContactManager: React.FC = () => {
       if (footerSuccess && contactSuccess) {
         setStatus('saved');
         setIsDirty(false);
+        toast.success('Changes saved successfully!');
         setTimeout(() => setStatus('idle'), 3000);
       } else {
         setStatus('error');
         setErrorMessage('Failed to save to database. Changes remain cached in memory.');
+        toast.error('Failed to save to database.');
       }
     } catch (err: any) {
       setStatus('error');
-      setErrorMessage(validators.formatFriendlyError(err));
+      const formatted = validators.formatFriendlyError(err);
+      setErrorMessage(formatted);
+      toast.error(formatted);
     }
   };
 
@@ -250,6 +266,7 @@ export const FooterContactManager: React.FC = () => {
     setIsDirty(false);
     setStatus('idle');
     setErrorMessage(null);
+    toast.info('Changes reverted');
   };
 
   // Restore defaults
@@ -259,130 +276,128 @@ export const FooterContactManager: React.FC = () => {
       setContactForm(defaultWebsiteData.contact);
       setSocialLinks(defaultWebsiteData.footer.socialLinks || []);
       markDirty();
+      toast.info('Restored factory defaults');
     }
   };
 
   return (
     <div className="space-y-6 pb-20">
       {/* Top Banner / Breadcrumb & Actions */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-6">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-[10px] font-bold uppercase tracking-widest text-muted">Admin Content Editor</span>
-            <span className="text-xs text-muted">/</span>
-            <span className="text-[10px] font-bold uppercase tracking-widest text-foreground font-mono">
-              FOOTER, SOCIAL & CONTACT
-            </span>
+      <Card className="p-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-muted">Admin Content Editor</span>
+              <span className="text-xs text-muted">/</span>
+              <Badge variant="neutral" size="sm" className="font-mono uppercase">
+                FOOTER, SOCIAL & CONTACT
+              </Badge>
+              {isDirty && (
+                <Badge variant="warning" size="sm" className="animate-pulse">
+                  Unsaved Changes
+                </Badge>
+              )}
+            </div>
+            <h1 className="text-2xl font-bold uppercase tracking-tight text-foreground flex items-center gap-2.5">
+              <Globe className="w-6 h-6 text-foreground" />
+              <span>Footer & Outreach Architecture</span>
+            </h1>
+            <p className="text-xs text-muted mt-1">
+              Manage public footer editorial columns, social links directory, and client collaboration contact triggers.
+            </p>
           </div>
-          <h1 className="text-2xl font-bold uppercase tracking-tight text-foreground flex items-center gap-2.5">
-            <Globe className="w-6 h-6 text-foreground" />
-            <span>Footer & Outreach Architecture</span>
-          </h1>
-          <p className="text-xs text-muted mt-1">
-            Manage public footer editorial columns, social links directory, and client collaboration contact triggers.
-          </p>
-        </div>
 
-        {/* Global Save / Reset Actions */}
-        <div className="flex items-center gap-2.5 shrink-0">
-          <button
-            type="button"
-            onClick={handleRestoreDefaults}
-            className="px-3.5 py-2 rounded-xl border border-border bg-surface text-xs font-medium text-muted hover:text-foreground hover:bg-background transition-colors flex items-center gap-1.5"
-            title="Restore Factory Defaults"
-          >
-            <RotateCcw className="w-3.5 h-3.5" />
-            <span className="hidden md:inline">Defaults</span>
-          </button>
-
-          {isDirty && (
-            <button
+          {/* Global Save / Reset Actions */}
+          <div className="flex items-center gap-2.5 shrink-0">
+            <Button
               type="button"
-              onClick={handleReset}
-              className="px-3.5 py-2 rounded-xl border border-border bg-surface text-xs font-medium text-muted hover:text-foreground hover:bg-background transition-colors flex items-center gap-1.5"
+              variant="outline"
+              size="sm"
+              onClick={handleRestoreDefaults}
+              leftIcon={<RotateCcw className="w-3.5 h-3.5" />}
             >
-              <Undo2 className="w-3.5 h-3.5" />
-              <span>Cancel</span>
-            </button>
-          )}
+              <span className="hidden md:inline">Defaults</span>
+            </Button>
 
-          <button
-            type="button"
-            onClick={handleSaveAll}
-            disabled={status === 'saving' || !isDirty}
-            className={`px-5 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition-all shadow-xs ${
-              isDirty
-                ? 'bg-foreground text-background hover:opacity-90 cursor-pointer'
-                : 'bg-surface border border-border text-muted opacity-60 cursor-not-allowed'
-            }`}
-          >
-            <Save className="w-4 h-4" />
-            <span>{status === 'saving' ? 'Saving...' : 'Save Changes'}</span>
-          </button>
+            {isDirty && (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleReset}
+                leftIcon={<Undo2 className="w-3.5 h-3.5" />}
+              >
+                Cancel
+              </Button>
+            )}
+
+            <Button
+              type="button"
+              variant="primary"
+              size="sm"
+              onClick={handleSaveAll}
+              disabled={!isDirty || status === 'saving'}
+              isLoading={status === 'saving'}
+              leftIcon={<Save className="w-4 h-4" />}
+            >
+              Save Changes
+            </Button>
+          </div>
         </div>
-      </div>
+      </Card>
 
       {/* Status Notifications */}
       {status === 'saved' && (
-        <div className="p-4 rounded-xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-500 flex items-center gap-3 animate-in fade-in duration-200">
-          <CheckCircle2 className="w-5 h-5 shrink-0" />
-          <div className="text-xs">
-            <p className="font-semibold">Changes saved successfully!</p>
-            <p className="opacity-80">Footer, Social Links and Contact CTA are live on the portfolio website.</p>
-          </div>
-        </div>
+        <Alert
+          variant="success"
+          title="Changes saved successfully!"
+          onClose={() => setStatus('idle')}
+        >
+          Footer, Social Links and Contact CTA are live on the portfolio website.
+        </Alert>
       )}
 
       {status === 'error' && (
-        <div className="p-4 rounded-xl border border-red-500/30 bg-red-500/10 text-red-500 flex items-center gap-3 animate-in fade-in duration-200">
-          <ShieldAlert className="w-5 h-5 shrink-0" />
-          <div className="text-xs">
-            <p className="font-semibold">Validation / Storage Error</p>
-            <p className="opacity-90">{errorMessage || 'Could not save changes. Check inputs.'}</p>
-          </div>
-        </div>
+        <Alert
+          variant="error"
+          title="Validation / Storage Error"
+          onClose={() => setStatus('idle')}
+        >
+          {errorMessage || 'Could not save changes. Check inputs.'}
+        </Alert>
       )}
 
       {/* Tabs Navigation */}
       <div className="flex items-center gap-2 border-b border-border pb-2 overflow-x-auto no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0 sm:flex-wrap">
-        <button
+        <Button
           type="button"
+          variant={activeTab === 'footer' ? 'primary' : 'ghost'}
+          size="sm"
           onClick={() => setActiveTab('footer')}
-          className={`px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider whitespace-nowrap shrink-0 transition-all flex items-center gap-2 ${
-            activeTab === 'footer'
-              ? 'bg-foreground text-background shadow-xs'
-              : 'text-muted hover:text-foreground hover:bg-surface'
-          }`}
+          leftIcon={<Layers className="w-4 h-4" />}
         >
-          <Layers className="w-4 h-4" />
-          <span>Footer Columns</span>
-        </button>
+          Footer Columns
+        </Button>
 
-        <button
+        <Button
           type="button"
+          variant={activeTab === 'social' ? 'primary' : 'ghost'}
+          size="sm"
           onClick={() => setActiveTab('social')}
-          className={`px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider whitespace-nowrap shrink-0 transition-all flex items-center gap-2 ${
-            activeTab === 'social'
-              ? 'bg-foreground text-background shadow-xs'
-              : 'text-muted hover:text-foreground hover:bg-surface'
-          }`}
+          leftIcon={<Share2 className="w-4 h-4" />}
         >
-          <Share2 className="w-4 h-4" />
-          <span>Social Links ({socialLinks.length})</span>
-        </button>
+          Social Links ({socialLinks.length})
+        </Button>
 
-        <button
+        <Button
           type="button"
+          variant={activeTab === 'contact' ? 'primary' : 'ghost'}
+          size="sm"
           onClick={() => setActiveTab('contact')}
-          className={`px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider whitespace-nowrap shrink-0 transition-all flex items-center gap-2 ${
-            activeTab === 'contact'
-              ? 'bg-foreground text-background shadow-xs'
-              : 'text-muted hover:text-foreground hover:bg-surface'
-          }`}
+          leftIcon={<Mail className="w-4 h-4" />}
         >
-          <Mail className="w-4 h-4" />
-          <span>Contact CTA</span>
-        </button>
+          Contact CTA
+        </Button>
       </div>
 
       {/* ================================================== */}
@@ -390,136 +405,101 @@ export const FooterContactManager: React.FC = () => {
       {/* ================================================== */}
       {activeTab === 'footer' && (
         <div className="space-y-6">
-          <div className="rounded-2xl border border-border bg-surface p-6 space-y-6">
+          <Card className="p-6 space-y-6">
             <div className="border-b border-border pb-4">
-              <h3 className="text-sm font-bold uppercase tracking-wider text-foreground flex items-center gap-2">
+              <CardTitle className="flex items-center gap-2 text-sm uppercase tracking-wider">
                 <Globe className="w-4 h-4" />
                 <span>Primary Footer Editorial Fields</span>
-              </h3>
-              <p className="text-xs text-muted mt-0.5">
+              </CardTitle>
+              <CardDescription className="text-xs">
                 Configure physical studio location, global availability tagline, copyright notice, and hero brand signature.
-              </p>
+              </CardDescription>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Location */}
-              <div className="space-y-2">
-                <label htmlFor="footer-location" className="block text-xs font-semibold text-foreground flex items-center gap-1.5">
-                  <MapPin className="w-3.5 h-3.5 text-muted" />
-                  <span>Studio Location</span>
-                </label>
-                <input
-                  id="footer-location"
-                  type="text"
+              <div>
+                <Input
+                  label="Studio Location"
                   value={footerForm.location || ''}
                   onChange={(e) => handleFooterChange('location', e.target.value.toUpperCase())}
                   placeholder="e.g. INDIA"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-xs font-mono text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
+                  className="font-mono text-xs"
+                  helperText="Rendered in column [01 // LOCATION] of the public footer."
                 />
-                <p className="text-[11px] text-muted">Rendered in column [01 // LOCATION] of the public footer.</p>
               </div>
 
               {/* Working Globally */}
-              <div className="space-y-2">
-                <label htmlFor="footer-working-globally" className="block text-xs font-semibold text-foreground flex items-center gap-1.5">
-                  <Globe className="w-3.5 h-3.5 text-muted" />
-                  <span>Working Globally Tagline</span>
-                </label>
-                <input
-                  id="footer-working-globally"
-                  type="text"
+              <div>
+                <Input
+                  label="Working Globally Tagline"
                   value={footerForm.workingGlobally || ''}
                   onChange={(e) => handleFooterChange('workingGlobally', e.target.value.toUpperCase())}
                   placeholder="e.g. WORKING GLOBALLY"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-xs font-mono text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
+                  className="font-mono text-xs"
+                  helperText="Availability scope indicator shown under studio location."
                 />
-                <p className="text-[11px] text-muted">Availability scope indicator shown under studio location.</p>
               </div>
 
               {/* Brand Text */}
-              <div className="space-y-2 md:col-span-2">
-                <label htmlFor="footer-brand-text" className="block text-xs font-semibold text-foreground flex items-center gap-1.5">
-                  <Sparkles className="w-3.5 h-3.5 text-muted" />
-                  <span>Brand Text / Massive Bottom Signature</span>
-                </label>
-                <input
-                  id="footer-brand-text"
-                  type="text"
+              <div className="md:col-span-2">
+                <Input
+                  label="Brand Text / Massive Bottom Signature"
                   value={footerForm.brandText || ''}
                   onChange={(e) => handleFooterChange('brandText', e.target.value.toUpperCase())}
                   placeholder="e.g. DARSHIL S. BHUVA"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-xs font-bold tracking-wider text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
+                  className="font-bold tracking-wider text-xs"
+                  helperText="Massive typographic text revealed in the footer climax."
                 />
-                <p className="text-[11px] text-muted">Massive typographic text revealed in the footer climax.</p>
               </div>
 
               {/* Copyright */}
-              <div className="space-y-2">
-                <label htmlFor="footer-copyright" className="block text-xs font-semibold text-foreground flex items-center gap-1.5">
-                  <Copyright className="w-3.5 h-3.5 text-muted" />
-                  <span>Copyright Notice</span>
-                </label>
-                <input
-                  id="footer-copyright"
-                  type="text"
+              <div>
+                <Input
+                  label="Copyright Notice"
                   value={footerForm.copyright || ''}
                   onChange={(e) => handleFooterChange('copyright', e.target.value)}
                   placeholder="e.g. © 2026 ALL RIGHTS RESERVED"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-xs font-mono text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
+                  className="font-mono text-xs"
                 />
               </div>
 
               {/* Response Window */}
-              <div className="space-y-2">
-                <label htmlFor="footer-response" className="block text-xs font-semibold text-foreground flex items-center gap-1.5">
-                  <Clock className="w-3.5 h-3.5 text-muted" />
-                  <span>Inquiry Response Window</span>
-                </label>
-                <input
-                  id="footer-response"
-                  type="text"
+              <div>
+                <Input
+                  label="Inquiry Response Window"
                   value={footerForm.responseWindow || ''}
                   onChange={(e) => handleFooterChange('responseWindow', e.target.value)}
                   placeholder="e.g. Response within 24–48 hours"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-xs text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
                 />
               </div>
 
               {/* Coordinates */}
-              <div className="space-y-2">
-                <label htmlFor="footer-coordinates" className="block text-xs font-semibold text-foreground flex items-center gap-1.5">
-                  <Compass className="w-3.5 h-3.5 text-muted" />
-                  <span>Timezone & Geographic Coordinates</span>
-                </label>
-                <input
-                  id="footer-coordinates"
-                  type="text"
+              <div>
+                <Input
+                  label="Timezone & Geographic Coordinates"
                   value={footerForm.coordinates || ''}
                   onChange={(e) => handleFooterChange('coordinates', e.target.value)}
                   placeholder="e.g. UTC +05:30 · 21.1702° N, 72.8311° E"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-xs font-mono text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
+                  className="font-mono text-xs"
                 />
               </div>
 
               {/* Sub-Copyright / Subtext */}
-              <div className="space-y-2">
-                <label htmlFor="footer-subcopyright" className="block text-xs font-semibold text-foreground">
-                  Sub-Copyright / Discipline Descriptor
-                </label>
-                <input
-                  id="footer-subcopyright"
-                  type="text"
+              <div>
+                <Input
+                  label="Sub-Copyright / Discipline Descriptor"
                   value={footerForm.subCopyright || ''}
                   onChange={(e) => handleFooterChange('subCopyright', e.target.value.toUpperCase())}
                   placeholder="e.g. CREATIVE DIRECTION & INTERFACE ARCHITECTURE"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-xs font-mono text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
+                  className="font-mono text-xs"
                 />
               </div>
             </div>
-          </div>
+          </Card>
 
           {/* Live Preview of Footer Columns */}
-          <div className="rounded-2xl border border-border bg-surface p-6 space-y-4">
+          <Card className="p-6 space-y-4">
             <h4 className="text-xs font-bold uppercase tracking-wider text-muted font-mono">
               Live Preview: 4-Column Layout
             </h4>
@@ -551,7 +531,7 @@ export const FooterContactManager: React.FC = () => {
                 <p className="text-muted text-[11px]">{footerForm.copyright}</p>
               </div>
             </div>
-          </div>
+          </Card>
         </div>
       )}
 
@@ -561,15 +541,15 @@ export const FooterContactManager: React.FC = () => {
       {activeTab === 'social' && (
         <div className="space-y-6">
           {/* Add New Social Link Form */}
-          <div className="rounded-2xl border border-border bg-surface p-6 space-y-4">
+          <Card className="p-6 space-y-4">
             <div className="border-b border-border pb-3">
-              <h3 className="text-sm font-bold uppercase tracking-wider text-foreground flex items-center gap-2">
+              <CardTitle className="flex items-center gap-2 text-sm uppercase tracking-wider">
                 <Plus className="w-4 h-4" />
                 <span>Add New Social Channel</span>
-              </h3>
-              <p className="text-xs text-muted mt-0.5">
+              </CardTitle>
+              <CardDescription className="text-xs">
                 Add profile links for LinkedIn, Instagram, Behance, Dribbble, X, GitHub, or custom platforms.
-              </p>
+              </CardDescription>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 items-end">
@@ -584,7 +564,7 @@ export const FooterContactManager: React.FC = () => {
                       setNewLabel(plat.toUpperCase());
                     }
                   }}
-                  className="w-full px-3 py-2 rounded-xl border border-border bg-background text-xs text-foreground font-medium focus:outline-hidden focus:ring-1 focus:ring-foreground"
+                  className="w-full px-3 py-2.5 rounded-xl border border-border bg-background text-xs text-foreground font-medium focus:outline-hidden focus:ring-1 focus:ring-foreground"
                 >
                   {PLATFORM_OPTIONS.map((p) => (
                     <option key={p} value={p}>
@@ -594,53 +574,53 @@ export const FooterContactManager: React.FC = () => {
                 </select>
               </div>
 
-              <div className="sm:col-span-4 space-y-1.5">
-                <label className="block text-xs font-semibold text-foreground">Display Label</label>
-                <input
-                  type="text"
+              <div className="sm:col-span-4">
+                <Input
+                  label="Display Label"
                   value={newLabel}
                   onChange={(e) => setNewLabel(e.target.value)}
                   placeholder="e.g. LINKEDIN"
-                  className="w-full px-3 py-2 rounded-xl border border-border bg-background text-xs text-foreground uppercase placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
+                  className="uppercase"
                 />
               </div>
 
-              <div className="sm:col-span-3 space-y-1.5">
-                <label className="block text-xs font-semibold text-foreground">URL / Profile Link</label>
-                <input
-                  type="text"
+              <div className="sm:col-span-3">
+                <Input
+                  label="URL / Profile Link"
                   value={newHref}
                   onChange={(e) => setNewHref(e.target.value)}
                   placeholder="https://linkedin.com/in/..."
-                  className="w-full px-3 py-2 rounded-xl border border-border bg-background text-xs font-mono text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
+                  className="font-mono text-xs"
                 />
               </div>
 
               <div className="sm:col-span-2">
-                <button
+                <Button
                   type="button"
+                  variant="primary"
+                  size="md"
                   onClick={handleAddSocialLink}
                   disabled={!newLabel.trim() || !newHref.trim()}
-                  className="w-full py-2 px-4 rounded-xl bg-foreground text-background text-xs font-semibold hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-1.5"
+                  leftIcon={<Plus className="w-3.5 h-3.5" />}
+                  className="w-full"
                 >
-                  <Plus className="w-3.5 h-3.5" />
-                  <span>Add Link</span>
-                </button>
+                  Add Link
+                </Button>
               </div>
             </div>
-          </div>
+          </Card>
 
           {/* Social Links List */}
-          <div className="rounded-2xl border border-border bg-surface p-6 space-y-4">
+          <Card className="p-6 space-y-4">
             <div className="flex items-center justify-between border-b border-border pb-3">
               <div>
-                <h3 className="text-sm font-bold uppercase tracking-wider text-foreground flex items-center gap-2">
+                <CardTitle className="flex items-center gap-2 text-sm uppercase tracking-wider">
                   <Share2 className="w-4 h-4" />
                   <span>Configured Social Directory ({socialLinks.length})</span>
-                </h3>
-                <p className="text-xs text-muted mt-0.5">
+                </CardTitle>
+                <CardDescription className="text-xs">
                   Reorder, rename, or toggle visibility of public channels.
-                </p>
+                </CardDescription>
               </div>
             </div>
 
@@ -672,6 +652,7 @@ export const FooterContactManager: React.FC = () => {
                             disabled={index === 0}
                             className="p-1 rounded-sm text-muted hover:text-foreground hover:bg-surface disabled:opacity-20 disabled:cursor-not-allowed"
                             title="Move Up"
+                            aria-label="Move Up"
                           >
                             <ArrowUp className="w-3 h-3" />
                           </button>
@@ -681,35 +662,34 @@ export const FooterContactManager: React.FC = () => {
                             disabled={index === socialLinks.length - 1}
                             className="p-1 rounded-sm text-muted hover:text-foreground hover:bg-surface disabled:opacity-20 disabled:cursor-not-allowed"
                             title="Move Down"
+                            aria-label="Move Down"
                           >
                             <ArrowDown className="w-3 h-3" />
                           </button>
                         </div>
 
-                        <span className="px-2 py-1 rounded-lg bg-surface border border-border text-[10px] font-mono font-semibold uppercase text-foreground">
+                        <Badge variant="neutral" size="sm" className="font-mono uppercase">
                           {item.platform || 'Link'}
-                        </span>
+                        </Badge>
                       </div>
 
                       {/* Label Input */}
                       <div className="w-full sm:flex-1 min-w-0">
-                        <input
-                          type="text"
+                        <Input
                           value={item.label}
                           onChange={(e) => handleUpdateSocialLink(index, 'label', e.target.value.toUpperCase())}
                           placeholder="Label"
-                          className="w-full px-3 py-2 rounded-lg border border-border bg-surface text-xs font-semibold uppercase text-foreground focus:outline-hidden focus:ring-1 focus:ring-foreground"
+                          className="uppercase font-semibold text-xs"
                         />
                       </div>
 
                       {/* URL Input */}
                       <div className="w-full sm:flex-2 min-w-0">
-                        <input
-                          type="text"
+                        <Input
                           value={item.href || item.url || ''}
                           onChange={(e) => handleUpdateSocialLink(index, 'href', e.target.value)}
                           placeholder="https://..."
-                          className="w-full px-3 py-2 rounded-lg border border-border bg-surface text-xs font-mono text-foreground focus:outline-hidden focus:ring-1 focus:ring-foreground"
+                          className="font-mono text-xs"
                         />
                       </div>
 
@@ -722,6 +702,7 @@ export const FooterContactManager: React.FC = () => {
                             rel="noopener noreferrer"
                             className="p-1.5 rounded-lg text-muted hover:text-foreground hover:bg-surface transition-colors"
                             title="Test Link in New Tab"
+                            aria-label="Test Link in New Tab"
                           >
                             <ExternalLink className="w-3.5 h-3.5" />
                           </a>
@@ -736,6 +717,7 @@ export const FooterContactManager: React.FC = () => {
                               : 'text-muted hover:text-foreground hover:bg-surface'
                           }`}
                           title={isVisible ? 'Hide Link from Public Footer' : 'Show Link in Public Footer'}
+                          aria-label={isVisible ? 'Hide Link from Public Footer' : 'Show Link in Public Footer'}
                         >
                           {isVisible ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
                         </button>
@@ -745,6 +727,7 @@ export const FooterContactManager: React.FC = () => {
                           onClick={() => handleDeleteSocialLink(index)}
                           className="p-1.5 rounded-lg text-red-400 hover:text-red-500 hover:bg-red-500/10 transition-colors"
                           title="Delete Social Link"
+                          aria-label="Delete Social Link"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
@@ -754,7 +737,7 @@ export const FooterContactManager: React.FC = () => {
                 })}
               </div>
             )}
-          </div>
+          </Card>
         </div>
       )}
 
@@ -763,26 +746,22 @@ export const FooterContactManager: React.FC = () => {
       {/* ================================================== */}
       {activeTab === 'contact' && (
         <div className="space-y-6">
-          <div className="rounded-2xl border border-border bg-surface p-6 space-y-6">
+          <Card className="p-6 space-y-6">
             <div className="border-b border-border pb-4">
-              <h3 className="text-sm font-bold uppercase tracking-wider text-foreground flex items-center gap-2">
+              <CardTitle className="flex items-center gap-2 text-sm uppercase tracking-wider">
                 <Mail className="w-4 h-4" />
                 <span>Contact & Collaboration Triggers</span>
-              </h3>
-              <p className="text-xs text-muted mt-0.5">
+              </CardTitle>
+              <CardDescription className="text-xs">
                 Manage contact email targets, CTA headline copy, and inquiry button triggers.
-              </p>
+              </CardDescription>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Primary Email */}
-              <div className="space-y-2">
-                <label htmlFor="contact-email" className="block text-xs font-semibold text-foreground flex items-center gap-1.5">
-                  <Mail className="w-3.5 h-3.5 text-muted" />
-                  <span>Primary Contact Email</span>
-                </label>
-                <input
-                  id="contact-email"
+              <div>
+                <Input
+                  label="Primary Contact Email"
                   type="email"
                   value={contactForm.email || ''}
                   onChange={(e) => {
@@ -790,104 +769,78 @@ export const FooterContactManager: React.FC = () => {
                     handleFooterChange('email', e.target.value);
                   }}
                   placeholder="darshilbhuva4322@gmail.com"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-xs font-mono text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
+                  className="font-mono text-xs"
+                  helperText="Primary outreach address used in both Contact section and Footer col [03]."
                 />
-                <p className="text-[11px] text-muted">Primary outreach address used in both Contact section and Footer col [03].</p>
               </div>
 
               {/* Button Action Link */}
-              <div className="space-y-2">
-                <label htmlFor="contact-cta-link" className="block text-xs font-semibold text-foreground flex items-center gap-1.5">
-                  <LinkIcon className="w-3.5 h-3.5 text-muted" />
-                  <span>Contact Button Action URL / Mailto</span>
-                </label>
-                <input
-                  id="contact-cta-link"
-                  type="text"
+              <div>
+                <Input
+                  label="Contact Button Action URL / Mailto"
                   value={contactForm.ctaLink || contactForm.buttonLink || ''}
                   onChange={(e) => handleContactChange('ctaLink', e.target.value)}
                   placeholder="mailto:darshilbhuva4322@gmail.com?subject=Project%20Inquiry"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-xs font-mono text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
+                  className="font-mono text-xs"
+                  helperText="Triggered when user clicks the magnetic START A PROJECT button."
                 />
-                <p className="text-[11px] text-muted">Triggered when user clicks the magnetic START A PROJECT button.</p>
               </div>
 
               {/* Button Text */}
-              <div className="space-y-2">
-                <label htmlFor="contact-cta-text" className="block text-xs font-semibold text-foreground">
-                  Contact Button Text
-                </label>
-                <input
-                  id="contact-cta-text"
-                  type="text"
+              <div>
+                <Input
+                  label="Contact Button Text"
                   value={contactForm.ctaText || contactForm.buttonText || ''}
                   onChange={(e) => handleContactChange('ctaText', e.target.value.toUpperCase())}
                   placeholder="START A PROJECT"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-xs font-bold uppercase text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
+                  className="uppercase font-bold text-xs"
                 />
               </div>
 
               {/* Availability Status */}
-              <div className="space-y-2">
-                <label htmlFor="contact-availability" className="block text-xs font-semibold text-foreground">
-                  Availability Status Tagline
-                </label>
-                <input
-                  id="contact-availability"
-                  type="text"
+              <div>
+                <Input
+                  label="Availability Status Tagline"
                   value={contactForm.availabilityStatus || ''}
                   onChange={(e) => handleContactChange('availabilityStatus', e.target.value.toUpperCase())}
                   placeholder="AVAILABLE FOR COMMISSIONS WORLDWIDE"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-xs uppercase font-mono text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
+                  className="uppercase font-mono text-xs"
                 />
               </div>
 
               {/* Headline Line 1 */}
-              <div className="space-y-2">
-                <label htmlFor="contact-headline-1" className="block text-xs font-semibold text-foreground">
-                  Headline Line 1
-                </label>
-                <input
-                  id="contact-headline-1"
-                  type="text"
+              <div>
+                <Input
+                  label="Headline Line 1"
                   value={contactForm.headlineLine1 || ''}
                   onChange={(e) => handleContactChange('headlineLine1', e.target.value.toUpperCase())}
                   placeholder="HAVE SOMETHING"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-xs font-bold uppercase text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
+                  className="uppercase font-bold text-xs"
                 />
               </div>
 
               {/* Headline Line 2 */}
-              <div className="space-y-2">
-                <label htmlFor="contact-headline-2" className="block text-xs font-semibold text-foreground">
-                  Headline Line 2 (Muted Accent)
-                </label>
-                <input
-                  id="contact-headline-2"
-                  type="text"
+              <div>
+                <Input
+                  label="Headline Line 2 (Muted Accent)"
                   value={contactForm.headlineLine2 || ''}
                   onChange={(e) => handleContactChange('headlineLine2', e.target.value.toUpperCase())}
                   placeholder="WORTH BUILDING?"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-xs font-bold uppercase text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
+                  className="uppercase font-bold text-xs"
                 />
               </div>
 
               {/* Secondary Subtext */}
-              <div className="space-y-2 md:col-span-2">
-                <label htmlFor="contact-secondary" className="block text-xs font-semibold text-foreground">
-                  Secondary Supporting Line
-                </label>
-                <input
-                  id="contact-secondary"
-                  type="text"
+              <div className="md:col-span-2">
+                <Input
+                  label="Secondary Supporting Line"
                   value={contactForm.secondaryLine || contactForm.secondaryText || ''}
                   onChange={(e) => handleContactChange('secondaryLine', e.target.value)}
                   placeholder="Let's make it real."
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-xs text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
                 />
               </div>
             </div>
-          </div>
+          </Card>
         </div>
       )}
     </div>

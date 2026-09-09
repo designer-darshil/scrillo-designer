@@ -20,6 +20,15 @@ import {
   Dribbble,
 } from 'lucide-react';
 import { useWebsiteData } from '../../hooks/useWebsiteData';
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  Badge,
+  Button,
+  Avatar,
+} from '../../design-system';
 
 /* ── Completeness helpers ──────────────────────── */
 
@@ -89,18 +98,11 @@ function profileCompleteness(data: any): CompletenessItem[] {
 /* ── Status badge ──────────────────────────────── */
 
 const StatusBadge: React.FC<{ status: 'Complete' | 'Partial' | 'Missing' }> = ({ status }) => {
-  const config = {
-    Complete: { color: 'text-emerald-400', bg: 'bg-emerald-500/10', icon: CheckCircle2 },
-    Partial: { color: 'text-amber-400', bg: 'bg-amber-500/10', icon: AlertCircle },
-    Missing: { color: 'text-red-400', bg: 'bg-red-500/10', icon: AlertCircle },
-  }[status];
-  const Icon = config.icon;
-
+  const variant = status === 'Complete' ? 'success' : status === 'Partial' ? 'warning' : 'error';
   return (
-    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium ${config.bg} ${config.color}`}>
-      <Icon className="w-3 h-3" />
+    <Badge variant={variant} dot>
       {status}
-    </span>
+    </Badge>
   );
 };
 
@@ -112,19 +114,17 @@ const StatCard: React.FC<{
   value: string | number;
   href: string;
 }> = ({ icon: Icon, label, value, href }) => (
-  <Link
-    to={href}
-    className="group flex items-center gap-4 p-4 rounded-xl border border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.04] transition-all duration-300"
-    style={{ textDecoration: 'none' }}
-  >
-    <div className="w-10 h-10 rounded-lg bg-white/[0.06] flex items-center justify-center shrink-0">
-      <Icon className="w-5 h-5 text-[var(--color-muted)]" />
-    </div>
-    <div className="flex-1 min-w-0">
-      <div className="text-xs text-[var(--color-muted)] tracking-wider uppercase">{label}</div>
-      <div className="text-lg font-semibold text-[var(--color-text)]">{value}</div>
-    </div>
-    <ChevronRight className="w-4 h-4 text-[var(--color-muted)] opacity-0 group-hover:opacity-100 transition-opacity" />
+  <Link to={href} className="no-underline block">
+    <Card className="p-4 flex items-center gap-4 hover:border-[var(--color-border-strong)] transition-all group shadow-xs">
+      <div className="w-10 h-10 rounded-xl bg-background border border-border flex items-center justify-center shrink-0">
+        <Icon className="w-5 h-5 text-muted group-hover:text-foreground transition-colors" />
+      </div>
+      <div className="flex-1 min-w-0">
+        <div className="text-xs text-muted tracking-wider uppercase font-mono">{label}</div>
+        <div className="text-lg font-semibold text-foreground">{value}</div>
+      </div>
+      <ChevronRight className="w-4 h-4 text-muted opacity-0 group-hover:opacity-100 transition-opacity" />
+    </Card>
   </Link>
 );
 
@@ -141,19 +141,19 @@ const SocialRow: React.FC<{ platform: string; url?: string }> = ({ platform, url
   const Icon = iconMap[platform] || Globe;
 
   return (
-    <div className="flex items-center justify-between py-2.5 border-b border-white/[0.04] last:border-b-0">
+    <div className="flex items-center justify-between py-2.5 border-b border-border last:border-b-0">
       <div className="flex items-center gap-2.5">
-        <Icon className="w-4 h-4 text-[var(--color-muted)]" />
-        <span className="text-sm text-[var(--color-text)]">{platform}</span>
+        <Icon className="w-4 h-4 text-muted" />
+        <span className="text-sm text-foreground">{platform}</span>
       </div>
       {isPlaceholder ? (
-        <span className="text-xs text-[var(--color-muted)] italic">Not set</span>
+        <span className="text-xs text-muted italic">Not configured</span>
       ) : (
         <a
           href={url}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1"
+          className="text-xs text-foreground hover:underline flex items-center gap-1 font-mono"
         >
           View <ExternalLink className="w-3 h-3" />
         </a>
@@ -169,14 +169,12 @@ const QuickAction: React.FC<{
   label: string;
   href: string;
 }> = ({ icon: Icon, label, href }) => (
-  <Link
-    to={href}
-    className="flex items-center gap-3 px-4 py-3 rounded-xl border border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.05] transition-all duration-300 text-sm text-[var(--color-text)]"
-    style={{ textDecoration: 'none' }}
-  >
-    <Icon className="w-4 h-4 text-[var(--color-muted)]" />
-    <span className="flex-1">{label}</span>
-    <ChevronRight className="w-3.5 h-3.5 text-[var(--color-muted)]" />
+  <Link to={href} className="no-underline block">
+    <Card className="flex items-center gap-3 px-4 py-3 hover:border-[var(--color-border-strong)] transition-all text-sm text-foreground group shadow-xs">
+      <Icon className="w-4 h-4 text-muted group-hover:text-foreground transition-colors" />
+      <span className="flex-1 font-medium">{label}</span>
+      <ChevronRight className="w-3.5 h-3.5 text-muted group-hover:translate-x-0.5 transition-transform" />
+    </Card>
   </Link>
 );
 
@@ -199,90 +197,85 @@ export const ProfileOverview: React.FC = () => {
     <div className="space-y-8 max-w-5xl">
       {/* ── Header ──────────────────────────────── */}
       <div>
-        <h1 className="text-2xl font-bold text-[var(--color-text)] tracking-tight">Profile</h1>
-        <p className="text-sm text-[var(--color-muted)] mt-1">
-          Overview of your profile information sourced from Resume.pdf
+        <h1 className="text-2xl font-bold text-foreground tracking-tight">Profile & Identity</h1>
+        <p className="text-sm text-muted mt-1">
+          Overview of your career profile, contact endpoints, and capabilities architecture.
         </p>
       </div>
 
       {/* ── Profile Identity Card ───────────────── */}
-      <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] overflow-hidden">
-        <div className="p-6 flex items-start gap-6">
-          {/* Profile Image */}
-          <div className="w-20 h-20 rounded-xl bg-white/[0.06] border border-white/[0.08] overflow-hidden shrink-0">
-            {profile.profileImage ? (
-              <img
-                src={profile.profileImage}
-                alt={profile.name || 'Profile'}
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center">
-                <User className="w-8 h-8 text-[var(--color-muted)]" />
-              </div>
+      <Card className="p-6 sm:p-8 flex flex-col sm:flex-row items-start gap-6 shadow-xs">
+        {/* Profile Avatar */}
+        <Avatar
+          src={profile.profileImage}
+          alt={profile.name || 'Profile'}
+          name={profile.name || 'User'}
+          size="xl"
+          className="shrink-0"
+        />
+
+        {/* Name & Title */}
+        <div className="flex-1 min-w-0">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h2 className="text-xl sm:text-2xl font-bold text-foreground">
+                {profile.name || 'Name not set'}
+              </h2>
+              <p className="text-sm text-muted mt-0.5 font-mono">
+                {profile.title || 'Title not set'}
+              </p>
+            </div>
+
+            <Link to="/admin/content" className="no-underline">
+              <Button
+                variant="secondary"
+                icon={<Edit3 className="w-3.5 h-3.5" />}
+              >
+                Edit Profile
+              </Button>
+            </Link>
+          </div>
+
+          {/* Contact quick info */}
+          <div className="flex flex-wrap gap-x-5 gap-y-1.5 mt-4 pt-4 border-t border-border">
+            {profile.email && (
+              <span className="flex items-center gap-1.5 text-xs text-muted">
+                <Mail className="w-3.5 h-3.5 text-foreground" /> {profile.email}
+              </span>
+            )}
+            {profile.phone && (
+              <span className="flex items-center gap-1.5 text-xs text-muted">
+                <Phone className="w-3.5 h-3.5 text-foreground" /> {profile.phone}
+              </span>
+            )}
+            {profile.location && (
+              <span className="flex items-center gap-1.5 text-xs text-muted">
+                <MapPin className="w-3.5 h-3.5 text-foreground" /> {profile.location}
+              </span>
             )}
           </div>
-
-          {/* Name & Title */}
-          <div className="flex-1 min-w-0">
-            <h2 className="text-xl font-bold text-[var(--color-text)]">
-              {profile.name || 'Name not set'}
-            </h2>
-            <p className="text-sm text-[var(--color-muted)] mt-0.5">
-              {profile.title || 'Title not set'}
-            </p>
-
-            {/* Contact quick info */}
-            <div className="flex flex-wrap gap-x-5 gap-y-1.5 mt-3">
-              {profile.email && (
-                <span className="flex items-center gap-1.5 text-xs text-[var(--color-muted)]">
-                  <Mail className="w-3 h-3" /> {profile.email}
-                </span>
-              )}
-              {profile.phone && (
-                <span className="flex items-center gap-1.5 text-xs text-[var(--color-muted)]">
-                  <Phone className="w-3 h-3" /> {profile.phone}
-                </span>
-              )}
-              {profile.location && (
-                <span className="flex items-center gap-1.5 text-xs text-[var(--color-muted)]">
-                  <MapPin className="w-3 h-3" /> {profile.location}
-                </span>
-              )}
-            </div>
-          </div>
-
-          {/* Edit button */}
-          <Link
-            to="/admin/content"
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-white/[0.08] bg-white/[0.04] hover:bg-white/[0.08] text-sm text-[var(--color-text)] transition-colors"
-            style={{ textDecoration: 'none' }}
-          >
-            <Edit3 className="w-3.5 h-3.5" />
-            Edit Profile
-          </Link>
         </div>
-      </div>
+      </Card>
 
       {/* ── Stats Grid ──────────────────────────── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         <StatCard icon={Briefcase} label="Experience" value={`${experience.length} positions`} href="/admin/content" />
         <StatCard icon={GraduationCap} label="Education" value={`${education.length} entries`} href="/admin/content" />
-        <StatCard icon={Sparkles} label="Skills" value={`${skills.reduce((acc: number, s: any) => acc + (s.items?.length || 0), 0)} items`} href="/admin/skills" />
-        <StatCard icon={Wrench} label="Tools" value={`${tools.length} tools`} href="/admin/skills" />
+        <StatCard icon={Sparkles} label="Skills" value={`${skills.reduce((acc: number, s: any) => acc + (s.items?.length || s.skills?.length || 0), 0)} items`} href="/admin/skills" />
+        <StatCard icon={Wrench} label="Tools" value={`${tools.length} tools`} href="/admin/content" />
       </div>
 
       {/* ── Two column layout ───────────────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Left: Social Links */}
-        <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-5">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-semibold text-[var(--color-text)] tracking-wider uppercase">
+        <Card className="p-5 space-y-4 shadow-xs">
+          <div className="flex items-center justify-between border-b border-border pb-3">
+            <h3 className="text-xs font-semibold text-foreground tracking-wider uppercase font-mono">
               Social Links
             </h3>
             <Link
               to="/admin/content"
-              className="text-xs text-[var(--color-muted)] hover:text-[var(--color-text)] transition-colors"
+              className="text-xs text-muted hover:text-foreground font-mono transition-colors"
             >
               Edit
             </Link>
@@ -293,89 +286,82 @@ export const ProfileOverview: React.FC = () => {
             <SocialRow platform="Behance" url={profile.behanceUrl} />
             <SocialRow platform="Instagram" url={profile.instagramUrl} />
           </div>
-        </div>
+        </Card>
 
         {/* Right: Profile Image Preview */}
-        <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-5">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-semibold text-[var(--color-text)] tracking-wider uppercase">
-              Profile Image
+        <Card className="p-5 space-y-4 shadow-xs">
+          <div className="flex items-center justify-between border-b border-border pb-3">
+            <h3 className="text-xs font-semibold text-foreground tracking-wider uppercase font-mono">
+              Visual Specimen Preview
             </h3>
             <Link
               to="/admin/media"
-              className="text-xs text-[var(--color-muted)] hover:text-[var(--color-text)] transition-colors"
+              className="text-xs text-muted hover:text-foreground font-mono transition-colors"
             >
-              Change
+              Media Library
             </Link>
           </div>
-          <div className="aspect-[4/3] rounded-xl bg-white/[0.04] border border-white/[0.06] overflow-hidden">
+          <div className="aspect-[4/3] rounded-xl bg-background border border-border overflow-hidden">
             {profile.profileImage ? (
               <img
                 src={profile.profileImage}
                 alt="Profile preview"
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover grayscale contrast-125 hover:grayscale-0 transition-all duration-300"
               />
             ) : (
-              <div className="w-full h-full flex flex-col items-center justify-center gap-2 text-[var(--color-muted)]">
-                <ImageIcon className="w-8 h-8" />
-                <span className="text-xs">No image set</span>
+              <div className="w-full h-full flex flex-col items-center justify-center gap-2 text-muted">
+                <ImageIcon className="w-8 h-8 opacity-40" />
+                <span className="text-xs">No image uploaded</span>
               </div>
             )}
           </div>
-        </div>
+        </Card>
       </div>
 
       {/* ── Content Completeness ────────────────── */}
-      <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-5">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-sm font-semibold text-[var(--color-text)] tracking-wider uppercase">
-            Content Completeness
+      <Card className="p-5 space-y-4 shadow-xs">
+        <div className="flex items-center justify-between">
+          <h3 className="text-xs font-semibold text-foreground tracking-wider uppercase font-mono">
+            Portfolio Content Completeness
           </h3>
-          <span className="text-xs text-[var(--color-muted)]">
+          <Badge variant={completionPercent === 100 ? 'success' : completionPercent >= 70 ? 'warning' : 'neutral'}>
             {completionPercent}% complete
-          </span>
+          </Badge>
         </div>
 
         {/* Progress bar */}
-        <div className="h-1.5 rounded-full bg-white/[0.06] mb-5 overflow-hidden">
+        <div className="h-2 rounded-full bg-background border border-border overflow-hidden">
           <div
-            className="h-full rounded-full transition-all duration-500"
-            style={{
-              width: `${completionPercent}%`,
-              background: completionPercent === 100
-                ? 'linear-gradient(90deg, #34d399, #10b981)'
-                : completionPercent >= 70
-                  ? 'linear-gradient(90deg, #fbbf24, #f59e0b)'
-                  : 'linear-gradient(90deg, #f87171, #ef4444)',
-            }}
+            className="h-full rounded-full transition-all duration-500 bg-[var(--color-action-primary)]"
+            style={{ width: `${completionPercent}%` }}
           />
         </div>
 
         {/* Items list */}
-        <div className="space-y-2.5">
+        <div className="divide-y divide-border">
           {completeness.map((item) => (
-            <div key={item.label} className="flex items-center justify-between py-1.5">
-              <span className="text-sm text-[var(--color-text)]">{item.label}</span>
+            <div key={item.label} className="flex items-center justify-between py-2.5">
+              <span className="text-xs sm:text-sm text-foreground">{item.label}</span>
               <StatusBadge status={item.status} />
             </div>
           ))}
         </div>
-      </div>
+      </Card>
 
       {/* ── Quick Actions ───────────────────────── */}
-      <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-5">
-        <h3 className="text-sm font-semibold text-[var(--color-text)] tracking-wider uppercase mb-4">
-          Quick Actions
+      <Card className="p-5 space-y-4 shadow-xs">
+        <h3 className="text-xs font-semibold text-foreground tracking-wider uppercase font-mono mb-2">
+          Quick Management Portals
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-          <QuickAction icon={Edit3} label="Edit Profile" href="/admin/content" />
-          <QuickAction icon={Briefcase} label="Edit Experience" href="/admin/content" />
-          <QuickAction icon={GraduationCap} label="Edit Education" href="/admin/content" />
-          <QuickAction icon={Sparkles} label="Edit Skills" href="/admin/skills" />
-          <QuickAction icon={Globe} label="Edit Social Links" href="/admin/content" />
-          <QuickAction icon={ImageIcon} label="Change Profile Image" href="/admin/media" />
+          <QuickAction icon={Edit3} label="Edit Profile & Biography" href="/admin/content" />
+          <QuickAction icon={Briefcase} label="Edit Work Experience" href="/admin/content" />
+          <QuickAction icon={GraduationCap} label="Edit Education & Accreditations" href="/admin/content" />
+          <QuickAction icon={Sparkles} label="Edit Skills Matrix" href="/admin/skills" />
+          <QuickAction icon={Globe} label="Edit Social Links & Footers" href="/admin/footer-contact" />
+          <QuickAction icon={ImageIcon} label="Media Library Assets" href="/admin/media" />
         </div>
-      </div>
+      </Card>
     </div>
   );
 };

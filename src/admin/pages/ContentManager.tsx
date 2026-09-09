@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
 import {
   User,
   Phone,
@@ -10,25 +9,15 @@ import {
   Share2,
   Image as ImageIcon,
   Save,
-  RotateCcw,
   Plus,
   Trash2,
   ArrowUp,
   ArrowDown,
-  CheckCircle2,
-  AlertCircle,
   Upload,
   ExternalLink,
   Eye,
   EyeOff,
   Layers,
-  FileText,
-  MapPin,
-  Mail,
-  Linkedin,
-  Dribbble,
-  Instagram,
-  Check,
   Compass,
   Repeat,
 } from 'lucide-react';
@@ -50,6 +39,12 @@ import {
 import { MediaPickerModal } from '../components/MediaPickerModal';
 import { validators } from '../utils/validators';
 import { useUnsavedChanges } from '../hooks/useUnsavedChanges';
+import { Button } from '../../design-system/components/Button';
+import { Input, Textarea } from '../../design-system/components/Input';
+import { Badge } from '../../design-system/components/Badge';
+import { Alert } from '../../design-system/components/Alert';
+import { Card, CardTitle, CardDescription } from '../../design-system/components/Card';
+import { useToast } from '../../design-system/hooks/useToast';
 
 type ContentSubSection =
   | 'profile'
@@ -75,9 +70,8 @@ export const ContentManager: React.FC = () => {
     updateTools,
     updatePhilosophy,
     updateMarquee,
-    updateSkillCategory,
-    createSkillCategory,
   } = useWebsiteData();
+  const toast = useToast();
 
   const [activeTab, setActiveTab] = useState<ContentSubSection>('profile');
 
@@ -181,11 +175,13 @@ export const ContentManager: React.FC = () => {
       visible: true,
     };
     setExperienceList((prev) => [...prev, newExp]);
+    toast.info('New experience role added');
   };
 
   const handleDeleteExperience = (id: string) => {
     markDirty();
     setExperienceList((prev) => prev.filter((item) => item.id !== id));
+    toast.info('Experience item removed');
   };
 
   const handleMoveExperience = (index: number, direction: 'up' | 'down') => {
@@ -228,11 +224,13 @@ export const ContentManager: React.FC = () => {
       visible: true,
     };
     setEducationList((prev) => [...prev, newEdu]);
+    toast.info('New education entry added');
   };
 
   const handleDeleteEducation = (id: string) => {
     markDirty();
     setEducationList((prev) => prev.filter((item) => item.id !== id));
+    toast.info('Education entry removed');
   };
 
   const handleMoveEducation = (index: number, direction: 'up' | 'down') => {
@@ -283,6 +281,7 @@ export const ContentManager: React.FC = () => {
       })
     );
     setNewSkillName('');
+    toast.success(`Added skill "${skillName}"`);
   };
 
   const handleDeleteDesignSkill = (skillName: string) => {
@@ -361,6 +360,7 @@ export const ContentManager: React.FC = () => {
     };
     setToolsList((prev) => [...prev, newTool]);
     setNewToolName('');
+    toast.success(`Added tool "${newTool.name}"`);
   };
 
   const handleDeleteTool = (id: string) => {
@@ -393,12 +393,13 @@ export const ContentManager: React.FC = () => {
     if (!urlValidation.isValid) {
       setErrorMessage(urlValidation.error || 'Invalid URL format');
       setStatus('error');
+      toast.error(urlValidation.error || 'Invalid URL format');
       return;
     }
     markDirty();
     const newSoc: SocialLink = {
       id: `soc-${Date.now()}`,
-      platform: newSocialPlatform,
+      platform: newSocialPlatform as any,
       label: newSocialLabel.trim() || newSocialPlatform,
       href: newSocialUrl.trim(),
       url: newSocialUrl.trim(),
@@ -409,6 +410,7 @@ export const ContentManager: React.FC = () => {
     setNewSocialLabel('');
     setNewSocialUrl('');
     setErrorMessage(null);
+    toast.success(`Added ${newSoc.label}`);
   };
 
   const handleDeleteSocialLink = (index: number) => {
@@ -450,6 +452,7 @@ export const ContentManager: React.FC = () => {
     if (!fileValidation.isValid) {
       setErrorMessage(fileValidation.error || 'Invalid image file');
       setStatus('error');
+      toast.error(fileValidation.error || 'Invalid image file');
       return;
     }
 
@@ -464,6 +467,7 @@ export const ContentManager: React.FC = () => {
       }
       setStatus('idle');
       setErrorMessage(null);
+      toast.success('Image loaded successfully');
     };
     reader.readAsDataURL(file);
   };
@@ -476,6 +480,7 @@ export const ContentManager: React.FC = () => {
       setProfileForm((prev) => ({ ...prev, coverImage: url }));
     }
     setIsMediaPickerOpen(false);
+    toast.success('Image updated from media library');
   };
 
   // Master Save Handler
@@ -489,6 +494,7 @@ export const ContentManager: React.FC = () => {
     if (!emailValidation.isValid) {
       setStatus('error');
       setErrorMessage(emailValidation.error || 'Invalid email address');
+      toast.error(emailValidation.error || 'Invalid email address');
       return;
     }
 
@@ -545,14 +551,18 @@ export const ContentManager: React.FC = () => {
       if (results.every(Boolean)) {
         setStatus('saved');
         setIsDirty(false);
+        toast.success('Content changes saved live!');
         setTimeout(() => setStatus('idle'), 3000);
       } else {
         setStatus('error');
         setErrorMessage('Failed to save some sections to persistent storage.');
+        toast.error('Failed to save some sections.');
       }
     } catch (err: any) {
       setStatus('error');
-      setErrorMessage(validators.formatFriendlyError(err));
+      const formatted = validators.formatFriendlyError(err);
+      setErrorMessage(formatted);
+      toast.error(formatted);
     }
   };
 
@@ -572,73 +582,68 @@ export const ContentManager: React.FC = () => {
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-24">
       {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-6">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground font-sans uppercase">
-            Resume & Profile Manager
-          </h1>
-          <p className="text-xs sm:text-sm text-muted font-mono mt-1">
-            Single Source of Truth backed by Resume.pdf (Darshil S. Bhuva)
-          </p>
-        </div>
+      <Card className="p-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-[10px] font-bold uppercase tracking-widest text-muted">Admin Content Editor</span>
+              <span className="text-xs text-muted">/</span>
+              <Badge variant="neutral" size="sm" className="font-mono uppercase">
+                RESUME & PROFILE
+              </Badge>
+              {isDirty && (
+                <Badge variant="warning" size="sm" className="animate-pulse">
+                  Unsaved Changes
+                </Badge>
+              )}
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground font-sans uppercase">
+              Resume & Profile Manager
+            </h1>
+            <p className="text-xs sm:text-sm text-muted font-mono mt-1">
+              Single Source of Truth backed by Resume.pdf (Darshil S. Bhuva)
+            </p>
+          </div>
 
-        {/* Global Save Button with State Feedback */}
-        <div className="flex items-center gap-3">
-          <button
-            type="button"
-            onClick={handleSaveAll}
-            disabled={status === 'saving'}
-            className={`min-h-[44px] px-6 py-2.5 rounded-xl font-mono text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all shadow-xs ${
-              status === 'saved'
-                ? 'bg-emerald-600 text-white'
-                : status === 'error'
-                ? 'bg-red-600 text-white'
-                : 'bg-foreground text-background hover:opacity-90'
-            }`}
-          >
-            {status === 'saving' ? (
-              <>
-                <div className="w-4 h-4 border-2 border-background/30 border-t-background rounded-full animate-spin" />
-                <span>Saving...</span>
-              </>
-            ) : status === 'saved' ? (
-              <>
-                <CheckCircle2 className="w-4 h-4" />
-                <span>Saved Live</span>
-              </>
-            ) : status === 'error' ? (
-              <>
-                <AlertCircle className="w-4 h-4" />
-                <span>Retry Save</span>
-              </>
-            ) : (
-              <>
-                <Save className="w-4 h-4" />
-                <span>Save Changes {isDirty && '•'}</span>
-              </>
-            )}
-          </button>
+          {/* Global Save Button */}
+          <div className="flex items-center gap-3 shrink-0">
+            <Button
+              type="button"
+              variant="primary"
+              size="md"
+              onClick={handleSaveAll}
+              disabled={status === 'saving'}
+              isLoading={status === 'saving'}
+              leftIcon={<Save className="w-4 h-4" />}
+            >
+              Save Changes {isDirty && '•'}
+            </Button>
+          </div>
         </div>
-      </div>
+      </Card>
 
       {/* Error Alert Banner */}
       {errorMessage && (
-        <div className="p-4 rounded-xl border border-red-500/30 bg-red-500/10 text-red-400 text-xs font-mono flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 shrink-0" />
-            <span>{errorMessage}</span>
-          </div>
-          <button
-            type="button"
-            onClick={() => setErrorMessage(null)}
-            className="text-red-400 hover:text-red-300 font-bold"
-          >
-            [Dismiss]
-          </button>
-        </div>
+        <Alert
+          variant="error"
+          title="Validation / Storage Error"
+          onClose={() => setErrorMessage(null)}
+        >
+          {errorMessage}
+        </Alert>
       )}
 
-      {/* Navigation Subsections (8 Tabs) */}
+      {status === 'saved' && (
+        <Alert
+          variant="success"
+          title="Content updated successfully!"
+          onClose={() => setStatus('idle')}
+        >
+          Profile, career timeline, and skills are synchronized across the public portfolio.
+        </Alert>
+      )}
+
+      {/* Navigation Subsections (10 Tabs) */}
       <div className="flex items-center gap-1.5 p-1.5 rounded-2xl bg-surface border border-border overflow-x-auto no-scrollbar">
         {navTabs.map((tab) => {
           const Icon = tab.icon;
@@ -663,306 +668,238 @@ export const ContentManager: React.FC = () => {
 
       {/* SUBSECTION 1: PROFILE EDITOR */}
       {activeTab === 'profile' && (
-        <div className="p-6 sm:p-8 rounded-2xl border border-border bg-surface/30 space-y-6">
+        <Card className="p-6 sm:p-8 space-y-6">
           <div className="border-b border-border pb-4">
-            <h2 className="text-lg font-bold uppercase tracking-tight text-foreground flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-base">
               <User className="w-4 h-4 text-foreground" />
               <span>Profile Information</span>
-            </h2>
-            <p className="text-xs text-muted font-mono mt-0.5">
+            </CardTitle>
+            <CardDescription className="text-xs font-mono">
               Core identity, professional title, and design philosophy.
-            </p>
+            </CardDescription>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Full Name */}
-            <div className="space-y-2">
-              <label htmlFor="profile-name" className="block text-xs font-semibold text-foreground">
-                Full Name
-              </label>
-              <input
-                id="profile-name"
-                type="text"
+            <div>
+              <Input
+                label="Full Name"
                 value={profileForm.name}
                 onChange={(e) => handleProfileChange('name', e.target.value)}
                 placeholder="Darshil S. Bhuva"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-xs font-bold text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
+                className="font-bold text-xs"
               />
             </div>
 
             {/* Professional Title */}
-            <div className="space-y-2">
-              <label htmlFor="profile-title" className="block text-xs font-semibold text-foreground">
-                Professional Title
-              </label>
-              <input
-                id="profile-title"
-                type="text"
+            <div>
+              <Input
+                label="Professional Title"
                 value={profileForm.title}
                 onChange={(e) => handleProfileChange('title', e.target.value)}
                 placeholder="UI/UX Designer / Web Designer"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-xs text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
               />
             </div>
 
             {/* Location */}
-            <div className="space-y-2">
-              <label htmlFor="profile-location" className="block text-xs font-semibold text-foreground">
-                Location
-              </label>
-              <input
-                id="profile-location"
-                type="text"
+            <div>
+              <Input
+                label="Location"
                 value={profileForm.location}
                 onChange={(e) => handleProfileChange('location', e.target.value)}
                 placeholder="Surat, Gujarat, India"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-xs text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
               />
             </div>
 
             {/* Availability */}
-            <div className="space-y-2">
-              <label htmlFor="profile-avail" className="block text-xs font-semibold text-foreground">
-                Availability Status
-              </label>
-              <input
-                id="profile-avail"
-                type="text"
+            <div>
+              <Input
+                label="Availability Status"
                 value={contactForm.availabilityStatus || 'AVAILABLE FOR COMMISSIONS // +91 8866 90 2600'}
                 onChange={(e) => {
                   markDirty();
                   setContactForm((prev) => ({ ...prev, availabilityStatus: e.target.value }));
                 }}
                 placeholder="AVAILABLE FOR COMMISSIONS // +91 8866 90 2600"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-xs font-mono text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
+                className="font-mono text-xs"
               />
             </div>
 
             {/* Short Introduction */}
-            <div className="space-y-2 md:col-span-2">
-              <label htmlFor="profile-short-intro" className="block text-xs font-semibold text-foreground">
-                Short Introduction (Hero Tagline)
-              </label>
-              <input
-                id="profile-short-intro"
-                type="text"
+            <div className="md:col-span-2">
+              <Input
+                label="Short Introduction (Hero Tagline)"
                 value={data.hero.title}
                 onChange={(e) => {
                   markDirty();
                   updateHero({ ...data.hero, title: e.target.value, headlineLines: e.target.value.split('\n') });
                 }}
                 placeholder="Transforming ideas into dynamic digital experiences."
-                className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-xs text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
               />
             </div>
 
             {/* Long Introduction */}
-            <div className="space-y-2 md:col-span-2">
-              <label htmlFor="profile-primary-desc" className="block text-xs font-semibold text-foreground">
-                Primary Description (Resume Biography)
-              </label>
-              <textarea
-                id="profile-primary-desc"
+            <div className="md:col-span-2">
+              <Textarea
+                label="Primary Description (Resume Biography)"
                 rows={3}
                 value={profileForm.primaryDescription}
                 onChange={(e) => handleProfileChange('primaryDescription', e.target.value)}
                 placeholder="As a UI/UX and Web Designer, I transform your ideas into dynamic digital experiences. Consider me your all-in-one expert for diverse business solutions."
-                className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-xs text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
               />
             </div>
 
             {/* Design Philosophy / Objective */}
-            <div className="space-y-2 md:col-span-2">
-              <label htmlFor="profile-objective" className="block text-xs font-semibold text-foreground">
-                Design Objective & Philosophy
-              </label>
-              <textarea
-                id="profile-objective"
+            <div className="md:col-span-2">
+              <Textarea
+                label="Design Objective & Philosophy"
                 rows={2}
                 value={profileForm.objective}
                 onChange={(e) => handleProfileChange('objective', e.target.value)}
                 placeholder="Improve user experience through the utility, ease of use, and pleasure provided in the design and interaction with a product."
-                className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-xs text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
               />
             </div>
           </div>
-        </div>
+        </Card>
       )}
 
       {/* SUBSECTION 2: CONTACT EDITOR */}
       {activeTab === 'contact' && (
-        <div className="p-6 sm:p-8 rounded-2xl border border-border bg-surface/30 space-y-6">
+        <Card className="p-6 sm:p-8 space-y-6">
           <div className="border-b border-border pb-4">
-            <h2 className="text-lg font-bold uppercase tracking-tight text-foreground flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-base">
               <Phone className="w-4 h-4 text-foreground" />
               <span>Contact & Outreach</span>
-            </h2>
-            <p className="text-xs text-muted font-mono mt-0.5">
+            </CardTitle>
+            <CardDescription className="text-xs font-mono">
               Official email, phone number, and physical coordinates.
-            </p>
+            </CardDescription>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Email */}
-            <div className="space-y-2">
-              <label htmlFor="contact-email" className="block text-xs font-semibold text-foreground">
-                Email Address
-              </label>
-              <input
-                id="contact-email"
+            <div>
+              <Input
+                label="Email Address"
                 type="email"
                 value={profileForm.email}
                 onChange={(e) => handleProfileChange('email', e.target.value)}
                 placeholder="darshilbhuva4322@gmail.com"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-xs font-mono text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
+                className="font-mono text-xs"
               />
             </div>
 
             {/* Phone */}
-            <div className="space-y-2">
-              <label htmlFor="contact-phone" className="block text-xs font-semibold text-foreground">
-                Phone Number
-              </label>
-              <input
-                id="contact-phone"
-                type="text"
+            <div>
+              <Input
+                label="Phone Number"
                 value={profileForm.phone}
                 onChange={(e) => handleProfileChange('phone', e.target.value)}
                 placeholder="+91 8866 90 2600"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-xs font-mono text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
+                className="font-mono text-xs"
               />
             </div>
 
             {/* Address */}
-            <div className="space-y-2 md:col-span-2">
-              <label htmlFor="contact-address" className="block text-xs font-semibold text-foreground">
-                Full Address
-              </label>
-              <input
-                id="contact-address"
-                type="text"
+            <div className="md:col-span-2">
+              <Input
+                label="Full Address"
                 value={profileForm.address || '21 - Laxminagar Soc., Sarthana Jakatnaka, Surat. 06'}
                 onChange={(e) => handleProfileChange('address', e.target.value)}
                 placeholder="21 - Laxminagar Soc., Sarthana Jakatnaka, Surat. 06"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-xs text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
               />
             </div>
 
             {/* City */}
-            <div className="space-y-2">
-              <label htmlFor="contact-city" className="block text-xs font-semibold text-foreground">
-                City
-              </label>
-              <input
-                id="contact-city"
-                type="text"
+            <div>
+              <Input
+                label="City"
                 value={profileForm.city || 'Surat'}
                 onChange={(e) => handleProfileChange('city', e.target.value)}
                 placeholder="Surat"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-xs text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
               />
             </div>
 
             {/* Country/Region */}
-            <div className="space-y-2">
-              <label htmlFor="contact-country" className="block text-xs font-semibold text-foreground">
-                Country / Region
-              </label>
-              <input
-                id="contact-country"
-                type="text"
+            <div>
+              <Input
+                label="Country / Region"
                 value={profileForm.country || 'Gujarat, India'}
                 onChange={(e) => handleProfileChange('country', e.target.value)}
                 placeholder="Gujarat, India"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-xs text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
               />
             </div>
 
             {/* Social Direct Fields */}
-            <div className="space-y-2">
-              <label htmlFor="contact-linkedin" className="block text-xs font-semibold text-foreground flex items-center gap-1.5">
-                <Linkedin className="w-3.5 h-3.5 text-foreground" />
-                <span>LinkedIn Profile URL</span>
-              </label>
-              <input
-                id="contact-linkedin"
+            <div>
+              <Input
+                label="LinkedIn Profile URL"
                 type="url"
                 value={profileForm.linkedinUrl || 'https://linkedin.com/in/dsbhuva'}
                 onChange={(e) => handleProfileChange('linkedinUrl', e.target.value)}
                 placeholder="https://linkedin.com/in/dsbhuva"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-xs font-mono text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
+                className="font-mono text-xs"
               />
             </div>
 
-            <div className="space-y-2">
-              <label htmlFor="contact-dribbble" className="block text-xs font-semibold text-foreground flex items-center gap-1.5">
-                <Dribbble className="w-3.5 h-3.5 text-foreground" />
-                <span>Dribbble Profile URL</span>
-              </label>
-              <input
-                id="contact-dribbble"
+            <div>
+              <Input
+                label="Dribbble Profile URL"
                 type="url"
                 value={profileForm.dribbbleUrl || 'https://dribbble.com'}
                 onChange={(e) => handleProfileChange('dribbbleUrl', e.target.value)}
                 placeholder="https://dribbble.com"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-xs font-mono text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
+                className="font-mono text-xs"
               />
             </div>
 
-            <div className="space-y-2">
-              <label htmlFor="contact-behance" className="block text-xs font-semibold text-foreground flex items-center gap-1.5">
-                <ExternalLink className="w-3.5 h-3.5 text-foreground" />
-                <span>Behance Profile URL</span>
-              </label>
-              <input
-                id="contact-behance"
+            <div>
+              <Input
+                label="Behance Profile URL"
                 type="url"
                 value={profileForm.behanceUrl || 'https://behance.net'}
                 onChange={(e) => handleProfileChange('behanceUrl', e.target.value)}
                 placeholder="https://behance.net"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-xs font-mono text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
+                className="font-mono text-xs"
               />
             </div>
 
-            <div className="space-y-2">
-              <label htmlFor="contact-instagram" className="block text-xs font-semibold text-foreground flex items-center gap-1.5">
-                <Instagram className="w-3.5 h-3.5 text-foreground" />
-                <span>Instagram Profile URL</span>
-              </label>
-              <input
-                id="contact-instagram"
+            <div>
+              <Input
+                label="Instagram Profile URL"
                 type="url"
                 value={profileForm.instagramUrl || 'https://instagram.com'}
                 onChange={(e) => handleProfileChange('instagramUrl', e.target.value)}
                 placeholder="https://instagram.com"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-xs font-mono text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
+                className="font-mono text-xs"
               />
             </div>
           </div>
-        </div>
+        </Card>
       )}
 
       {/* SUBSECTION 3: EXPERIENCE EDITOR */}
       {activeTab === 'experience' && (
-        <div className="p-6 sm:p-8 rounded-2xl border border-border bg-surface/30 space-y-6">
-          <div className="flex items-center justify-between border-b border-border pb-4">
+        <Card className="p-6 sm:p-8 space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-4">
             <div>
-              <h2 className="text-lg font-bold uppercase tracking-tight text-foreground flex items-center gap-2">
+              <CardTitle className="flex items-center gap-2 text-base">
                 <Briefcase className="w-4 h-4 text-foreground" />
                 <span>Professional Experience</span>
-              </h2>
-              <p className="text-xs text-muted font-mono mt-0.5">
+              </CardTitle>
+              <CardDescription className="text-xs font-mono">
                 Manage companies, job titles, start/end dates, current status, and achievements.
-              </p>
+              </CardDescription>
             </div>
-            <button
+            <Button
               type="button"
+              variant="primary"
+              size="sm"
               onClick={handleAddExperience}
-              className="min-h-[40px] px-4 py-2 rounded-xl bg-foreground text-background font-mono text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 hover:opacity-90 transition-opacity"
+              leftIcon={<Plus className="w-3.5 h-3.5" />}
             >
-              <Plus className="w-3.5 h-3.5" />
-              <span>Add Experience</span>
-            </button>
+              Add Experience
+            </Button>
           </div>
 
           <div className="space-y-4">
@@ -991,6 +928,7 @@ export const ContentManager: React.FC = () => {
                       disabled={index === 0}
                       className="p-1.5 rounded-lg border border-border text-muted hover:text-foreground disabled:opacity-30"
                       title="Move Up"
+                      aria-label="Move Up"
                     >
                       <ArrowUp className="w-3.5 h-3.5" />
                     </button>
@@ -1000,6 +938,7 @@ export const ContentManager: React.FC = () => {
                       disabled={index === experienceList.length - 1}
                       className="p-1.5 rounded-lg border border-border text-muted hover:text-foreground disabled:opacity-30"
                       title="Move Down"
+                      aria-label="Move Down"
                     >
                       <ArrowDown className="w-3.5 h-3.5" />
                     </button>
@@ -1012,6 +951,7 @@ export const ContentManager: React.FC = () => {
                           : 'border-border text-muted opacity-50'
                       }`}
                       title={exp.visible !== false ? 'Visible' : 'Hidden'}
+                      aria-label={exp.visible !== false ? 'Visible' : 'Hidden'}
                     >
                       {exp.visible !== false ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
                     </button>
@@ -1020,6 +960,7 @@ export const ContentManager: React.FC = () => {
                       onClick={() => handleDeleteExperience(exp.id)}
                       className="p-1.5 rounded-lg border border-red-500/30 text-red-400 hover:bg-red-500/10"
                       title="Delete"
+                      aria-label="Delete"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
@@ -1028,70 +969,54 @@ export const ContentManager: React.FC = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-[11px] font-semibold text-muted uppercase mb-1">
-                      Company
-                    </label>
-                    <input
-                      type="text"
+                    <Input
+                      label="Company"
                       value={exp.company}
                       onChange={(e) => handleExperienceChange(exp.id, 'company', e.target.value)}
-                      className="w-full px-3 py-2 rounded-lg border border-border bg-surface text-xs text-foreground font-semibold"
+                      className="font-semibold text-xs"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[11px] font-semibold text-muted uppercase mb-1">
-                      Job Title
-                    </label>
-                    <input
-                      type="text"
+                    <Input
+                      label="Job Title"
                       value={exp.role}
                       onChange={(e) => handleExperienceChange(exp.id, 'role', e.target.value)}
-                      className="w-full px-3 py-2 rounded-lg border border-border bg-surface text-xs text-foreground"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[11px] font-semibold text-muted uppercase mb-1">
-                      Period (Display Range)
-                    </label>
-                    <input
-                      type="text"
+                    <Input
+                      label="Period (Display Range)"
                       value={exp.period}
                       onChange={(e) => handleExperienceChange(exp.id, 'period', e.target.value)}
                       placeholder="e.g. Mar 2022 - Present"
-                      className="w-full px-3 py-2 rounded-lg border border-border bg-surface text-xs font-mono text-foreground"
+                      className="font-mono text-xs"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[11px] font-semibold text-muted uppercase mb-1">
-                      Start Date
-                    </label>
-                    <input
-                      type="text"
+                    <Input
+                      label="Start Date"
                       value={exp.startDate || ''}
                       onChange={(e) => handleExperienceChange(exp.id, 'startDate', e.target.value)}
                       placeholder="e.g. Mar 2022"
-                      className="w-full px-3 py-2 rounded-lg border border-border bg-surface text-xs font-mono text-foreground"
+                      className="font-mono text-xs"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[11px] font-semibold text-muted uppercase mb-1">
-                      End Date
-                    </label>
-                    <input
-                      type="text"
+                    <Input
+                      label="End Date"
                       value={exp.endDate || ''}
                       disabled={exp.currentlyWorking}
                       onChange={(e) => handleExperienceChange(exp.id, 'endDate', e.target.value)}
                       placeholder="e.g. Present / Nov 2023"
-                      className="w-full px-3 py-2 rounded-lg border border-border bg-surface text-xs font-mono text-foreground disabled:opacity-40"
+                      className="font-mono text-xs"
                     />
                   </div>
 
-                  <div className="flex items-center gap-2 pt-5">
+                  <div className="flex items-center gap-2 pt-6">
                     <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-foreground select-none">
                       <input
                         type="checkbox"
@@ -1110,44 +1035,42 @@ export const ContentManager: React.FC = () => {
                   </div>
 
                   <div className="md:col-span-3">
-                    <label className="block text-[11px] font-semibold text-muted uppercase mb-1">
-                      Description & Deliverables
-                    </label>
-                    <textarea
+                    <Textarea
+                      label="Description & Deliverables"
                       rows={3}
                       value={exp.description}
                       onChange={(e) => handleExperienceChange(exp.id, 'description', e.target.value)}
-                      className="w-full px-3 py-2 rounded-lg border border-border bg-surface text-xs text-foreground leading-relaxed"
                     />
                   </div>
                 </div>
               </div>
             ))}
           </div>
-        </div>
+        </Card>
       )}
 
       {/* SUBSECTION 4: EDUCATION EDITOR */}
       {activeTab === 'education' && (
-        <div className="p-6 sm:p-8 rounded-2xl border border-border bg-surface/30 space-y-6">
-          <div className="flex items-center justify-between border-b border-border pb-4">
+        <Card className="p-6 sm:p-8 space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-4">
             <div>
-              <h2 className="text-lg font-bold uppercase tracking-tight text-foreground flex items-center gap-2">
+              <CardTitle className="flex items-center gap-2 text-base">
                 <GraduationCap className="w-4 h-4 text-foreground" />
                 <span>Education Foundation</span>
-              </h2>
-              <p className="text-xs text-muted font-mono mt-0.5">
+              </CardTitle>
+              <CardDescription className="text-xs font-mono">
                 Academic institutions, education types, locations, and tenures.
-              </p>
+              </CardDescription>
             </div>
-            <button
+            <Button
               type="button"
+              variant="primary"
+              size="sm"
               onClick={handleAddEducation}
-              className="min-h-[40px] px-4 py-2 rounded-xl bg-foreground text-background font-mono text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 hover:opacity-90 transition-opacity"
+              leftIcon={<Plus className="w-3.5 h-3.5" />}
             >
-              <Plus className="w-3.5 h-3.5" />
-              <span>Add Education</span>
-            </button>
+              Add Education
+            </Button>
           </div>
 
           <div className="space-y-4">
@@ -1176,6 +1099,7 @@ export const ContentManager: React.FC = () => {
                       disabled={index === 0}
                       className="p-1.5 rounded-lg border border-border text-muted hover:text-foreground disabled:opacity-30"
                       title="Move Up"
+                      aria-label="Move Up"
                     >
                       <ArrowUp className="w-3.5 h-3.5" />
                     </button>
@@ -1185,6 +1109,7 @@ export const ContentManager: React.FC = () => {
                       disabled={index === educationList.length - 1}
                       className="p-1.5 rounded-lg border border-border text-muted hover:text-foreground disabled:opacity-30"
                       title="Move Down"
+                      aria-label="Move Down"
                     >
                       <ArrowDown className="w-3.5 h-3.5" />
                     </button>
@@ -1197,6 +1122,7 @@ export const ContentManager: React.FC = () => {
                           : 'border-border text-muted opacity-50'
                       }`}
                       title={edu.visible !== false ? 'Visible' : 'Hidden'}
+                      aria-label={edu.visible !== false ? 'Visible' : 'Hidden'}
                     >
                       {edu.visible !== false ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
                     </button>
@@ -1205,6 +1131,7 @@ export const ContentManager: React.FC = () => {
                       onClick={() => handleDeleteEducation(edu.id)}
                       className="p-1.5 rounded-lg border border-red-500/30 text-red-400 hover:bg-red-500/10"
                       title="Delete"
+                      aria-label="Delete"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
@@ -1213,135 +1140,114 @@ export const ContentManager: React.FC = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-[11px] font-semibold text-muted uppercase mb-1">
-                      Institution
-                    </label>
-                    <input
-                      type="text"
+                    <Input
+                      label="Institution"
                       value={edu.institution}
                       onChange={(e) => handleEducationChange(edu.id, 'institution', e.target.value)}
-                      className="w-full px-3 py-2 rounded-lg border border-border bg-surface text-xs text-foreground font-semibold"
+                      className="font-semibold text-xs"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[11px] font-semibold text-muted uppercase mb-1">
-                      Education Type / Degree
-                    </label>
-                    <input
-                      type="text"
+                    <Input
+                      label="Education Type / Degree"
                       value={edu.educationType || edu.degree || ''}
                       onChange={(e) => {
                         handleEducationChange(edu.id, 'educationType', e.target.value);
                         handleEducationChange(edu.id, 'degree', e.target.value);
                       }}
                       placeholder="e.g. Higher Secondary / Diploma"
-                      className="w-full px-3 py-2 rounded-lg border border-border bg-surface text-xs text-foreground"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[11px] font-semibold text-muted uppercase mb-1">
-                      Location
-                    </label>
-                    <input
-                      type="text"
+                    <Input
+                      label="Location"
                       value={edu.location || 'Surat, Gujarat'}
                       onChange={(e) => handleEducationChange(edu.id, 'location', e.target.value)}
                       placeholder="e.g. Surat, Gujarat"
-                      className="w-full px-3 py-2 rounded-lg border border-border bg-surface text-xs text-foreground"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[11px] font-semibold text-muted uppercase mb-1">
-                      Period (Display Range)
-                    </label>
-                    <input
-                      type="text"
+                    <Input
+                      label="Period (Display Range)"
                       value={edu.period}
                       onChange={(e) => handleEducationChange(edu.id, 'period', e.target.value)}
                       placeholder="e.g. 2017 - 2018"
-                      className="w-full px-3 py-2 rounded-lg border border-border bg-surface text-xs font-mono text-foreground"
+                      className="font-mono text-xs"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[11px] font-semibold text-muted uppercase mb-1">
-                      Start Date
-                    </label>
-                    <input
-                      type="text"
+                    <Input
+                      label="Start Date"
                       value={edu.startDate || ''}
                       onChange={(e) => handleEducationChange(edu.id, 'startDate', e.target.value)}
                       placeholder="e.g. 2017"
-                      className="w-full px-3 py-2 rounded-lg border border-border bg-surface text-xs font-mono text-foreground"
+                      className="font-mono text-xs"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[11px] font-semibold text-muted uppercase mb-1">
-                      End Date
-                    </label>
-                    <input
-                      type="text"
+                    <Input
+                      label="End Date"
                       value={edu.endDate || ''}
                       onChange={(e) => handleEducationChange(edu.id, 'endDate', e.target.value)}
                       placeholder="e.g. 2018"
-                      className="w-full px-3 py-2 rounded-lg border border-border bg-surface text-xs font-mono text-foreground"
+                      className="font-mono text-xs"
                     />
                   </div>
 
                   <div className="md:col-span-3">
-                    <label className="block text-[11px] font-semibold text-muted uppercase mb-1">
-                      Description & Scope
-                    </label>
-                    <textarea
+                    <Textarea
+                      label="Description & Scope"
                       rows={2}
                       value={edu.description}
                       onChange={(e) => handleEducationChange(edu.id, 'description', e.target.value)}
-                      className="w-full px-3 py-2 rounded-lg border border-border bg-surface text-xs text-foreground leading-relaxed"
                     />
                   </div>
                 </div>
               </div>
             ))}
           </div>
-        </div>
+        </Card>
       )}
 
       {/* SUBSECTION 5: SKILLS EDITOR (DESIGN) */}
       {activeTab === 'skills' && (
-        <div className="p-6 sm:p-8 rounded-2xl border border-border bg-surface/30 space-y-6">
+        <Card className="p-6 sm:p-8 space-y-6">
           <div className="border-b border-border pb-4">
-            <h2 className="text-lg font-bold uppercase tracking-tight text-foreground flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-base">
               <Sparkles className="w-4 h-4 text-foreground" />
               <span>Design Disciplines & Capabilities</span>
-            </h2>
-            <p className="text-xs text-muted font-mono mt-0.5">
+            </CardTitle>
+            <CardDescription className="text-xs font-mono">
               Core design specializations (Wireframes & Flows, Prototyping, UI, Interaction Design).
-            </p>
+            </CardDescription>
           </div>
 
           <div className="space-y-4">
             {/* Input to Add New Skill */}
             <div className="flex gap-2">
-              <input
-                type="text"
-                value={newSkillName}
-                onChange={(e) => setNewSkillName(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddDesignSkill())}
-                placeholder="e.g. Wireframes & Flows, Interaction Design..."
-                className="flex-1 px-4 py-2.5 rounded-xl border border-border bg-background text-xs font-mono text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
-              />
-              <button
+              <div className="flex-1">
+                <Input
+                  value={newSkillName}
+                  onChange={(e) => setNewSkillName(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddDesignSkill())}
+                  placeholder="e.g. Wireframes & Flows, Interaction Design..."
+                  className="font-mono text-xs"
+                />
+              </div>
+              <Button
                 type="button"
+                variant="primary"
+                size="md"
                 onClick={handleAddDesignSkill}
                 disabled={!newSkillName.trim()}
-                className="min-h-[44px] px-5 py-2.5 rounded-xl bg-foreground text-background font-mono text-xs font-bold uppercase tracking-wider disabled:opacity-40"
               >
                 Add Skill
-              </button>
+              </Button>
             </div>
 
             {/* List of current design skills */}
@@ -1367,8 +1273,9 @@ export const ContentManager: React.FC = () => {
                       disabled={index === 0}
                       className="p-1 text-muted hover:text-foreground disabled:opacity-20"
                       title="Move Up"
+                      aria-label="Move Up"
                     >
-                      <ArrowUp className="w-3 h-3" />
+                      <ArrowUp className="w-3.5 h-3.5" />
                     </button>
                     <button
                       type="button"
@@ -1376,8 +1283,9 @@ export const ContentManager: React.FC = () => {
                       disabled={index === (designCategory?.items || designCategory?.skills || []).length - 1}
                       className="p-1 text-muted hover:text-foreground disabled:opacity-20"
                       title="Move Down"
+                      aria-label="Move Down"
                     >
-                      <ArrowDown className="w-3 h-3" />
+                      <ArrowDown className="w-3.5 h-3.5" />
                     </button>
                     <button
                       type="button"
@@ -1386,14 +1294,16 @@ export const ContentManager: React.FC = () => {
                         skill.visible !== false ? 'text-emerald-500' : 'text-muted opacity-40'
                       }`}
                       title={skill.visible !== false ? 'Visible' : 'Hidden'}
+                      aria-label={skill.visible !== false ? 'Visible' : 'Hidden'}
                     >
-                      {skill.visible !== false ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
+                      {skill.visible !== false ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
                     </button>
                     <button
                       type="button"
                       onClick={() => handleDeleteDesignSkill(skill.name)}
                       className="p-1 text-muted hover:text-red-400 opacity-60 group-hover:opacity-100 transition-opacity"
                       title="Remove"
+                      aria-label="Remove"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
@@ -1402,49 +1312,53 @@ export const ContentManager: React.FC = () => {
               ))}
             </div>
           </div>
-        </div>
+        </Card>
       )}
 
       {/* SUBSECTION 6: DESIGN TOOLS EDITOR */}
       {activeTab === 'tools' && (
-        <div className="p-6 sm:p-8 rounded-2xl border border-border bg-surface/30 space-y-6">
+        <Card className="p-6 sm:p-8 space-y-6">
           <div className="border-b border-border pb-4">
-            <h2 className="text-lg font-bold uppercase tracking-tight text-foreground flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-base">
               <Wrench className="w-4 h-4 text-foreground" />
               <span>Design Tools & Technical Stack</span>
-            </h2>
-            <p className="text-xs text-muted font-mono mt-0.5">
+            </CardTitle>
+            <CardDescription className="text-xs font-mono">
               Tools and technologies (Figma, Adobe XD, Photoshop, Illustrator, HTML/CSS, JavaScript, Bootstrap, GitHub).
-            </p>
+            </CardDescription>
           </div>
 
           <div className="space-y-4">
             {/* Input to Add New Tool */}
             <div className="flex flex-col sm:flex-row gap-2">
-              <input
-                type="text"
-                value={newToolName}
-                onChange={(e) => setNewToolName(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddTool())}
-                placeholder="e.g. Figma, Adobe Illustrator, GitHub..."
-                className="flex-1 px-4 py-2.5 rounded-xl border border-border bg-background text-xs font-mono text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
-              />
+              <div className="flex-1">
+                <Input
+                  value={newToolName}
+                  onChange={(e) => setNewToolName(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddTool())}
+                  placeholder="e.g. Figma, Adobe Illustrator, GitHub..."
+                  className="font-mono text-xs"
+                />
+              </div>
               <select
                 value={newToolCategory}
-                onChange={(e: any) => setNewToolCategory(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+                  setNewToolCategory(e.target.value as 'Design Tools' | 'Technical')
+                }
                 className="px-3 py-2.5 rounded-xl border border-border bg-background text-xs font-mono text-foreground"
               >
                 <option value="Design Tools">Design Tools</option>
                 <option value="Technical">Technical</option>
               </select>
-              <button
+              <Button
                 type="button"
+                variant="primary"
+                size="md"
                 onClick={handleAddTool}
                 disabled={!newToolName.trim()}
-                className="min-h-[44px] px-5 py-2.5 rounded-xl bg-foreground text-background font-mono text-xs font-bold uppercase tracking-wider disabled:opacity-40"
               >
                 Add Tool
-              </button>
+              </Button>
             </div>
 
             {/* List of current tools */}
@@ -1466,8 +1380,9 @@ export const ContentManager: React.FC = () => {
                       disabled={idx === 0}
                       className="p-1 text-muted hover:text-foreground disabled:opacity-20"
                       title="Move Up"
+                      aria-label="Move Up"
                     >
-                      <ArrowUp className="w-3 h-3" />
+                      <ArrowUp className="w-3.5 h-3.5" />
                     </button>
                     <button
                       type="button"
@@ -1475,14 +1390,16 @@ export const ContentManager: React.FC = () => {
                       disabled={idx === toolsList.length - 1}
                       className="p-1 text-muted hover:text-foreground disabled:opacity-20"
                       title="Move Down"
+                      aria-label="Move Down"
                     >
-                      <ArrowDown className="w-3 h-3" />
+                      <ArrowDown className="w-3.5 h-3.5" />
                     </button>
                     <button
                       type="button"
                       onClick={() => handleDeleteTool(tool.id)}
                       className="p-1 text-muted hover:text-red-400 opacity-60 group-hover:opacity-100 transition-opacity"
                       title="Remove"
+                      aria-label="Remove"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
@@ -1491,20 +1408,20 @@ export const ContentManager: React.FC = () => {
               ))}
             </div>
           </div>
-        </div>
+        </Card>
       )}
 
       {/* SUBSECTION 7: SOCIAL LINKS EDITOR */}
       {activeTab === 'social' && (
-        <div className="p-6 sm:p-8 rounded-2xl border border-border bg-surface/30 space-y-6">
+        <Card className="p-6 sm:p-8 space-y-6">
           <div className="border-b border-border pb-4">
-            <h2 className="text-lg font-bold uppercase tracking-tight text-foreground flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-base">
               <Share2 className="w-4 h-4 text-foreground" />
               <span>Social Links Directory</span>
-            </h2>
-            <p className="text-xs text-muted font-mono mt-0.5">
+            </CardTitle>
+            <CardDescription className="text-xs font-mono">
               LinkedIn, Dribbble, Behance, and Instagram profiles.
-            </p>
+            </CardDescription>
           </div>
 
           <div className="space-y-4">
@@ -1526,22 +1443,27 @@ export const ContentManager: React.FC = () => {
                 <option value="Other">Other</option>
               </select>
 
-              <input
-                type="text"
-                value={newSocialUrl}
-                onChange={(e) => setNewSocialUrl(e.target.value)}
-                placeholder="https://linkedin.com/in/dsbhuva"
-                className="sm:col-span-6 px-4 py-2.5 rounded-xl border border-border bg-background text-xs font-mono text-foreground placeholder:text-muted"
-              />
+              <div className="sm:col-span-6">
+                <Input
+                  value={newSocialUrl}
+                  onChange={(e) => setNewSocialUrl(e.target.value)}
+                  placeholder="https://linkedin.com/in/dsbhuva"
+                  className="font-mono text-xs"
+                />
+              </div>
 
-              <button
-                type="button"
-                onClick={handleAddSocialLink}
-                disabled={!newSocialUrl.trim()}
-                className="sm:col-span-3 min-h-[44px] px-4 py-2.5 rounded-xl bg-foreground text-background font-mono text-xs font-bold uppercase tracking-wider disabled:opacity-40"
-              >
-                Add Link
-              </button>
+              <div className="sm:col-span-3">
+                <Button
+                  type="button"
+                  variant="primary"
+                  size="md"
+                  onClick={handleAddSocialLink}
+                  disabled={!newSocialUrl.trim()}
+                  className="w-full"
+                >
+                  Add Link
+                </Button>
+              </div>
             </div>
 
             {/* List of social links */}
@@ -1563,6 +1485,7 @@ export const ContentManager: React.FC = () => {
                       disabled={idx === 0}
                       className="p-1.5 rounded-lg border border-border text-muted hover:text-foreground disabled:opacity-20"
                       title="Move Up"
+                      aria-label="Move Up"
                     >
                       <ArrowUp className="w-3.5 h-3.5" />
                     </button>
@@ -1572,6 +1495,7 @@ export const ContentManager: React.FC = () => {
                       disabled={idx === socialLinks.length - 1}
                       className="p-1.5 rounded-lg border border-border text-muted hover:text-foreground disabled:opacity-20"
                       title="Move Down"
+                      aria-label="Move Down"
                     >
                       <ArrowDown className="w-3.5 h-3.5" />
                     </button>
@@ -1582,6 +1506,7 @@ export const ContentManager: React.FC = () => {
                         soc.visible !== false ? 'border-border text-emerald-500' : 'border-border text-muted opacity-40'
                       }`}
                       title={soc.visible !== false ? 'Visible' : 'Hidden'}
+                      aria-label={soc.visible !== false ? 'Visible' : 'Hidden'}
                     >
                       {soc.visible !== false ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
                     </button>
@@ -1590,6 +1515,7 @@ export const ContentManager: React.FC = () => {
                       onClick={() => handleDeleteSocialLink(idx)}
                       className="p-1.5 rounded-lg border border-red-500/30 text-red-400 hover:bg-red-500/10"
                       title="Delete"
+                      aria-label="Delete"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
@@ -1598,20 +1524,20 @@ export const ContentManager: React.FC = () => {
               ))}
             </div>
           </div>
-        </div>
+        </Card>
       )}
 
       {/* SUBSECTION 8: PROFILE IMAGE & VISUAL SPECIMENS */}
       {activeTab === 'image' && (
-        <div className="p-6 sm:p-8 rounded-2xl border border-border bg-surface/30 space-y-8">
+        <Card className="p-6 sm:p-8 space-y-8">
           <div className="border-b border-border pb-4">
-            <h2 className="text-lg font-bold uppercase tracking-tight text-foreground flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-base">
               <ImageIcon className="w-4 h-4 text-foreground" />
               <span>Profile Photo & Cover Artifact</span>
-            </h2>
-            <p className="text-xs text-muted font-mono mt-0.5">
+            </CardTitle>
+            <CardDescription className="text-xs font-mono">
               Manage resume profile headshot, media uploads, and portfolio cover specimen.
-            </p>
+            </CardDescription>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -1621,7 +1547,9 @@ export const ContentManager: React.FC = () => {
                 <span className="font-bold text-xs uppercase tracking-wider text-foreground">
                   Profile Photograph (Resume)
                 </span>
-                <span className="font-mono text-[10px] text-muted">[1200 × 1200]</span>
+                <Badge variant="neutral" size="sm" className="font-mono">
+                  [1200 × 1200]
+                </Badge>
               </div>
 
               <div className="w-full aspect-square max-w-[240px] mx-auto overflow-hidden rounded-xl border border-border bg-surface shadow-md">
@@ -1633,35 +1561,40 @@ export const ContentManager: React.FC = () => {
               </div>
 
               <div className="flex flex-wrap gap-2 pt-2">
-                <button
+                <Button
                   type="button"
+                  variant="outline"
+                  size="sm"
                   onClick={() => {
                     setMediaTarget('profile');
                     fileInputRef.current?.click();
                   }}
-                  className="flex-1 min-h-[40px] px-3 py-2 rounded-lg border border-border font-mono text-xs uppercase text-foreground hover:bg-surface flex items-center justify-center gap-1.5"
+                  leftIcon={<Upload className="w-3.5 h-3.5" />}
+                  className="flex-1"
                 >
-                  <Upload className="w-3.5 h-3.5" />
-                  <span>Upload</span>
-                </button>
-                <button
+                  Upload
+                </Button>
+                <Button
                   type="button"
+                  variant="primary"
+                  size="sm"
                   onClick={() => {
                     setMediaTarget('profile');
                     setIsMediaPickerOpen(true);
                   }}
-                  className="flex-1 min-h-[40px] px-3 py-2 rounded-lg bg-foreground text-background font-mono text-xs uppercase font-bold flex items-center justify-center gap-1.5"
+                  leftIcon={<Layers className="w-3.5 h-3.5" />}
+                  className="flex-1"
                 >
-                  <Layers className="w-3.5 h-3.5" />
-                  <span>Choose Media</span>
-                </button>
-                <button
+                  Choose Media
+                </Button>
+                <Button
                   type="button"
+                  variant="danger"
+                  size="sm"
                   onClick={() => handleProfileChange('profileImage', '')}
-                  className="min-h-[40px] px-3 py-2 rounded-lg border border-red-500/30 text-red-400 font-mono text-xs uppercase hover:bg-red-500/10"
                 >
                   Remove
-                </button>
+                </Button>
               </div>
             </div>
 
@@ -1671,7 +1604,9 @@ export const ContentManager: React.FC = () => {
                 <span className="font-bold text-xs uppercase tracking-wider text-foreground">
                   Cover / Specimen Artifact
                 </span>
-                <span className="font-mono text-[10px] text-muted">[4032 × 2268]</span>
+                <Badge variant="neutral" size="sm" className="font-mono">
+                  [4032 × 2268]
+                </Badge>
               </div>
 
               <div className="w-full aspect-video max-w-[320px] mx-auto overflow-hidden rounded-xl border border-border bg-surface shadow-md">
@@ -1683,73 +1618,68 @@ export const ContentManager: React.FC = () => {
               </div>
 
               <div className="flex flex-wrap gap-2 pt-2">
-                <button
+                <Button
                   type="button"
+                  variant="outline"
+                  size="sm"
                   onClick={() => {
                     setMediaTarget('cover');
                     fileInputRef.current?.click();
                   }}
-                  className="flex-1 min-h-[40px] px-3 py-2 rounded-lg border border-border font-mono text-xs uppercase text-foreground hover:bg-surface flex items-center justify-center gap-1.5"
+                  leftIcon={<Upload className="w-3.5 h-3.5" />}
+                  className="flex-1"
                 >
-                  <Upload className="w-3.5 h-3.5" />
-                  <span>Upload</span>
-                </button>
-                <button
+                  Upload
+                </Button>
+                <Button
                   type="button"
+                  variant="primary"
+                  size="sm"
                   onClick={() => {
                     setMediaTarget('cover');
                     setIsMediaPickerOpen(true);
                   }}
-                  className="flex-1 min-h-[40px] px-3 py-2 rounded-lg bg-foreground text-background font-mono text-xs uppercase font-bold flex items-center justify-center gap-1.5"
+                  leftIcon={<Layers className="w-3.5 h-3.5" />}
+                  className="flex-1"
                 >
-                  <Layers className="w-3.5 h-3.5" />
-                  <span>Choose Media</span>
-                </button>
+                  Choose Media
+                </Button>
               </div>
             </div>
           </div>
-        </div>
+        </Card>
       )}
 
       {/* SUBSECTION 9: PHILOSOPHY EDITOR */}
       {activeTab === 'philosophy' && (
-        <div className="p-6 sm:p-8 rounded-2xl border border-border bg-surface/30 space-y-6">
+        <Card className="p-6 sm:p-8 space-y-6">
           <div className="border-b border-border pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div>
-              <h2 className="text-lg font-bold uppercase tracking-tight text-foreground flex items-center gap-2">
+              <CardTitle className="flex items-center gap-2 text-base">
                 <Compass className="w-4 h-4 text-foreground" />
                 <span>Design Philosophy Statement</span>
-              </h2>
-              <p className="text-xs text-muted font-mono mt-0.5">
+              </CardTitle>
+              <CardDescription className="text-xs font-mono">
                 Editable design philosophy thesis, typographic line breaks, and author attribution.
-              </p>
+              </CardDescription>
             </div>
             {philosophyForm.placeholder && (
-              <span className="px-2 py-0.5 rounded text-[10px] font-mono font-semibold border border-amber-500/30 bg-amber-500/10 text-amber-500">
+              <Badge variant="warning" size="sm">
                 Default Content
-              </span>
+              </Badge>
             )}
           </div>
 
           {/* Editable Statement Notice */}
-          <div className="p-4 rounded-xl border border-blue-500/20 bg-blue-500/5 flex items-start gap-3 text-xs text-foreground">
-            <Compass className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />
-            <div className="space-y-0.5">
-              <p className="font-bold">Editable Default Philosophy</p>
-              <p className="text-muted leading-relaxed">
-                The resume emphasizes utility, ease of use, and pleasure in product interaction. The default editable statement is <span className="text-foreground font-semibold">"Design should make complex things feel simple."</span> You can edit or refine this statement at any time.
-              </p>
-            </div>
-          </div>
+          <Alert variant="info" title="Editable Default Philosophy">
+            The resume emphasizes utility, ease of use, and pleasure in product interaction. The default editable statement is <span className="font-semibold text-foreground">"Design should make complex things feel simple."</span> You can edit or refine this statement at any time.
+          </Alert>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Full Main Statement */}
-            <div className="space-y-2 md:col-span-2">
-              <label htmlFor="phil-main" className="block text-xs font-semibold text-foreground">
-                Main Philosophy Statement
-              </label>
-              <textarea
-                id="phil-main"
+            <div className="md:col-span-2">
+              <Textarea
+                label="Main Philosophy Statement"
                 rows={2}
                 value={philosophyForm.mainStatement || philosophyForm.title || ''}
                 onChange={(e) => {
@@ -1767,72 +1697,53 @@ export const ContentManager: React.FC = () => {
                   }));
                 }}
                 placeholder="Design should make complex things feel simple."
-                className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-sm font-bold text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
+                className="font-bold text-sm"
               />
             </div>
 
             {/* Typographic Line 1 */}
-            <div className="space-y-2">
-              <label htmlFor="phil-line1" className="block text-xs font-semibold text-foreground">
-                Display Headline Line 1
-              </label>
-              <input
-                id="phil-line1"
-                type="text"
+            <div>
+              <Input
+                label="Display Headline Line 1"
                 value={philosophyForm.line1 || ''}
                 onChange={(e) => {
                   markDirty();
                   setPhilosophyForm((prev) => ({ ...prev, line1: e.target.value }));
                 }}
                 placeholder="Design should make"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-xs text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
               />
             </div>
 
             {/* Typographic Line 2 */}
-            <div className="space-y-2">
-              <label htmlFor="phil-line2" className="block text-xs font-semibold text-foreground">
-                Display Headline Line 2 (Indented)
-              </label>
-              <input
-                id="phil-line2"
-                type="text"
+            <div>
+              <Input
+                label="Display Headline Line 2 (Indented)"
                 value={philosophyForm.line2 || ''}
                 onChange={(e) => {
                   markDirty();
                   setPhilosophyForm((prev) => ({ ...prev, line2: e.target.value }));
                 }}
                 placeholder="complex things"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-xs text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
               />
             </div>
 
             {/* Typographic Line 3 */}
-            <div className="space-y-2">
-              <label htmlFor="phil-line3" className="block text-xs font-semibold text-foreground">
-                Display Headline Line 3
-              </label>
-              <input
-                id="phil-line3"
-                type="text"
+            <div>
+              <Input
+                label="Display Headline Line 3"
                 value={philosophyForm.line3 || ''}
                 onChange={(e) => {
                   markDirty();
                   setPhilosophyForm((prev) => ({ ...prev, line3: e.target.value }));
                 }}
                 placeholder="feel simple."
-                className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-xs text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
               />
             </div>
 
             {/* Author Attribution */}
-            <div className="space-y-2">
-              <label htmlFor="phil-author" className="block text-xs font-semibold text-foreground">
-                Author Attribution
-              </label>
-              <input
-                id="phil-author"
-                type="text"
+            <div>
+              <Input
+                label="Author Attribution"
                 value={philosophyForm.author || philosophyForm.attribution || philosophyForm.yearMeta || ''}
                 onChange={(e) => {
                   markDirty();
@@ -1844,55 +1755,58 @@ export const ContentManager: React.FC = () => {
                   }));
                 }}
                 placeholder="— DARSHIL S. BHUVA"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-xs font-mono uppercase text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
+                className="font-mono uppercase text-xs"
               />
             </div>
           </div>
-        </div>
+        </Card>
       )}
 
       {/* SUBSECTION 10: MARQUEE STRIP EDITOR */}
       {activeTab === 'marquee' && (
-        <div className="p-6 sm:p-8 rounded-2xl border border-border bg-surface/30 space-y-6">
+        <Card className="p-6 sm:p-8 space-y-6">
           <div className="border-b border-border pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div>
-              <h2 className="text-lg font-bold uppercase tracking-tight text-foreground flex items-center gap-2">
+              <CardTitle className="flex items-center gap-2 text-base">
                 <Repeat className="w-4 h-4 text-foreground" />
                 <span>Kinetic Marquee Typography</span>
-              </h2>
-              <p className="text-xs text-muted font-mono mt-0.5">
+              </CardTitle>
+              <CardDescription className="text-xs font-mono">
                 Manage moving ticker phrases, velocity animation, and separator tokens.
-              </p>
+              </CardDescription>
             </div>
             {marqueeForm.placeholder && (
-              <span className="px-2 py-0.5 rounded text-[10px] font-mono font-semibold border border-amber-500/30 bg-amber-500/10 text-amber-500">
+              <Badge variant="warning" size="sm">
                 Default Content
-              </span>
+              </Badge>
             )}
           </div>
 
           {/* Marquee Add New Item Bar */}
           <div className="flex flex-col sm:flex-row gap-2 items-stretch">
-            <input
-              type="text"
-              value={newMarqueeItem}
-              onChange={(e) => setNewMarqueeItem(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && newMarqueeItem.trim()) {
-                  e.preventDefault();
-                  markDirty();
-                  setMarqueeForm((prev) => ({
-                    ...prev,
-                    items: [...prev.items, newMarqueeItem.trim().toUpperCase()],
-                  }));
-                  setNewMarqueeItem('');
-                }
-              }}
-              placeholder="e.g. DIGITAL EXPERIENCES"
-              className="flex-1 px-3.5 py-2.5 rounded-xl border border-border bg-background text-xs font-bold uppercase text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
-            />
-            <button
+            <div className="flex-1">
+              <Input
+                value={newMarqueeItem}
+                onChange={(e) => setNewMarqueeItem(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && newMarqueeItem.trim()) {
+                    e.preventDefault();
+                    markDirty();
+                    setMarqueeForm((prev) => ({
+                      ...prev,
+                      items: [...prev.items, newMarqueeItem.trim().toUpperCase()],
+                    }));
+                    setNewMarqueeItem('');
+                  }
+                }}
+                placeholder="e.g. DIGITAL EXPERIENCES"
+                className="font-bold uppercase text-xs"
+              />
+            </div>
+            <Button
               type="button"
+              variant="primary"
+              size="md"
               onClick={() => {
                 if (!newMarqueeItem.trim()) return;
                 markDirty();
@@ -1903,11 +1817,10 @@ export const ContentManager: React.FC = () => {
                 setNewMarqueeItem('');
               }}
               disabled={!newMarqueeItem.trim()}
-              className="px-5 py-2.5 rounded-xl bg-foreground text-background text-xs font-semibold hover:opacity-90 transition-opacity disabled:opacity-40 flex items-center justify-center gap-1.5"
+              leftIcon={<Plus className="w-3.5 h-3.5" />}
             >
-              <Plus className="w-3.5 h-3.5" />
-              <span>Add Phrase</span>
-            </button>
+              Add Phrase
+            </Button>
           </div>
 
           {/* Active Items List */}
@@ -1939,8 +1852,9 @@ export const ContentManager: React.FC = () => {
                       disabled={idx === 0}
                       className="p-1 rounded-md border border-border text-muted hover:text-foreground disabled:opacity-20"
                       title="Move Up"
+                      aria-label="Move Up"
                     >
-                      <ArrowUp className="w-3 h-3" />
+                      <ArrowUp className="w-3.5 h-3.5" />
                     </button>
                     <button
                       type="button"
@@ -1956,8 +1870,9 @@ export const ContentManager: React.FC = () => {
                       disabled={idx === marqueeForm.items.length - 1}
                       className="p-1 rounded-md border border-border text-muted hover:text-foreground disabled:opacity-20"
                       title="Move Down"
+                      aria-label="Move Down"
                     >
-                      <ArrowDown className="w-3 h-3" />
+                      <ArrowDown className="w-3.5 h-3.5" />
                     </button>
                     <button
                       type="button"
@@ -1970,8 +1885,9 @@ export const ContentManager: React.FC = () => {
                       }}
                       className="p-1 rounded-md border border-red-500/20 text-red-400 hover:text-red-500 hover:bg-red-500/10"
                       title="Remove Item"
+                      aria-label="Remove Item"
                     >
-                      <Trash2 className="w-3 h-3" />
+                      <Trash2 className="w-3.5 h-3.5" />
                     </button>
                   </div>
                 </div>
@@ -1981,9 +1897,9 @@ export const ContentManager: React.FC = () => {
 
           {/* Marquee Speed & Separator */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 border-t border-border">
-            <div className="space-y-1.5">
-              <label className="block text-xs font-semibold text-foreground">Loop Duration (Seconds)</label>
-              <input
+            <div>
+              <Input
+                label="Loop Duration (Seconds)"
                 type="number"
                 min={10}
                 max={120}
@@ -1992,26 +1908,26 @@ export const ContentManager: React.FC = () => {
                   markDirty();
                   setMarqueeForm((prev) => ({ ...prev, speed: Number(e.target.value) || 30 }));
                 }}
-                className="w-full px-3.5 py-2 rounded-xl border border-border bg-background text-xs font-mono text-foreground"
+                className="font-mono text-xs"
               />
             </div>
-            <div className="space-y-1.5">
-              <label className="block text-xs font-semibold text-foreground">Separator Token</label>
-              <input
+            <div>
+              <Input
+                label="Separator Token"
                 type="text"
                 value={marqueeForm.separator || '✦'}
                 onChange={(e) => {
                   markDirty();
                   setMarqueeForm((prev) => ({ ...prev, separator: e.target.value }));
                 }}
-                className="w-full px-3.5 py-2 rounded-xl border border-border bg-background text-xs font-mono text-foreground"
+                className="font-mono text-xs"
               />
             </div>
             <div className="space-y-1.5">
               <label className="block text-xs font-semibold text-foreground">Movement Direction</label>
               <select
                 value={marqueeForm.direction || 'left'}
-                onChange={(e) => {
+                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
                   markDirty();
                   setMarqueeForm((prev) => ({ ...prev, direction: e.target.value as 'left' | 'right' }));
                 }}
@@ -2022,7 +1938,7 @@ export const ContentManager: React.FC = () => {
               </select>
             </div>
           </div>
-        </div>
+        </Card>
       )}
 
       {/* Hidden file input for uploads */}

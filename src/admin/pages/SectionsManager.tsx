@@ -24,13 +24,10 @@ import {
   Save,
   RotateCcw,
   Undo2,
-  CheckCircle2,
-  AlertCircle,
   Sparkles,
   ArrowUp,
   ArrowDown,
   Lock,
-  Compass,
   FileText,
   Repeat,
   FolderGit2,
@@ -38,12 +35,14 @@ import {
   Image as ImageIcon,
   Mail,
   Globe,
+  Compass,
 } from 'lucide-react';
 import { useWebsiteData } from '../../hooks/useWebsiteData';
 import { SectionId, SectionSetting, SectionSettings } from '../../types';
 import { defaultWebsiteData } from '../../data/defaultWebsiteData';
 import { validators } from '../utils/validators';
 import { useUnsavedChanges } from '../hooks/useUnsavedChanges';
+import { Button, Badge, Alert, Card, useToast } from '../../design-system';
 
 const SECTION_METADATA: Record<
   SectionId,
@@ -69,44 +68,43 @@ const SECTION_METADATA: Record<
     description: 'Triple-line editorial design manifesto with interactive core principles.',
     icon: FileText,
   },
+  experience: {
+    name: 'Career & Education Trajectory',
+    description: 'Chronological timeline of product design roles, internships, and educational degrees.',
+    icon: Compass,
+  },
   skills: {
     name: 'Discipline & Skills Matrix',
-    description: 'Categorized competencies with numeric index counters and hover imagery previews.',
+    description: 'Categorized competencies across Design Systems, Frontend Architecture, and Strategy.',
     icon: Sparkles,
   },
   philosophy: {
-    name: 'Design Philosophy Thesis',
-    description: 'Large-scale typographic thesis statements and attributions.',
-    icon: Compass,
+    name: 'Design Philosophy & Metrics',
+    description: 'Core design principles paired with verified production performance metrics.',
+    icon: Sparkles,
   },
   services: {
-    name: 'Services Scope',
-    description: 'Service offerings, custom deliverable badges, and Lucide iconography.',
+    name: 'Capabilities & Deliverables',
+    description: 'Available agency scopes, design audit offerings, and project deliverables.',
     icon: Briefcase,
   },
   image: {
-    name: 'Experimental Visual Study Break',
-    description: 'Full-bleed monochrome image specimen visual break.',
+    name: 'Experimental Specimen Showcase',
+    description: 'Large-scale visual specimen with interactive parallax depth and caption details.',
     icon: ImageIcon,
   },
   contact: {
-    name: 'Contact CTA Collaboration',
-    description: 'Massive headline climax, magnetic action button, and availability status pulse.',
+    name: 'Outreach & Contact CTA',
+    description: 'Direct inquiry action area with email trigger, availability badge, and direct channels.',
     icon: Mail,
   },
-  experience: {
-    name: 'Career Experience & Education',
-    description: 'Professional career timeline, company roles, tenures, and academic foundation milestones.',
-    icon: Briefcase,
-  },
   footer: {
-    name: 'Editorial Footer (Terminal Section)',
-    description: '4-column editorial grid, live social directory, inquiry channels, and brand signature.',
+    name: 'Terminal Footer Anchor',
+    description: 'Structural footer with localized clock, copyright, index links, and return-to-top.',
     icon: Globe,
   },
 };
 
-// Sortable Item Component
 interface SortableSectionItemProps {
   id: SectionId;
   section: SectionSetting;
@@ -133,10 +131,11 @@ const SortableSectionItem: React.FC<SortableSectionItemProps> = ({
   };
 
   const meta = SECTION_METADATA[id] || {
-    name: section.name || id,
-    description: 'Portfolio page section',
+    name: id,
+    description: `Section ${id}`,
     icon: Layers,
   };
+
   const Icon = meta.icon;
   const isVisible = section.visible !== false;
 
@@ -146,10 +145,10 @@ const SortableSectionItem: React.FC<SortableSectionItemProps> = ({
       style={style}
       className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl border transition-all ${
         isDragging
-          ? 'border-foreground shadow-2xl bg-surface ring-2 ring-foreground/20 opacity-95'
+          ? 'border-[var(--color-action-primary)] bg-[var(--color-background-elevated)] shadow-lg opacity-90'
           : isVisible
-          ? 'border-border bg-background hover:border-foreground/40'
-          : 'border-border/40 bg-background/40 opacity-50'
+          ? 'border-[var(--color-border-default)] bg-[var(--color-background-secondary)] hover:border-[var(--color-border-strong)]'
+          : 'border-[var(--color-border-subtle)] bg-[var(--color-background-primary)] opacity-60'
       }`}
     >
       {/* Left: Drag Handle, Order, and Info */}
@@ -158,28 +157,28 @@ const SortableSectionItem: React.FC<SortableSectionItemProps> = ({
           type="button"
           {...attributes}
           {...listeners}
-          className="p-1.5 rounded-lg text-muted hover:text-foreground hover:bg-surface cursor-grab active:cursor-grabbing transition-colors shrink-0"
+          className="p-1.5 rounded-lg text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-background-elevated)] cursor-grab active:cursor-grabbing transition-colors shrink-0 focus-visible:outline-2 focus-visible:outline-[var(--color-focus-default)]"
           title="Drag to reorder section"
         >
           <GripVertical className="w-4 h-4" />
         </button>
 
-        <div className="w-8 h-8 rounded-lg bg-surface border border-border flex items-center justify-center font-mono text-xs font-bold text-foreground shrink-0 shadow-xs">
+        <div className="w-8 h-8 rounded-lg bg-[var(--color-background-primary)] border border-[var(--color-border-default)] flex items-center justify-center font-mono text-xs font-bold text-[var(--color-text-primary)] shrink-0 shadow-xs">
           #{String(index + 1).padStart(2, '0')}
         </div>
 
-        <div className="w-8 h-8 rounded-lg bg-surface border border-border flex items-center justify-center text-foreground shrink-0 hidden sm:flex">
+        <div className="w-8 h-8 rounded-lg bg-[var(--color-background-primary)] border border-[var(--color-border-default)] flex items-center justify-center text-[var(--color-text-primary)] shrink-0 hidden sm:flex">
           <Icon className="w-4 h-4" />
         </div>
 
         <div className="min-w-0">
           <div className="flex items-center gap-2">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-foreground truncate">{meta.name}</h4>
-            <span className="text-[10px] font-mono px-1.5 py-0.5 rounded-sm bg-surface border border-border text-muted hidden md:inline">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-[var(--color-text-primary)] truncate">{meta.name}</h4>
+            <span className="text-[10px] font-mono px-1.5 py-0.5 rounded-sm bg-[var(--color-background-primary)] border border-[var(--color-border-default)] text-[var(--color-text-tertiary)] hidden md:inline">
               ID: {id}
             </span>
           </div>
-          <p className="text-[11px] text-muted truncate max-w-md">{meta.description}</p>
+          <p className="text-[11px] text-[var(--color-text-tertiary)] truncate max-w-md">{meta.description}</p>
         </div>
       </div>
 
@@ -187,57 +186,45 @@ const SortableSectionItem: React.FC<SortableSectionItemProps> = ({
       <div className="flex items-center gap-3 self-end sm:self-auto shrink-0">
         {/* Quick move up/down */}
         <div className="flex items-center gap-1">
-          <button
-            type="button"
+          <Button
+            variant="icon"
+            size="sm"
             onClick={() => onMove(index, 'up')}
             disabled={index === 0}
-            className="p-1.5 rounded-lg text-muted hover:text-foreground hover:bg-surface disabled:opacity-20 disabled:cursor-not-allowed transition-colors"
-            title="Move Up"
+            aria-label="Move Up"
           >
             <ArrowUp className="w-3.5 h-3.5" />
-          </button>
-          <button
-            type="button"
+          </Button>
+          <Button
+            variant="icon"
+            size="sm"
             onClick={() => onMove(index, 'down')}
             disabled={index === total - 1}
-            className="p-1.5 rounded-lg text-muted hover:text-foreground hover:bg-surface disabled:opacity-20 disabled:cursor-not-allowed transition-colors"
-            title="Move Down"
+            aria-label="Move Down"
           >
             <ArrowDown className="w-3.5 h-3.5" />
-          </button>
+          </Button>
         </div>
 
         {/* Status Badge */}
-        <span
-          className={`px-2.5 py-1 rounded-full text-[10px] font-mono font-semibold uppercase tracking-wider ${
-            isVisible
-              ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20'
-              : 'bg-zinc-500/10 text-zinc-400 border border-zinc-500/20'
-          }`}
-        >
+        <Badge variant={isVisible ? 'success' : 'neutral'} size="sm" dot>
           {isVisible ? 'ACTIVE' : 'HIDDEN'}
-        </span>
+        </Badge>
 
         {/* Visibility Button */}
-        <button
-          type="button"
+        <Button
+          variant="icon"
+          size="sm"
           onClick={() => onToggleVisibility(id)}
-          className={`p-2 rounded-xl border transition-all ${
-            isVisible
-              ? 'border-border bg-surface text-foreground hover:bg-background'
-              : 'border-border/60 bg-background text-muted hover:text-foreground'
-          }`}
-          title={isVisible ? 'Hide section from public site' : 'Show section on public site'}
+          aria-label={isVisible ? 'Hide section from public site' : 'Show section on public site'}
         >
           {isVisible ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
-        </button>
+        </Button>
       </div>
     </div>
   );
 };
 
-// Canonical list of ALL known section IDs — single source of truth.
-// Ensures no section is ever silently dropped during sync/reorder.
 const ALL_SECTION_IDS: SectionId[] = [
   'hero', 'marquee', 'projects', 'statement', 'experience',
   'skills', 'philosophy', 'services', 'image', 'contact', 'footer',
@@ -247,154 +234,125 @@ const ALL_MAIN_SECTION_IDS: SectionId[] = ALL_SECTION_IDS.filter((id) => id !== 
 
 export const SectionsManager: React.FC = () => {
   const { data, updateSettings } = useWebsiteData();
+  const toast = useToast();
 
-  // Local reorderable list of section IDs (excluding footer which is pinned)
+  const [sectionsState, setSectionsState] = useState<SectionSettings>({} as SectionSettings);
   const [orderedMainIds, setOrderedMainIds] = useState<SectionId[]>([]);
-  const [sectionsState, setSectionsState] = useState<SectionSettings>(data.settings.sections);
-
-  // Status & feedback
+  const [isDirty, setIsDirty] = useState(false);
   const [status, setStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [isDirty, setIsDirty] = useState(false);
 
-  // Prevent accidental loss of unsaved changes
   useUnsavedChanges(isDirty);
 
-  // DND Sensors
   const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 5,
-      },
-    }),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   );
 
-  // Sync state from global data — guarantees ALL known section IDs are present
   useEffect(() => {
     if (data.settings?.sections) {
-      const currentSections = data.settings.sections;
-
-      // Ensure every canonical section ID exists (fill missing with defaults)
-      const merged: SectionSettings = { ...currentSections };
+      const merged: SectionSettings = { ...(data.settings.sections as SectionSettings) };
       for (const id of ALL_SECTION_IDS) {
         if (!merged[id]) {
-          merged[id] = defaultWebsiteData.settings.sections[id] || {
+          merged[id] = {
             id,
-            name: id,
+            name: SECTION_METADATA[id]?.name || id,
             visible: true,
-            order: 99,
+            order: (defaultWebsiteData.settings.sections as any)?.[id]?.order ?? 99,
           };
         }
       }
       setSectionsState(merged);
-
-      // Extract main reorderable IDs sorted by order
       const mainIds = ALL_MAIN_SECTION_IDS
         .slice()
         .sort((a, b) => (merged[a]?.order ?? 0) - (merged[b]?.order ?? 0));
-
       setOrderedMainIds(mainIds);
-      setIsDirty(false);
     }
-  }, [data.settings]);
+  }, [data.settings?.sections]);
 
-  const markDirty = () => {
-    if (!isDirty) setIsDirty(true);
-    if (status === 'saved' || status === 'error') setStatus('idle');
-  };
-
-  // Drag End handler
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
-    if (!over || active.id === over.id) return;
+    if (over && active.id !== over.id) {
+      const oldIndex = orderedMainIds.indexOf(active.id as SectionId);
+      const newIndex = orderedMainIds.indexOf(over.id as SectionId);
+      const newOrder = arrayMove(orderedMainIds, oldIndex, newIndex);
+      setOrderedMainIds(newOrder);
 
-    const oldIndex = orderedMainIds.indexOf(active.id as SectionId);
-    const newIndex = orderedMainIds.indexOf(over.id as SectionId);
-
-    if (oldIndex !== -1 && newIndex !== -1) {
-      markDirty();
-      const nextOrderedIds = arrayMove(orderedMainIds, oldIndex, newIndex);
-      setOrderedMainIds(nextOrderedIds);
-
-      // Re-assign sequence orders
       const updatedSections: SectionSettings = { ...sectionsState };
-      nextOrderedIds.forEach((id, idx) => {
+      newOrder.forEach((id, index) => {
         if (updatedSections[id]) {
-          updatedSections[id] = { ...updatedSections[id], order: idx + 1 };
+          updatedSections[id] = { ...updatedSections[id], order: index + 1 };
         }
       });
       if (updatedSections.footer) {
-        updatedSections.footer = { ...updatedSections.footer, order: nextOrderedIds.length + 1 };
+        updatedSections.footer = { ...updatedSections.footer, order: 10 };
       }
+
       setSectionsState(updatedSections);
+      setIsDirty(true);
     }
   };
 
-  // Move Up/Down button handler
   const handleMove = (index: number, direction: 'up' | 'down') => {
     const targetIndex = direction === 'up' ? index - 1 : index + 1;
     if (targetIndex < 0 || targetIndex >= orderedMainIds.length) return;
 
-    markDirty();
-    const nextOrderedIds = arrayMove(orderedMainIds, index, targetIndex);
-    setOrderedMainIds(nextOrderedIds);
+    const newOrder = arrayMove(orderedMainIds, index, targetIndex);
+    setOrderedMainIds(newOrder);
 
     const updatedSections: SectionSettings = { ...sectionsState };
-    nextOrderedIds.forEach((id, idx) => {
+    newOrder.forEach((id, idx) => {
       if (updatedSections[id]) {
         updatedSections[id] = { ...updatedSections[id], order: idx + 1 };
       }
     });
     if (updatedSections.footer) {
-      updatedSections.footer = { ...updatedSections.footer, order: nextOrderedIds.length + 1 };
+      updatedSections.footer = { ...updatedSections.footer, order: 10 };
     }
+
     setSectionsState(updatedSections);
+    setIsDirty(true);
   };
 
-  // Toggle Visibility handler
   const handleToggleVisibility = (id: SectionId) => {
-    markDirty();
-    const current = sectionsState[id];
-    if (!current) return;
-
-    const nextVisible = current.visible === false ? true : false;
-    setSectionsState((prev) => ({
-      ...prev,
+    const current = sectionsState[id]?.visible !== false;
+    const updatedSections: SectionSettings = {
+      ...sectionsState,
       [id]: {
-        ...current,
-        visible: nextVisible,
+        ...sectionsState[id],
+        visible: !current,
       },
-    }));
+    };
+    setSectionsState(updatedSections);
+    setIsDirty(true);
   };
 
-  // Reset to default ordering
   const handleResetDefaults = () => {
-    if (window.confirm('Reset homepage sections to factory default layout and visibility?')) {
-      const defaultSections = defaultWebsiteData.settings.sections;
-      setSectionsState(defaultSections);
-
-      const defaultMainIds = ALL_MAIN_SECTION_IDS
+    if (
+      window.confirm(
+        'Are you sure you want to restore the default section layout and visibility hierarchy?'
+      )
+    ) {
+      const defaults = defaultWebsiteData.settings.sections as SectionSettings;
+      setSectionsState(defaults);
+      const mainIds = ALL_MAIN_SECTION_IDS
         .slice()
-        .sort((a, b) => defaultSections[a].order - defaultSections[b].order);
-
-      setOrderedMainIds(defaultMainIds);
-      markDirty();
+        .sort((a, b) => (defaults[a]?.order ?? 0) - (defaults[b]?.order ?? 0));
+      setOrderedMainIds(mainIds);
+      setIsDirty(true);
     }
   };
 
-  // Cancel changes
   const handleCancel = () => {
     if (data.settings?.sections) {
-      // Ensure all canonical sections are present
-      const currentSections = data.settings.sections;
-      const merged: SectionSettings = { ...currentSections };
+      const merged: SectionSettings = { ...(data.settings.sections as SectionSettings) };
       for (const id of ALL_SECTION_IDS) {
         if (!merged[id]) {
-          merged[id] = defaultWebsiteData.settings.sections[id] || {
-            id, name: id, visible: true, order: 99,
+          merged[id] = {
+            id,
+            name: SECTION_METADATA[id]?.name || id,
+            visible: true,
+            order: (defaultWebsiteData.settings.sections as any)?.[id]?.order ?? 99,
           };
         }
       }
@@ -409,7 +367,6 @@ export const SectionsManager: React.FC = () => {
     }
   };
 
-  // Save Layout
   const handleSaveLayout = async () => {
     if (status === 'saving') return;
     setStatus('saving');
@@ -425,14 +382,17 @@ export const SectionsManager: React.FC = () => {
       if (success) {
         setStatus('saved');
         setIsDirty(false);
+        toast.success('Homepage section layout saved successfully!');
         setTimeout(() => setStatus('idle'), 3500);
       } else {
         setStatus('error');
         setErrorMessage('Failed to persist section layout. Please try again.');
+        toast.error('Failed to persist section layout.');
       }
     } catch (err: any) {
       setStatus('error');
       setErrorMessage(validators.formatFriendlyError(err));
+      toast.error('Error occurred while saving layout.');
     }
   };
 
@@ -446,100 +406,76 @@ export const SectionsManager: React.FC = () => {
   return (
     <div className="max-w-4xl mx-auto space-y-6 pb-20">
       {/* Top Banner / Breadcrumbs & Action Controls */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-6">
+      <Card className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-[10px] font-bold uppercase tracking-widest text-muted">Admin Content CMS</span>
-            <span className="text-xs text-muted">/</span>
-            <span className="text-[10px] font-bold uppercase tracking-widest text-foreground font-mono">
+            <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text-tertiary)]">Admin Content CMS</span>
+            <span className="text-xs text-[var(--color-text-tertiary)]">/</span>
+            <span className="text-[10px] font-bold uppercase tracking-widest text-[var(--color-text-primary)] font-mono">
               HOMEPAGE SECTION ARCHITECTURE
             </span>
           </div>
-          <h1 className="text-2xl font-bold uppercase tracking-tight text-foreground flex items-center gap-2.5">
-            <Layers className="w-6 h-6 text-foreground" />
+          <h1 className="text-2xl font-bold uppercase tracking-tight text-[var(--color-text-primary)] flex items-center gap-2.5">
+            <Layers className="w-6 h-6 text-[var(--color-text-primary)]" />
             <span>Homepage Section Management</span>
           </h1>
-          <p className="text-xs text-muted mt-1">
+          <p className="text-xs text-[var(--color-text-secondary)] mt-1">
             Reorder page flow, toggle section visibility, and configure public presentation hierarchy.
           </p>
         </div>
 
         {/* Global Action Buttons */}
         <div className="flex items-center gap-2.5 shrink-0">
-          <button
-            type="button"
+          <Button
+            variant="secondary"
+            size="sm"
             onClick={handleResetDefaults}
-            className="px-3.5 py-2 rounded-xl border border-border bg-surface text-xs font-medium text-muted hover:text-foreground hover:bg-background transition-colors flex items-center gap-1.5"
+            icon={<RotateCcw className="w-3.5 h-3.5" />}
             title="Restore Factory Default Layout"
           >
-            <RotateCcw className="w-3.5 h-3.5" />
             <span className="hidden md:inline">Defaults</span>
-          </button>
+          </Button>
 
           {isDirty && (
-            <button
-              type="button"
+            <Button
+              variant="secondary"
+              size="sm"
               onClick={handleCancel}
-              className="px-3.5 py-2 rounded-xl border border-border bg-surface text-xs font-medium text-muted hover:text-foreground hover:bg-background transition-colors flex items-center gap-1.5"
+              icon={<Undo2 className="w-3.5 h-3.5" />}
             >
-              <Undo2 className="w-3.5 h-3.5" />
-              <span>Cancel</span>
-            </button>
+              Cancel
+            </Button>
           )}
 
-          <button
-            type="button"
+          <Button
+            variant="primary"
+            size="sm"
             onClick={handleSaveLayout}
             disabled={status === 'saving' || !isDirty}
-            className={`px-5 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition-all shadow-xs ${
-              isDirty
-                ? 'bg-foreground text-background hover:opacity-90 cursor-pointer'
-                : 'bg-surface border border-border text-muted opacity-60 cursor-not-allowed'
-            }`}
+            loading={status === 'saving'}
+            loadingText="Saving..."
+            icon={<Save className="w-4 h-4" />}
           >
-            <Save className="w-4 h-4" />
-            <span>{status === 'saving' ? 'Saving...' : 'Save Layout'}</span>
-          </button>
+            Save Layout
+          </Button>
         </div>
-      </div>
-
-      {/* Success Notification */}
-      {status === 'saved' && (
-        <div className="p-4 rounded-xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-500 flex items-center gap-3 animate-in fade-in duration-200">
-          <CheckCircle2 className="w-5 h-5 shrink-0" />
-          <div className="text-xs">
-            <p className="font-semibold">Homepage layout saved successfully!</p>
-            <p className="opacity-80">The public portfolio will immediately render sections in this updated order.</p>
-          </div>
-        </div>
-      )}
-
-      {/* Error Notification */}
-      {status === 'error' && (
-        <div className="p-4 rounded-xl border border-red-500/30 bg-red-500/10 text-red-500 flex items-center gap-3 animate-in fade-in duration-200">
-          <AlertCircle className="w-5 h-5 shrink-0" />
-          <div className="text-xs">
-            <p className="font-semibold">Failed to save section layout</p>
-            <p className="opacity-90">{errorMessage || 'Please try again.'}</p>
-          </div>
-        </div>
-      )}
+      </Card>
 
       {/* Reorderable Section List Container */}
-      <div className="rounded-2xl border border-border bg-surface p-6 sm:p-8 space-y-6">
-        <div className="border-b border-border pb-4 flex items-center justify-between">
+      <Card className="space-y-6">
+        <div className="border-b border-[var(--color-border-default)] pb-4 flex items-center justify-between">
           <div>
-            <h3 className="text-sm font-bold uppercase tracking-wider text-foreground flex items-center gap-2">
+            <h3 className="text-sm font-bold uppercase tracking-wider text-[var(--color-text-primary)] flex items-center gap-2">
               <Layers className="w-4 h-4" />
               <span>Main Body Sections ({orderedMainIds.length})</span>
             </h3>
-            <p className="text-xs text-muted mt-0.5">
+            <p className="text-xs text-[var(--color-text-tertiary)] mt-0.5">
               Drag items by their grip handle to reorder. Toggle the eye icon to enable or disable public rendering.
             </p>
           </div>
-          <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-background border border-border text-muted">
+          <Badge variant="neutral" size="sm">
             {orderedMainIds.filter((id) => sectionsState[id]?.visible !== false).length} Active
-          </span>
+          </Badge>
         </div>
 
         {/* DND Context & Sortable List */}
@@ -563,83 +499,73 @@ export const SectionsManager: React.FC = () => {
             </div>
           </SortableContext>
         </DndContext>
-      </div>
+      </Card>
 
       {/* Structural Terminal Section: Footer (Pinned) */}
-      <div className="rounded-2xl border border-border bg-surface p-6 sm:p-8 space-y-4">
-        <div className="flex items-center justify-between border-b border-border pb-3">
+      <Card className="space-y-4">
+        <div className="flex items-center justify-between border-b border-[var(--color-border-default)] pb-3">
           <div className="flex items-center gap-2">
-            <Lock className="w-4 h-4 text-muted" />
-            <h3 className="text-xs font-bold uppercase tracking-wider text-foreground">
+            <Lock className="w-4 h-4 text-[var(--color-text-tertiary)]" />
+            <h3 className="text-xs font-bold uppercase tracking-wider text-[var(--color-text-primary)]">
               Terminal Boundary Section (Pinned)
             </h3>
           </div>
-          <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-background border border-border text-muted">
+          <Badge variant="neutral" size="sm">
             STRUCTURAL ANCHOR
-          </span>
+          </Badge>
         </div>
 
         <div
           className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl border transition-all ${
             footerSection.visible !== false
-              ? 'border-border bg-background'
-              : 'border-border/40 bg-background/40 opacity-50'
+              ? 'border-[var(--color-border-default)] bg-[var(--color-background-secondary)]'
+              : 'border-[var(--color-border-subtle)] bg-[var(--color-background-primary)] opacity-60'
           }`}
         >
           <div className="flex items-center gap-3.5 min-w-0">
-            <div className="p-1.5 rounded-lg text-muted opacity-40 shrink-0">
+            <div className="p-1.5 rounded-lg text-[var(--color-text-tertiary)] opacity-40 shrink-0">
               <Lock className="w-4 h-4" />
             </div>
 
-            <div className="w-8 h-8 rounded-lg bg-surface border border-border flex items-center justify-center font-mono text-xs font-bold text-muted shrink-0 shadow-xs">
+            <div className="w-8 h-8 rounded-lg bg-[var(--color-background-primary)] border border-[var(--color-border-default)] flex items-center justify-center font-mono text-xs font-bold text-[var(--color-text-tertiary)] shrink-0 shadow-xs">
               #END
             </div>
 
-            <div className="w-8 h-8 rounded-lg bg-surface border border-border flex items-center justify-center text-foreground shrink-0 hidden sm:flex">
+            <div className="w-8 h-8 rounded-lg bg-[var(--color-background-primary)] border border-[var(--color-border-default)] flex items-center justify-center text-[var(--color-text-primary)] shrink-0 hidden sm:flex">
               <Globe className="w-4 h-4" />
             </div>
 
             <div className="min-w-0">
               <div className="flex items-center gap-2">
-                <h4 className="text-xs font-bold uppercase tracking-wider text-foreground truncate">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-[var(--color-text-primary)] truncate">
                   {SECTION_METADATA.footer.name}
                 </h4>
-                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded-sm bg-surface border border-border text-muted hidden md:inline">
+                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded-sm bg-[var(--color-background-primary)] border border-[var(--color-border-default)] text-[var(--color-text-tertiary)] hidden md:inline">
                   ID: footer
                 </span>
               </div>
-              <p className="text-[11px] text-muted truncate max-w-md">
+              <p className="text-[11px] text-[var(--color-text-tertiary)] truncate max-w-md">
                 {SECTION_METADATA.footer.description}
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-3 self-end sm:self-auto shrink-0">
-            <span
-              className={`px-2.5 py-1 rounded-full text-[10px] font-mono font-semibold uppercase tracking-wider ${
-                footerSection.visible !== false
-                  ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20'
-                  : 'bg-zinc-500/10 text-zinc-400 border border-zinc-500/20'
-              }`}
-            >
+            <Badge variant={footerSection.visible !== false ? 'success' : 'neutral'} size="sm" dot>
               {footerSection.visible !== false ? 'ACTIVE' : 'HIDDEN'}
-            </span>
+            </Badge>
 
-            <button
-              type="button"
+            <Button
+              variant="icon"
+              size="sm"
               onClick={() => handleToggleVisibility('footer')}
-              className={`p-2 rounded-xl border transition-all ${
-                footerSection.visible !== false
-                  ? 'border-border bg-surface text-foreground hover:bg-background'
-                  : 'border-border/60 bg-background text-muted hover:text-foreground'
-              }`}
-              title={footerSection.visible !== false ? 'Hide Footer' : 'Show Footer'}
+              aria-label={footerSection.visible !== false ? 'Hide Footer' : 'Show Footer'}
             >
               {footerSection.visible !== false ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
-            </button>
+            </Button>
           </div>
         </div>
-      </div>
+      </Card>
     </div>
   );
 };

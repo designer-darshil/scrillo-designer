@@ -6,7 +6,7 @@ import {
   Trash2,
   Copy,
   Check,
-  Search,
+  Search as SearchIcon,
   AlertTriangle,
   X,
   ExternalLink,
@@ -20,9 +20,28 @@ import {
 import { useWebsiteData } from '../../hooks/useWebsiteData';
 import { mediaService, MediaAsset } from '../services/mediaService';
 import { validators } from '../utils/validators';
+import {
+  Button,
+  Input,
+  Badge,
+  Alert,
+  Modal,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  Search,
+  Skeleton,
+  EmptyState,
+  useToast,
+} from '../../design-system';
 
 export const MediaManager: React.FC = () => {
   const { data: websiteData } = useWebsiteData();
+  const { success: toastSuccess, error: toastError, info: toastInfo } = useToast();
 
   const [assets, setAssets] = useState<MediaAsset[]>([]);
   const [loading, setLoading] = useState(true);
@@ -49,11 +68,8 @@ export const MediaManager: React.FC = () => {
   } | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  // Toast feedback
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
   const showToast = (msg: string) => {
-    setToastMessage(msg);
-    setTimeout(() => setToastMessage(null), 3500);
+    toastSuccess(msg);
   };
 
   // Load assets on mount
@@ -109,7 +125,7 @@ export const MediaManager: React.FC = () => {
     }
 
     if (validFiles.length === 0) {
-      if (rawFiles.length > 0 && !toastMessage) {
+      if (rawFiles.length > 0) {
         showToast('No valid images (PNG, JPG, JPEG, WEBP, SVG under 10MB) to upload.');
       }
       return;
@@ -171,47 +187,34 @@ export const MediaManager: React.FC = () => {
 
   return (
     <div className="max-w-7xl mx-auto space-y-8 pb-16">
-      {/* Toast Notification */}
-      {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 rounded-xl border border-emerald-500/30 bg-surface p-4 shadow-xl flex items-center gap-3 text-xs text-foreground animate-in fade-in slide-in-from-bottom-2 duration-200">
-          <Check className="w-4 h-4 text-emerald-500 shrink-0" />
-          <span className="font-medium">{toastMessage}</span>
-        </div>
-      )}
-
       {/* Delete Confirmation Modal with In-Use Guard */}
-      {assetToDelete && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="w-full max-w-lg rounded-2xl border border-border bg-surface p-6 sm:p-8 space-y-6 shadow-2xl">
-            <div className="flex items-center gap-3 text-red-500">
-              <div className="p-2.5 rounded-xl bg-red-500/10 border border-red-500/20">
-                <AlertTriangle className="w-6 h-6" />
-              </div>
-              <div>
-                <h3 className="text-base font-bold uppercase tracking-wide text-foreground">Confirm Asset Deletion</h3>
-                <p className="text-xs text-muted">Remove asset file from storage bucket permanently.</p>
-              </div>
-            </div>
+      <Modal
+        isOpen={Boolean(assetToDelete)}
+        onClose={() => setAssetToDelete(null)}
+        title="Confirm Asset Deletion"
+        size="md"
+      >
+        <div className="space-y-4">
+          <Alert variant="error" title="Irreversible Storage Deletion">
+            Remove asset file from storage bucket permanently.
+          </Alert>
 
-            {/* In-use Warning Alert */}
-            {assetToDelete.inUse && (
-              <div className="p-4 rounded-xl border border-amber-500/30 bg-amber-500/10 space-y-2 text-xs text-amber-600 dark:text-amber-400">
-                <div className="flex items-center gap-2 font-bold uppercase tracking-wide">
-                  <AlertTriangle className="w-4 h-4" />
-                  <span>Warning: Asset is currently referenced by published content!</span>
-                </div>
-                <p className="text-[11px] leading-relaxed">
-                  Deleting this media asset may cause broken images on the live website in the following sections:
-                </p>
-                <ul className="list-disc pl-4 space-y-0.5 text-[11px] font-mono text-foreground">
+          {/* In-use Warning Alert */}
+          {assetToDelete?.inUse && (
+            <Alert variant="warning" title="Asset in Active Use!">
+              <div className="space-y-1 mt-1 text-xs">
+                <p>Deleting this media asset may cause broken images on the live website in the following sections:</p>
+                <ul className="list-disc pl-4 font-mono text-[11px]">
                   {assetToDelete.references.map((ref, i) => (
                     <li key={i}>{ref}</li>
                   ))}
                 </ul>
               </div>
-            )}
+            </Alert>
+          )}
 
-            <div className="p-4 rounded-xl bg-background border border-border flex items-center gap-3">
+          {assetToDelete && (
+            <div className="p-3.5 rounded-xl bg-background border border-border flex items-center gap-3">
               <div className="w-14 h-14 rounded-lg overflow-hidden border border-border bg-surface shrink-0">
                 <img
                   src={assetToDelete.asset.url}
@@ -226,104 +229,83 @@ export const MediaManager: React.FC = () => {
                 </p>
               </div>
             </div>
+          )}
 
-            <div className="flex items-center justify-end gap-2.5 pt-2">
-              <button
-                type="button"
-                onClick={() => setAssetToDelete(null)}
-                className="px-4 py-2 rounded-xl border border-border text-xs font-medium text-muted hover:text-foreground hover:bg-background transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={handleConfirmDelete}
-                disabled={isDeleting}
-                className="px-5 py-2 rounded-xl bg-red-500 text-white text-xs font-bold uppercase tracking-wider hover:bg-red-600 transition-colors disabled:opacity-50"
-              >
-                {isDeleting ? 'Deleting...' : 'Delete Asset'}
-              </button>
-            </div>
-          </div>
+          <ModalFooter className="px-0 pb-0">
+            <Button variant="secondary" onClick={() => setAssetToDelete(null)}>
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleConfirmDelete}
+              loading={isDeleting}
+            >
+              Delete Asset
+            </Button>
+          </ModalFooter>
         </div>
-      )}
+      </Modal>
 
       {/* Large Image Preview Modal */}
-      {previewAsset && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-background/85 backdrop-blur-md animate-in fade-in duration-200">
-          <div className="w-full max-w-4xl rounded-2xl border border-border bg-surface shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
-            {/* Modal Header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-border">
+      <Modal
+        isOpen={Boolean(previewAsset)}
+        onClose={() => setPreviewAsset(null)}
+        title={previewAsset?.name || 'Media Asset Preview'}
+        size="lg"
+      >
+        {previewAsset && (
+          <div className="space-y-5">
+            {/* Image Box */}
+            <div className="relative aspect-[16/10] sm:aspect-[16/9] rounded-xl overflow-hidden border border-border bg-background flex items-center justify-center">
+              <img
+                src={previewAsset.url}
+                alt={previewAsset.name}
+                className="w-full h-full object-contain filter grayscale contrast-125 hover:grayscale-0 transition-all duration-300"
+              />
+            </div>
+
+            {/* Asset Metadata Grid */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-4 rounded-xl border border-border bg-background text-xs font-mono">
+              <div>
+                <span className="text-muted block text-[10px] uppercase">Format</span>
+                <span className="text-foreground font-semibold uppercase">{previewAsset.format}</span>
+              </div>
+              <div>
+                <span className="text-muted block text-[10px] uppercase">Dimensions</span>
+                <span className="text-foreground font-semibold">{previewAsset.dimensions}</span>
+              </div>
+              <div>
+                <span className="text-muted block text-[10px] uppercase">File Size</span>
+                <span className="text-foreground font-semibold">{previewAsset.sizeFormatted}</span>
+              </div>
+              <div>
+                <span className="text-muted block text-[10px] uppercase">Uploaded</span>
+                <span className="text-foreground font-semibold">
+                  {new Date(previewAsset.uploadedAt).toLocaleDateString()}
+                </span>
+              </div>
+            </div>
+
+            {/* Direct Link */}
+            <div className="space-y-1.5">
+              <label className="block text-xs font-semibold text-foreground">Direct CDN Asset Link</label>
               <div className="flex items-center gap-2">
-                <FileImage className="w-4 h-4 text-foreground" />
-                <h3 className="text-sm font-bold truncate max-w-md text-foreground">{previewAsset.name}</h3>
-              </div>
-              <button
-                type="button"
-                onClick={() => setPreviewAsset(null)}
-                className="p-1 rounded-lg text-muted hover:text-foreground hover:bg-background transition-colors"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            {/* Modal Body */}
-            <div className="p-6 overflow-y-auto space-y-6 flex-1">
-              {/* Image Box */}
-              <div className="relative aspect-[16/10] sm:aspect-[16/9] rounded-xl overflow-hidden border border-border bg-background flex items-center justify-center">
-                <img
-                  src={previewAsset.url}
-                  alt={previewAsset.name}
-                  className="w-full h-full object-contain filter grayscale contrast-125 hover:grayscale-0 transition-all duration-300"
+                <Input
+                  readOnly
+                  value={previewAsset.url}
+                  className="flex-1 font-mono text-xs"
                 />
-              </div>
-
-              {/* Asset Metadata Grid */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-4 rounded-xl border border-border bg-background text-xs font-mono">
-                <div>
-                  <span className="text-muted block text-[10px] uppercase">Format / Type</span>
-                  <span className="text-foreground font-semibold uppercase">{previewAsset.format}</span>
-                </div>
-                <div>
-                  <span className="text-muted block text-[10px] uppercase">Dimensions</span>
-                  <span className="text-foreground font-semibold">{previewAsset.dimensions}</span>
-                </div>
-                <div>
-                  <span className="text-muted block text-[10px] uppercase">File Size</span>
-                  <span className="text-foreground font-semibold">{previewAsset.sizeFormatted}</span>
-                </div>
-                <div>
-                  <span className="text-muted block text-[10px] uppercase">Uploaded</span>
-                  <span className="text-foreground font-semibold">
-                    {new Date(previewAsset.uploadedAt).toLocaleDateString()}
-                  </span>
-                </div>
-              </div>
-
-              {/* URL & Copy Action */}
-              <div className="space-y-1.5">
-                <label className="block text-xs font-semibold text-foreground">Direct CDN Asset Link</label>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="text"
-                    readOnly
-                    value={previewAsset.url}
-                    className="flex-1 px-3.5 py-2.5 rounded-xl border border-border bg-background text-xs text-foreground font-mono truncate focus:outline-hidden"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => handleCopyLink(previewAsset.url)}
-                    className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-foreground text-background text-xs font-semibold hover:opacity-90 transition-opacity"
-                  >
-                    {copiedUrl ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-                    <span>{copiedUrl ? 'Copied' : 'Copy URL'}</span>
-                  </button>
-                </div>
+                <Button
+                  variant="primary"
+                  onClick={() => handleCopyLink(previewAsset.url)}
+                  icon={copiedUrl ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                >
+                  {copiedUrl ? 'Copied' : 'Copy URL'}
+                </Button>
               </div>
             </div>
 
-            {/* Modal Footer */}
-            <div className="flex items-center justify-between px-6 py-4 border-t border-border bg-surface">
+            <ModalFooter className="px-0 pb-0 justify-between">
               <a
                 href={previewAsset.url}
                 target="_blank"
@@ -334,23 +316,20 @@ export const MediaManager: React.FC = () => {
                 <ExternalLink className="w-3.5 h-3.5" />
               </a>
 
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => handleOpenDelete(previewAsset)}
-                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border border-red-500/30 text-xs font-semibold text-red-500 hover:bg-red-500/10 transition-colors"
-                >
-                  <Trash2 className="w-3.5 h-3.5" />
-                  <span>Delete Asset</span>
-                </button>
-              </div>
-            </div>
+              <Button
+                variant="destructive"
+                onClick={() => handleOpenDelete(previewAsset)}
+                icon={<Trash2 className="w-3.5 h-3.5" />}
+              >
+                Delete Asset
+              </Button>
+            </ModalFooter>
           </div>
-        </div>
-      )}
+        )}
+      </Modal>
 
       {/* Page Header */}
-      <div className="rounded-2xl border border-border bg-surface p-6 sm:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-xs">
+      <Card className="p-6 sm:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-xs">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <span className="font-mono text-xs font-semibold uppercase tracking-wider text-muted flex items-center gap-1.5">
@@ -375,35 +354,34 @@ export const MediaManager: React.FC = () => {
             onChange={(e) => e.target.files && handleFiles(e.target.files)}
             className="hidden"
           />
-          <button
-            type="button"
+          <Button
+            variant="primary"
             onClick={() => fileInputRef.current?.click()}
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-foreground text-background font-semibold text-xs hover:opacity-90 transition-opacity shadow-xs"
+            icon={<Upload className="w-4 h-4" />}
           >
-            <Upload className="w-4 h-4" />
-            <span>Upload New Assets</span>
-          </button>
+            Upload New Assets
+          </Button>
         </div>
-      </div>
+      </Card>
 
       {/* Quick Stats Summary Row */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <div className="p-4 rounded-xl border border-border bg-surface flex flex-col justify-between">
+        <Card className="p-4 flex flex-col justify-between shadow-xs">
           <span className="text-[11px] font-mono text-muted uppercase">Total Media Files</span>
           <span className="text-2xl font-bold text-foreground mt-2">{assets.length}</span>
-        </div>
-        <div className="p-4 rounded-xl border border-border bg-surface flex flex-col justify-between">
+        </Card>
+        <Card className="p-4 flex flex-col justify-between shadow-xs">
           <span className="text-[11px] font-mono text-muted uppercase">Storage Utilized</span>
           <span className="text-2xl font-bold text-foreground mt-2">{totalStorageFormatted}</span>
-        </div>
-        <div className="p-4 rounded-xl border border-border bg-surface flex flex-col justify-between">
+        </Card>
+        <Card className="p-4 flex flex-col justify-between shadow-xs">
           <span className="text-[11px] font-mono text-muted uppercase">Storage Engine</span>
           <span className="text-xs font-mono font-bold text-emerald-500 mt-3">SUPABASE BUCKET</span>
-        </div>
-        <div className="p-4 rounded-xl border border-border bg-surface flex flex-col justify-between">
+        </Card>
+        <Card className="p-4 flex flex-col justify-between shadow-xs">
           <span className="text-[11px] font-mono text-muted uppercase">Supported Formats</span>
           <span className="text-xs font-mono font-bold text-muted mt-3">WEBP, JPG, PNG, SVG</span>
-        </div>
+        </Card>
       </div>
 
       {/* Drag & Drop Upload Zone */}
@@ -436,13 +414,12 @@ export const MediaManager: React.FC = () => {
             <p className="text-xs text-muted">Supports high-res PNG, JPG, JPEG, WEBP, and safe vector SVG</p>
           </div>
 
-          <button
-            type="button"
+          <Button
+            variant="secondary"
             onClick={() => fileInputRef.current?.click()}
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border border-border bg-background text-xs font-semibold text-foreground hover:bg-surface transition-colors"
           >
-            <span>Browse Local Files</span>
-          </button>
+            Browse Local Files
+          </Button>
         </div>
 
         {/* Progress bar */}
@@ -454,7 +431,7 @@ export const MediaManager: React.FC = () => {
             </div>
             <div className="w-full h-2 rounded-full bg-background border border-border overflow-hidden">
               <div
-                className="h-full bg-foreground transition-all duration-200"
+                className="h-full bg-[var(--color-action-primary)] transition-all duration-200"
                 style={{ width: `${uploadProgress}%` }}
               />
             </div>
@@ -463,67 +440,58 @@ export const MediaManager: React.FC = () => {
       </div>
 
       {/* Filter & Search Toolbar */}
-      <div className="rounded-2xl border border-border bg-surface p-4 sm:p-5 space-y-4 shadow-xs">
+      <Card className="p-4 sm:p-5 shadow-xs">
         <div className="flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
-          <div className="relative flex-1">
-            <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-muted" />
-            <input
-              type="text"
+          <div className="flex-1">
+            <Search
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
+              onClear={() => setSearchTerm('')}
               placeholder="Search assets by filename..."
-              className="w-full pl-9 pr-8 py-2 rounded-xl border border-border bg-background text-xs text-foreground placeholder:text-muted focus:outline-hidden focus:ring-1 focus:ring-foreground"
             />
-            {searchTerm && (
-              <button
-                type="button"
-                onClick={() => setSearchTerm('')}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-muted hover:text-foreground"
-              >
-                <X className="w-3.5 h-3.5" />
-              </button>
-            )}
           </div>
 
           <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1">
-            {/* Format Filter Tabs */}
             {(['ALL', 'WEBP', 'JPG', 'PNG', 'SVG'] as const).map((fmt) => (
-              <button
+              <Button
                 key={fmt}
-                type="button"
+                variant={formatFilter === fmt ? 'primary' : 'secondary'}
+                size="sm"
                 onClick={() => setFormatFilter(fmt)}
-                className={`px-3 py-2 rounded-xl text-xs font-semibold transition-all whitespace-nowrap shrink-0 ${
-                  formatFilter === fmt
-                    ? 'bg-foreground text-background shadow-xs'
-                    : 'text-muted hover:text-foreground hover:bg-background'
-                }`}
               >
                 {fmt}
-              </button>
+              </Button>
             ))}
           </div>
         </div>
-      </div>
+      </Card>
 
       {/* Media Grid */}
       {loading ? (
-        <div className="p-16 text-center rounded-2xl border border-border bg-surface text-muted text-xs">
-          <div className="w-6 h-6 border-2 border-foreground border-t-transparent rounded-full animate-spin mx-auto mb-2" />
-          <span>Loading asset library...</span>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-5">
+          <Skeleton variant="card" className="h-44" />
+          <Skeleton variant="card" className="h-44" />
+          <Skeleton variant="card" className="h-44" />
+          <Skeleton variant="card" className="h-44" />
         </div>
       ) : filteredAssets.length === 0 ? (
-        <div className="p-16 text-center rounded-2xl border border-dashed border-border bg-surface text-muted space-y-2">
-          <ImageIcon className="w-8 h-8 mx-auto opacity-30" />
-          <p className="text-sm font-semibold text-foreground">No media assets found</p>
-          <p className="text-xs">Upload images or clear your search query.</p>
-        </div>
+        <EmptyState
+          icon={<ImageIcon className="w-8 h-8" />}
+          title="No media assets found"
+          description="Upload images or adjust your search filter criteria."
+          primaryAction={
+            <Button variant="primary" onClick={() => fileInputRef.current?.click()} icon={<Upload className="w-4 h-4" />}>
+              Upload Assets
+            </Button>
+          }
+        />
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-5">
           {filteredAssets.map((asset) => (
-            <div
+            <Card
               key={asset.id}
               onClick={() => setPreviewAsset(asset)}
-              className="group rounded-2xl border border-border bg-surface overflow-hidden cursor-pointer hover:border-foreground/50 hover:shadow-md transition-all flex flex-col justify-between"
+              className="group overflow-hidden cursor-pointer hover:border-foreground/50 hover:shadow-md transition-all flex flex-col justify-between shadow-xs p-0"
             >
               {/* Thumbnail Container */}
               <div className="relative aspect-[16/10] overflow-hidden bg-background">
@@ -535,10 +503,10 @@ export const MediaManager: React.FC = () => {
 
                 {/* Overlay Preview Trigger */}
                 <div className="absolute inset-0 bg-background/60 backdrop-blur-xs opacity-0 group-hover:opacity-100 flex items-center justify-center gap-2 transition-opacity">
-                  <span className="px-3 py-1.5 rounded-lg bg-foreground text-background text-xs font-semibold flex items-center gap-1 shadow-xs">
+                  <Badge variant="neutral" className="gap-1 shadow-xs font-semibold">
                     <Eye className="w-3.5 h-3.5" />
                     <span>Inspect</span>
-                  </span>
+                  </Badge>
                 </div>
 
                 {/* Format Tag */}
@@ -557,7 +525,7 @@ export const MediaManager: React.FC = () => {
                   <span>{asset.sizeFormatted}</span>
                 </div>
               </div>
-            </div>
+            </Card>
           ))}
         </div>
       )}

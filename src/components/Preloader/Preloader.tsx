@@ -19,6 +19,7 @@ export const Preloader: React.FC<PreloaderProps> = ({
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const brandRef = useRef<HTMLDivElement>(null);
+  const loadingLabelRef = useRef<HTMLDivElement>(null);
   const counterRef = useRef<HTMLSpanElement>(null);
   const progressBarRef = useRef<HTMLDivElement>(null);
 
@@ -29,6 +30,7 @@ export const Preloader: React.FC<PreloaderProps> = ({
     const ctx = gsap.context(() => {
       const container = containerRef.current;
       const brand = brandRef.current;
+      const loadingLabel = loadingLabelRef.current;
       const counter = counterRef.current;
       const progressBar = progressBarRef.current;
 
@@ -52,7 +54,7 @@ export const Preloader: React.FC<PreloaderProps> = ({
         },
       });
 
-      // 1. Brand & Counter reveal (0.0s - 0.3s)
+      // 1. Initial reveal (0.0s - 0.35s)
       masterTl
         .fromTo(
           brand,
@@ -60,13 +62,13 @@ export const Preloader: React.FC<PreloaderProps> = ({
           { opacity: 1, y: 0, duration: 0.35, ease: 'power3.out' }
         )
         .fromTo(
-          counter,
+          [loadingLabel, counter],
           { opacity: 0, y: 6 },
-          { opacity: 1, y: 0, duration: 0.35, ease: 'power3.out' },
+          { opacity: 1, y: 0, duration: 0.35, ease: 'power3.out', stagger: 0.05 },
           '-=0.25'
         );
 
-      // 2. Percentage counter & 1px progress line animation
+      // 2. Percentage counter & progress bar animation
       const progressObj = { value: 0 };
       const countDuration = Math.max(0.7, (duration || 1.2) * 0.75);
 
@@ -128,24 +130,42 @@ export const Preloader: React.FC<PreloaderProps> = ({
         )}
       </div>
 
-      {/* BOTTOM RIGHT: Restrained Percentage Counter */}
-      <div className="flex justify-end items-end">
-        <span
-          ref={counterRef}
-          className="font-mono text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-foreground tabular-nums leading-none"
-        >
-          00%
-        </span>
+      {/* BOTTOM: Loading Label, Percentage Counter & Progress Bar */}
+      <div className="space-y-4 max-w-xl w-full">
+        {/* Label & Counter Row */}
+        <div className="flex items-end justify-between gap-4">
+          <div ref={loadingLabelRef} className="flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-foreground animate-pulse" />
+            <span className="font-mono text-xs sm:text-sm uppercase tracking-widest text-muted">
+              Loading...
+            </span>
+          </div>
+
+          <span
+            ref={counterRef}
+            className="font-mono text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-foreground tabular-nums leading-none"
+          >
+            00%
+          </span>
+        </div>
+
+        {/* Visible Progress Bar Track & Fill */}
+        <div className="w-full h-1 sm:h-1.5 rounded-full bg-border/40 overflow-hidden">
+          <div
+            ref={progressBarRef}
+            className="h-full w-full bg-foreground rounded-full scale-x-0 origin-left will-change-transform"
+          />
+        </div>
       </div>
 
-      {/* BOTTOM: 1px Hairline Progress Line (0 -> 100%) */}
+      {/* BOTTOM EDGE: Subtle 1px Hairline */}
       <div
         aria-hidden="true"
-        className="absolute bottom-0 left-0 w-full h-[1px] bg-border/40 overflow-hidden"
+        className="absolute bottom-0 left-0 w-full h-[1px] bg-border/30 overflow-hidden"
       >
         <div
-          ref={progressBarRef}
-          className="w-full h-full bg-foreground scale-x-0 origin-left will-change-transform"
+          className="w-full h-full bg-foreground/60 scale-x-0 origin-left"
+          style={{ transform: progressBarRef.current?.style.transform }}
         />
       </div>
     </div>

@@ -30,6 +30,11 @@ export const defaultWebsiteData: WebsiteData = {
       cursorEnabled: true,
       marqueeEnabled: true,
     },
+    preloader: {
+      enabled: true,
+      duration: 1.2,
+      animationEnabled: true,
+    },
     enableCustomCursor: true,
     enableSmoothScroll: true,
     enableMarqueeVelocity: true,
@@ -63,6 +68,25 @@ export const defaultWebsiteData: WebsiteData = {
       footer: { id: 'footer', name: 'Footer', visible: true, order: 10 },
       experience: { id: 'experience', name: 'Experience & Career', visible: true, order: 11 },
     },
+  },
+
+  header: {
+    brandName: '', // Defaults to profile.name if empty
+    brandSuffix: '®',
+    roleText: '', // Defaults to profile.title if empty
+    showHeader: true,
+    showRole: true,
+    showNavigation: true,
+    showThemeToggle: true,
+    showContactButton: false,
+    contactButtonText: "Let's Talk",
+    contactButtonHref: '#contact',
+    navigationItems: [
+      { id: 'home', label: 'Home', href: '#home', visible: true, order: 1, external: false },
+      { id: 'about', label: 'About', href: '#about', visible: true, order: 2, external: false },
+      { id: 'works', label: 'Works', href: '#works', visible: true, order: 3, external: false },
+      { id: 'contact', label: "Let's Talk", href: '#contact', visible: true, order: 4, external: false },
+    ],
   },
 
   profile: {

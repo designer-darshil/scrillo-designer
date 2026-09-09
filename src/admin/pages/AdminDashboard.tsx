@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import {
   FolderGit2,
   FileClock,
@@ -12,33 +12,31 @@ import {
   Settings,
   Plus,
   ExternalLink,
-  Activity,
   Layers,
   Upload,
   ChevronRight,
   CheckCircle,
   TrendingUp,
   RefreshCw,
-  Edit3,
+  Tag,
+  Palette,
 } from 'lucide-react';
 
 import { useWebsiteData } from '../../hooks/useWebsiteData';
 import { mediaService, MediaAsset } from '../services/mediaService';
 import { activityService, ActivityEvent } from '../services/activityService';
-import { publishService } from '../services/publishService';
 import { useAuth } from '../context/AuthContext';
 import { Project } from '../../types';
 import {
   Button,
   Badge,
   Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
   Skeleton,
   EmptyState,
-  Search,
+  StatCard,
+  ActivityFeed,
+  QuickActionGrid,
+  QuickActionItem,
 } from '../../design-system';
 
 // Helper for formatting relative time
@@ -82,14 +80,13 @@ function formatExactDateTime(dateStr?: string): string {
 }
 
 export const AdminDashboard: React.FC = () => {
-  const { data, loading: contextLoading } = useWebsiteData();
+  const { data } = useWebsiteData();
   const { profile, role, isEditor } = useAuth();
+  const navigate = useNavigate();
 
   // Local state for statistics and activity audit log
   const [mediaAssets, setMediaAssets] = useState<MediaAsset[]>([]);
   const [activities, setActivities] = useState<ActivityEvent[]>([]);
-  const [activityFilter, setActivityFilter] = useState('');
-  const [lastPublishedDate, setLastPublishedDate] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
@@ -127,31 +124,75 @@ export const AdminDashboard: React.FC = () => {
 
   const totalMediaCount = mediaAssets.length || 24;
   const totalMediaSizeBytes = mediaAssets.reduce((acc, a) => acc + (a.size || 0), 0);
-  const totalMediaSizeFormatted = totalMediaSizeBytes > 0
-    ? `${(totalMediaSizeBytes / (1024 * 1024)).toFixed(1)} MB`
-    : '4.2 MB';
+  const totalMediaSizeFormatted =
+    totalMediaSizeBytes > 0
+      ? `${(totalMediaSizeBytes / (1024 * 1024)).toFixed(1)} MB`
+      : '4.2 MB';
 
   const sectionsConfig = data?.settings?.sections || {};
   const totalSectionsCount = Object.keys(sectionsConfig).length || 10;
-  const visibleSectionsCount = Object.values(sectionsConfig).filter((s: any) => s?.visible !== false).length || 9;
+  const visibleSectionsCount =
+    Object.values(sectionsConfig).filter((s: any) => s?.visible !== false).length || 9;
 
-  const effectiveLastUpdated = lastPublishedDate || new Date().toISOString();
+  const effectiveLastUpdated = new Date().toISOString();
 
   // Sort recent projects by updatedAt descending
   const recentProjects = [...projects]
     .sort((a, b) => new Date(b.updatedAt || 0).getTime() - new Date(a.updatedAt || 0).getTime())
     .slice(0, 5);
 
-  // Filter activities
-  const filteredActivities = activities.filter((act) => {
-    if (!activityFilter.trim()) return true;
-    const q = activityFilter.toLowerCase();
-    return (
-      act.action.toLowerCase().includes(q) ||
-      act.item.toLowerCase().includes(q) ||
-      act.user.toLowerCase().includes(q)
-    );
-  });
+  // Quick Action Items for the Watermelon UI QuickActionGrid adapter
+  const quickActions: QuickActionItem[] = [
+    {
+      id: 'new-project',
+      label: 'New Project',
+      description: 'Create and publish an editorial case study',
+      icon: Plus,
+      onClick: () => navigate('/admin/projects/new'),
+      badge: 'Action',
+      shortcut: 'N',
+    },
+    {
+      id: 'upload-media',
+      label: 'Media Library',
+      description: 'Upload high-res imagery & manage assets',
+      icon: Upload,
+      onClick: () => navigate('/admin/media'),
+      badge: `${totalMediaCount} files`,
+      shortcut: 'M',
+    },
+    {
+      id: 'edit-content',
+      label: 'Website Content',
+      description: 'Manifesto, Hero headline & statements',
+      icon: FileText,
+      onClick: () => navigate('/admin/content'),
+      shortcut: 'C',
+    },
+    {
+      id: 'manage-services',
+      label: 'Services & Scope',
+      description: 'Client deliverables, pricing & offerings',
+      icon: Briefcase,
+      onClick: () => navigate('/admin/services'),
+      shortcut: 'S',
+    },
+    {
+      id: 'categories',
+      label: 'Categories',
+      description: 'Portfolio filtering taxonomy & tags',
+      icon: Tag,
+      onClick: () => navigate('/admin/categories'),
+    },
+    {
+      id: 'design-system',
+      label: 'Design System',
+      description: 'Inspect tokens, components & contrast',
+      icon: Palette,
+      onClick: () => navigate('/admin/design-system'),
+      badge: 'Tokens',
+    },
+  ];
 
   return (
     <div className="space-y-8 max-w-[var(--admin-content-max-width)] mx-auto">
@@ -214,7 +255,7 @@ export const AdminDashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* 2. REAL DATABASE STATISTICS CARDS */}
+      {/* 2. REAL DATABASE STATISTICS CARDS (Using Watermelon UI StatCard Adapter) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         {isLoading ? (
           Array.from({ length: 5 }).map((_, i) => (
@@ -222,115 +263,84 @@ export const AdminDashboard: React.FC = () => {
           ))
         ) : (
           <>
-            {/* 1. Published Projects */}
-            <Card className="space-y-3.5">
-              <div className="flex items-start justify-between">
-                <div className="w-10 h-10 rounded-lg bg-[var(--color-background-primary)] border border-[var(--color-border-default)] flex items-center justify-center text-[var(--color-text-primary)]">
-                  <FolderGit2 className="w-5 h-5" />
-                </div>
-                <Badge variant="success" size="sm">
-                  Live
-                </Badge>
-              </div>
-              <div>
-                <p className="text-xs font-medium text-[var(--color-text-tertiary)]">Published Projects</p>
-                <h3 className="text-2xl font-bold tracking-tight text-[var(--color-text-primary)] mt-0.5">
-                  {publishedCount}
-                </h3>
-                <p className="text-[11px] text-[var(--color-text-tertiary)] mt-1 truncate">
-                  {publishedCount === 1 ? '1 active showcase' : `${publishedCount} active showcases`}
-                </p>
-              </div>
-            </Card>
+            <StatCard
+              title="Published Projects"
+              value={publishedCount}
+              subtitle={publishedCount === 1 ? '1 active showcase' : `${publishedCount} active showcases`}
+              icon={FolderGit2}
+              badgeText="Live"
+              badgeVariant="success"
+              trend={{
+                value: `${publishedCount} live`,
+                direction: 'up',
+                label: 'vs drafts',
+              }}
+              onClick={() => navigate('/admin/projects')}
+            />
 
-            {/* 2. Draft Projects */}
-            <Card className="space-y-3.5">
-              <div className="flex items-start justify-between">
-                <div className="w-10 h-10 rounded-lg bg-[var(--color-background-primary)] border border-[var(--color-border-default)] flex items-center justify-center text-[var(--color-text-primary)]">
-                  <FileClock className="w-5 h-5" />
-                </div>
-                <Badge variant={draftCount > 0 ? 'warning' : 'neutral'} size="sm">
-                  {draftCount > 0 ? `${draftCount} staging` : 'Ready'}
-                </Badge>
-              </div>
-              <div>
-                <p className="text-xs font-medium text-[var(--color-text-tertiary)]">Draft Projects</p>
-                <h3 className="text-2xl font-bold tracking-tight text-[var(--color-text-primary)] mt-0.5">
-                  {draftCount}
-                </h3>
-                <p className="text-[11px] text-[var(--color-text-tertiary)] mt-1 truncate">
-                  {draftCount > 0 ? 'Unpublished works' : 'No draft backlogs'}
-                </p>
-              </div>
-            </Card>
+            <StatCard
+              title="Draft Projects"
+              value={draftCount}
+              subtitle={draftCount > 0 ? 'Unpublished works' : 'No draft backlogs'}
+              icon={FileClock}
+              badgeText={draftCount > 0 ? `${draftCount} staging` : 'Ready'}
+              badgeVariant={draftCount > 0 ? 'warning' : 'neutral'}
+              trend={{
+                value: `${draftCount} pending`,
+                direction: draftCount > 0 ? 'down' : 'neutral',
+                label: 'review needed',
+              }}
+              onClick={() => navigate('/admin/projects')}
+            />
 
-            {/* 3. Total Media */}
-            <Card className="space-y-3.5">
-              <div className="flex items-start justify-between">
-                <div className="w-10 h-10 rounded-lg bg-[var(--color-background-primary)] border border-[var(--color-border-default)] flex items-center justify-center text-[var(--color-text-primary)]">
-                  <ImageIcon className="w-5 h-5" />
-                </div>
-                <Badge variant="info" size="sm">
-                  {totalMediaSizeFormatted}
-                </Badge>
-              </div>
-              <div>
-                <p className="text-xs font-medium text-[var(--color-text-tertiary)]">Total Media</p>
-                <h3 className="text-2xl font-bold tracking-tight text-[var(--color-text-primary)] mt-0.5">
-                  {totalMediaCount}
-                </h3>
-                <p className="text-[11px] text-[var(--color-text-tertiary)] mt-1 truncate">
-                  CDN assets stored
-                </p>
-              </div>
-            </Card>
+            <StatCard
+              title="Media Assets"
+              value={totalMediaCount}
+              subtitle="CDN assets stored"
+              icon={ImageIcon}
+              badgeText={totalMediaSizeFormatted}
+              badgeVariant="info"
+              trend={{
+                value: totalMediaSizeFormatted,
+                direction: 'up',
+                label: 'storage',
+              }}
+              onClick={() => navigate('/admin/media')}
+            />
 
-            {/* 4. Visible Sections */}
-            <Card className="space-y-3.5">
-              <div className="flex items-start justify-between">
-                <div className="w-10 h-10 rounded-lg bg-[var(--color-background-primary)] border border-[var(--color-border-default)] flex items-center justify-center text-[var(--color-text-primary)]">
-                  <Layers className="w-5 h-5" />
-                </div>
-                <Badge variant="neutral" size="sm">
-                  {visibleSectionsCount} / {totalSectionsCount}
-                </Badge>
-              </div>
-              <div>
-                <p className="text-xs font-medium text-[var(--color-text-tertiary)]">Visible Sections</p>
-                <h3 className="text-2xl font-bold tracking-tight text-[var(--color-text-primary)] mt-0.5">
-                  {visibleSectionsCount}
-                </h3>
-                <p className="text-[11px] text-[var(--color-text-tertiary)] mt-1 truncate">
-                  Homepage components active
-                </p>
-              </div>
-            </Card>
+            <StatCard
+              title="Active Sections"
+              value={`${visibleSectionsCount} / ${totalSectionsCount}`}
+              subtitle="Homepage components active"
+              icon={Layers}
+              badgeText="Configured"
+              badgeVariant="neutral"
+              trend={{
+                value: `${Math.round((visibleSectionsCount / (totalSectionsCount || 1)) * 100)}%`,
+                direction: 'up',
+                label: 'visibility',
+              }}
+              onClick={() => navigate('/admin/content/sections')}
+            />
 
-            {/* 5. Last Updated */}
-            <Card className="space-y-3.5 sm:col-span-2 lg:col-span-1">
-              <div className="flex items-start justify-between">
-                <div className="w-10 h-10 rounded-lg bg-[var(--color-background-primary)] border border-[var(--color-border-default)] flex items-center justify-center text-[var(--color-text-primary)]">
-                  <Clock className="w-5 h-5" />
-                </div>
-                <Badge variant="success" size="sm">
-                  Synced
-                </Badge>
-              </div>
-              <div>
-                <p className="text-xs font-medium text-[var(--color-text-tertiary)]">Last Updated</p>
-                <h3 className="text-base sm:text-lg font-bold tracking-tight text-[var(--color-text-primary)] mt-0.5 truncate" title={formatExactDateTime(effectiveLastUpdated)}>
-                  {formatRelativeTime(effectiveLastUpdated)}
-                </h3>
-                <p className="text-[11px] text-[var(--color-text-tertiary)] mt-1 truncate" title={profile?.email || 'admin@scrillo.design'}>
-                  By {profile?.email?.split('@')[0] || 'admin'}
-                </p>
-              </div>
-            </Card>
+            <StatCard
+              title="Sync Status"
+              value="Live"
+              subtitle={`By ${profile?.email?.split('@')[0] || 'admin'}`}
+              icon={Clock}
+              badgeText="Synced"
+              badgeVariant="success"
+              trend={{
+                value: formatRelativeTime(effectiveLastUpdated),
+                direction: 'neutral',
+                label: 'last update',
+              }}
+            />
           </>
         )}
       </div>
 
-      {/* 3. QUICK ACTIONS BAR */}
+      {/* 3. QUICK ACTIONS GRID (Using Watermelon UI QuickActionGrid Adapter) */}
       <div className="space-y-3.5">
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-bold tracking-tight text-[var(--color-text-primary)] flex items-center gap-2">
@@ -339,74 +349,10 @@ export const AdminDashboard: React.FC = () => {
           <span className="text-xs text-[var(--color-text-tertiary)] font-mono">Common admin workflows</span>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-          <NavLink
-            to="/admin/projects/new"
-            className="group flex flex-col justify-between p-4 rounded-2xl border border-[var(--color-border-default)] bg-[var(--color-background-secondary)] hover:border-[var(--color-border-strong)] hover:bg-[var(--color-background-elevated)] transition-all shadow-xs"
-          >
-            <div className="flex items-center justify-between mb-3">
-              <div className="w-9 h-9 rounded-lg bg-[var(--color-action-primary)] text-[var(--color-text-inverse)] flex items-center justify-center group-hover:scale-105 transition-transform">
-                <Plus className="w-4 h-4" />
-              </div>
-              <ArrowUpRight className="w-3.5 h-3.5 text-[var(--color-text-tertiary)] group-hover:text-[var(--color-text-primary)] transition-all" />
-            </div>
-            <div>
-              <h3 className="font-bold text-xs sm:text-sm text-[var(--color-text-primary)]">New Project</h3>
-              <p className="text-[11px] text-[var(--color-text-tertiary)] mt-0.5 truncate">Create case study</p>
-            </div>
-          </NavLink>
-
-          <NavLink
-            to="/admin/media"
-            className="group flex flex-col justify-between p-4 rounded-2xl border border-[var(--color-border-default)] bg-[var(--color-background-secondary)] hover:border-[var(--color-border-strong)] hover:bg-[var(--color-background-elevated)] transition-all shadow-xs"
-          >
-            <div className="flex items-center justify-between mb-3">
-              <div className="w-9 h-9 rounded-lg bg-[var(--color-background-primary)] border border-[var(--color-border-default)] text-[var(--color-text-primary)] flex items-center justify-center group-hover:bg-[var(--color-action-primary)] group-hover:text-[var(--color-text-inverse)] transition-colors">
-                <Upload className="w-4 h-4" />
-              </div>
-              <ArrowUpRight className="w-3.5 h-3.5 text-[var(--color-text-tertiary)] group-hover:text-[var(--color-text-primary)] transition-all" />
-            </div>
-            <div>
-              <h3 className="font-bold text-xs sm:text-sm text-[var(--color-text-primary)]">Upload Media</h3>
-              <p className="text-[11px] text-[var(--color-text-tertiary)] mt-0.5 truncate">Add images & assets</p>
-            </div>
-          </NavLink>
-
-          <NavLink
-            to="/admin/content"
-            className="group flex flex-col justify-between p-4 rounded-2xl border border-[var(--color-border-default)] bg-[var(--color-background-secondary)] hover:border-[var(--color-border-strong)] hover:bg-[var(--color-background-elevated)] transition-all shadow-xs"
-          >
-            <div className="flex items-center justify-between mb-3">
-              <div className="w-9 h-9 rounded-lg bg-[var(--color-background-primary)] border border-[var(--color-border-default)] text-[var(--color-text-primary)] flex items-center justify-center group-hover:bg-[var(--color-action-primary)] group-hover:text-[var(--color-text-inverse)] transition-colors">
-                <Edit3 className="w-4 h-4" />
-              </div>
-              <ArrowUpRight className="w-3.5 h-3.5 text-[var(--color-text-tertiary)] group-hover:text-[var(--color-text-primary)] transition-all" />
-            </div>
-            <div>
-              <h3 className="font-bold text-xs sm:text-sm text-[var(--color-text-primary)]">Edit Homepage</h3>
-              <p className="text-[11px] text-[var(--color-text-tertiary)] mt-0.5 truncate">Manifesto, Hero & Copy</p>
-            </div>
-          </NavLink>
-
-          <NavLink
-            to="/admin/services"
-            className="group flex flex-col justify-between p-4 rounded-2xl border border-[var(--color-border-default)] bg-[var(--color-background-secondary)] hover:border-[var(--color-border-strong)] hover:bg-[var(--color-background-elevated)] transition-all shadow-xs"
-          >
-            <div className="flex items-center justify-between mb-3">
-              <div className="w-9 h-9 rounded-lg bg-[var(--color-background-primary)] border border-[var(--color-border-default)] text-[var(--color-text-primary)] flex items-center justify-center group-hover:bg-[var(--color-action-primary)] group-hover:text-[var(--color-text-inverse)] transition-colors">
-                <Briefcase className="w-4 h-4" />
-              </div>
-              <ArrowUpRight className="w-3.5 h-3.5 text-[var(--color-text-tertiary)] group-hover:text-[var(--color-text-primary)] transition-all" />
-            </div>
-            <div>
-              <h3 className="font-bold text-xs sm:text-sm text-[var(--color-text-primary)]">Manage Services</h3>
-              <p className="text-[11px] text-[var(--color-text-tertiary)] mt-0.5 truncate">Scope & Deliverables</p>
-            </div>
-          </NavLink>
-        </div>
+        <QuickActionGrid actions={quickActions} columns={3} />
       </div>
 
-      {/* 4. MAIN CONTENT GRID: RECENT PROJECTS & RECENT ACTIVITY */}
+      {/* 4. MAIN CONTENT GRID: RECENT PROJECTS & RECENT ACTIVITY AUDIT */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-8">
           {/* Recent Projects */}
@@ -517,107 +463,20 @@ export const AdminDashboard: React.FC = () => {
             )}
           </Card>
 
-          {/* Recent Activity Table */}
-          <Card className="p-0 overflow-hidden">
-            <div className="p-5 border-b border-[var(--color-border-default)] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-[var(--color-background-primary)] border border-[var(--color-border-default)] flex items-center justify-center text-[var(--color-text-primary)]">
-                  <Activity className="w-4 h-4" />
-                </div>
-                <div>
-                  <h2 className="font-bold text-sm text-[var(--color-text-primary)]">Recent Activity</h2>
-                  <p className="text-xs text-[var(--color-text-tertiary)]">Audit trail of system modifications and content edits</p>
-                </div>
-              </div>
-
-              <div className="relative w-full sm:w-48">
-                <Search
-                  placeholder="Filter activity..."
-                  value={activityFilter}
-                  onChange={(e) => setActivityFilter(e.target.value)}
-                />
-              </div>
-            </div>
-
-            {isLoading ? (
-              <div className="p-5 space-y-3">
-                <Skeleton variant="text" lines={4} />
-              </div>
-            ) : filteredActivities.length === 0 ? (
-              <div className="p-8">
-                <EmptyState
-                  title="No Activities Found"
-                  description={
-                    activityFilter
-                      ? `No activity events match "${activityFilter}".`
-                      : 'No recent events recorded in the database audit log.'
-                  }
-                  primaryAction={
-                    activityFilter ? (
-                      <Button variant="secondary" size="sm" onClick={() => setActivityFilter('')}>
-                        Clear Filter
-                      </Button>
-                    ) : undefined
-                  }
-                />
-              </div>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs border-collapse">
-                  <thead>
-                    <tr className="border-b border-[var(--color-border-default)] bg-[var(--color-background-primary)]/50 text-[var(--color-text-tertiary)] font-mono uppercase text-[11px]">
-                      <th className="py-3 px-5">Action</th>
-                      <th className="py-3 px-4">Item</th>
-                      <th className="py-3 px-4 hidden sm:table-cell">User</th>
-                      <th className="py-3 px-4 text-right">Date</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-[var(--color-border-subtle)]">
-                    {filteredActivities.slice(0, 8).map((act) => {
-                      const isDeleted = act.action.toLowerCase().includes('delete');
-                      const isPub = act.action.toLowerCase().includes('publish');
-                      const isUpload = act.action.toLowerCase().includes('upload');
-
-                      return (
-                        <tr key={act.id} className="hover:bg-[var(--color-background-elevated)]/40 transition-colors">
-                          <td className="py-3.5 px-5">
-                            <Badge
-                              variant={isDeleted ? 'error' : isPub ? 'success' : isUpload ? 'info' : 'neutral'}
-                              size="sm"
-                            >
-                              {act.action}
-                            </Badge>
-                          </td>
-                          <td className="py-3.5 px-4 font-medium text-[var(--color-text-primary)] max-w-xs truncate">
-                            <span title={act.item}>{act.item}</span>
-                          </td>
-                          <td className="py-3.5 px-4 hidden sm:table-cell text-[var(--color-text-tertiary)] text-[11px] truncate max-w-[140px]">
-                            <span title={act.user}>{act.user}</span>
-                          </td>
-                          <td
-                            className="py-3.5 px-4 text-right text-[var(--color-text-tertiary)] text-[11px] whitespace-nowrap font-mono"
-                            title={formatExactDateTime(act.timestamp)}
-                          >
-                            {formatRelativeTime(act.timestamp)}
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            )}
-
-            <div className="p-3.5 border-t border-[var(--color-border-default)] bg-[var(--color-background-primary)]/30 flex items-center justify-between text-[11px] text-[var(--color-text-tertiary)] font-mono">
-              <span>
-                Showing {Math.min(filteredActivities.length, 8)} of {filteredActivities.length} logged events
-              </span>
-              <span className="flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                Audit Log Active
-              </span>
-            </div>
-          </Card>
+          {/* Activity Feed (Using Watermelon UI ActivityFeed Adapter) */}
+          <ActivityFeed
+            activities={activities.map((act) => ({
+              id: act.id,
+              action: act.action,
+              item: act.item,
+              section: act.section || 'General',
+              user: act.user,
+              timestamp: act.timestamp,
+              status: act.status || 'Updated',
+            }))}
+            title="Recent Activity & Audit Log"
+            maxItems={10}
+          />
         </div>
 
         {/* System Health & Quick Modules */}

@@ -27,12 +27,15 @@ import {
   User,
   Palette,
   Lock,
+  Compass,
+  Search,
+  Plus,
 } from 'lucide-react';
 import { useTheme } from '../../hooks/useTheme';
 import { useAuth } from '../hooks/useAuth';
 import { useWebsiteData } from '../../hooks/useWebsiteData';
 import { PublishReviewModal } from '../components/PublishReviewModal';
-import { Avatar, Button, Badge } from '../../design-system';
+import { Avatar, Button, Badge, CommandPalette, CommandItem } from '../../design-system';
 
 interface NavItem {
   path: string;
@@ -46,6 +49,7 @@ const navItems: NavItem[] = [
   { path: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { path: '/admin/profile', label: 'Profile', icon: User },
   { path: '/admin/content', label: 'Website Content', icon: FileText },
+  { path: '/admin/content/header', label: 'Header & Nav', icon: Compass },
   { path: '/admin/content/sections', label: 'Section Layout', icon: Layers, badge: '10' },
   { path: '/admin/content/footer', label: 'Footer & Outreach', icon: Globe },
   { path: '/admin/categories', label: 'Categories', icon: Tag, badge: '9' },
@@ -66,10 +70,23 @@ export const AdminLayout: React.FC = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
+  const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
   const [reverting, setReverting] = useState(false);
 
   const location = useLocation();
   const navigate = useNavigate();
+
+  // Global ⌘K / Ctrl+K listener for CommandPalette
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setIsCommandPaletteOpen((prev) => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   const currentNav =
     navItems
@@ -105,6 +122,161 @@ export const AdminLayout: React.FC = () => {
   const userEmail = user?.email || 'darshilbhuva4322@gmail.com';
   const userName = userEmail.split('@')[0];
 
+  // Watermelon UI Command Palette items
+  const commands: CommandItem[] = [
+    // Navigation
+    {
+      id: 'nav-dashboard',
+      label: 'Dashboard',
+      description: 'Overview, analytics and live statistics',
+      category: 'Navigation',
+      icon: LayoutDashboard,
+      shortcut: 'G D',
+      onSelect: () => navigate('/admin/dashboard'),
+    },
+    {
+      id: 'nav-profile',
+      label: 'Profile',
+      description: 'Personal details, bio, and credentials',
+      category: 'Navigation',
+      icon: User,
+      shortcut: 'G P',
+      onSelect: () => navigate('/admin/profile'),
+    },
+    {
+      id: 'nav-content',
+      label: 'Website Content',
+      description: 'Homepage headline, manifesto & statements',
+      category: 'Navigation',
+      icon: FileText,
+      shortcut: 'G C',
+      onSelect: () => navigate('/admin/content'),
+    },
+    {
+      id: 'nav-header-nav',
+      label: 'Header & Navigation',
+      description: 'Top navigation links and CTA configuration',
+      category: 'Navigation',
+      icon: Compass,
+      shortcut: 'G H',
+      onSelect: () => navigate('/admin/content/header'),
+    },
+    {
+      id: 'nav-sections',
+      label: 'Section Layout',
+      description: 'Manage homepage section ordering & visibility',
+      category: 'Navigation',
+      icon: Layers,
+      onSelect: () => navigate('/admin/content/sections'),
+    },
+    {
+      id: 'nav-projects',
+      label: 'Projects & Case Studies',
+      description: 'Create, update and manage portfolio projects',
+      category: 'Navigation',
+      icon: FolderGit2,
+      shortcut: 'G W',
+      onSelect: () => navigate('/admin/projects'),
+    },
+    {
+      id: 'nav-media',
+      label: 'Media Library',
+      description: 'Upload and manage image/video assets',
+      category: 'Navigation',
+      icon: ImageIcon,
+      shortcut: 'G M',
+      onSelect: () => navigate('/admin/media'),
+    },
+    {
+      id: 'nav-categories',
+      label: 'Categories',
+      description: 'Project tags and filter taxonomies',
+      category: 'Navigation',
+      icon: Tag,
+      onSelect: () => navigate('/admin/categories'),
+    },
+    {
+      id: 'nav-skills',
+      label: 'Skills Matrix',
+      description: 'Technical competencies & design tools',
+      category: 'Navigation',
+      icon: Sparkles,
+      onSelect: () => navigate('/admin/skills'),
+    },
+    {
+      id: 'nav-services',
+      label: 'Services & Scope',
+      description: 'Design offerings, pricing and deliverables',
+      category: 'Navigation',
+      icon: Briefcase,
+      onSelect: () => navigate('/admin/services'),
+    },
+    {
+      id: 'nav-design-system',
+      label: 'Design System',
+      description: 'Tokens, contrast checker & component matrix',
+      category: 'Navigation',
+      icon: Palette,
+      onSelect: () => navigate('/admin/design-system'),
+    },
+    {
+      id: 'nav-settings',
+      label: 'System Settings',
+      description: 'Theme configuration, CSS tokens and SEO',
+      category: 'Navigation',
+      icon: Settings,
+      shortcut: 'G S',
+      onSelect: () => navigate('/admin/settings'),
+    },
+
+    // Quick Actions
+    {
+      id: 'action-new-project',
+      label: 'Create New Project',
+      description: 'Launch a new case study draft',
+      category: 'Actions',
+      icon: Plus,
+      shortcut: 'N',
+      onSelect: () => navigate('/admin/projects/new'),
+    },
+    {
+      id: 'action-upload-media',
+      label: 'Upload Media Asset',
+      description: 'Add new image or asset to library',
+      category: 'Actions',
+      icon: UploadCloud,
+      onSelect: () => navigate('/admin/media'),
+    },
+    {
+      id: 'action-preview-site',
+      label: 'Preview Live / Draft Website',
+      description: 'Open website in new preview window',
+      category: 'Actions',
+      icon: Eye,
+      shortcut: 'P',
+      onSelect: () => window.open('/?preview=true', '_blank'),
+    },
+    {
+      id: 'action-publish-draft',
+      label: 'Publish Draft Changes',
+      description: 'Review and push draft revisions live',
+      category: 'Actions',
+      icon: UploadCloud,
+      onSelect: () => setIsPublishModalOpen(true),
+    },
+
+    // Theme & Preferences
+    {
+      id: 'theme-toggle',
+      label: `Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Mode`,
+      description: 'Toggle UI color theme',
+      category: 'Preferences',
+      icon: theme === 'dark' ? Sun : Moon,
+      shortcut: 'T',
+      onSelect: toggleTheme,
+    },
+  ];
+
   return (
     <div className="min-h-screen bg-[var(--color-background-primary)] text-[var(--color-text-primary)] flex flex-col lg:flex-row antialiased selection:bg-[var(--color-text-primary)] selection:text-[var(--color-background-primary)]">
       {/* Mobile Drawer Backdrop */}
@@ -134,6 +306,16 @@ export const AdminLayout: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-1.5 shrink-0">
+          {/* Mobile Command Search Button */}
+          <Button
+            variant="icon"
+            size="sm"
+            onClick={() => setIsCommandPaletteOpen(true)}
+            aria-label="Search and commands (⌘K)"
+          >
+            <Search className="w-4 h-4 text-[var(--color-text-secondary)]" />
+          </Button>
+
           {/* Quick Publish badge on mobile if modified */}
           {isDraftModified && (
             <Button
@@ -387,6 +569,19 @@ export const AdminLayout: React.FC = () => {
             <h1 className="text-base font-bold tracking-tight text-[var(--color-text-primary)]">{currentNav.label}</h1>
           </div>
 
+          {/* Center Search / Command Trigger */}
+          <button
+            type="button"
+            onClick={() => setIsCommandPaletteOpen(true)}
+            className="flex items-center gap-2.5 px-3.5 py-1.5 rounded-xl border border-[var(--color-border-default)] bg-[var(--color-background-primary)] text-xs text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] hover:border-[var(--color-border-strong)] transition-all shadow-2xs group"
+          >
+            <Search className="w-3.5 h-3.5 text-[var(--color-text-tertiary)] group-hover:text-[var(--color-text-primary)] transition-colors" />
+            <span className="text-xs">Quick search or command...</span>
+            <kbd className="inline-flex items-center rounded border border-[var(--color-border-default)] bg-[var(--color-background-secondary)] px-1.5 py-0.5 font-mono text-[10px] text-[var(--color-text-tertiary)] ml-2">
+              ⌘K
+            </kbd>
+          </button>
+
           {/* Right Header Controls (Workflow & Actions) */}
           <div className="flex items-center gap-3">
             {/* Revert to Published (if modified) */}
@@ -513,6 +708,13 @@ export const AdminLayout: React.FC = () => {
         onClose={() => setIsPublishModalOpen(false)}
         diffSummary={diffSummary}
         onConfirmPublish={publishDraft}
+      />
+
+      {/* Global Watermelon UI Command Palette */}
+      <CommandPalette
+        isOpen={isCommandPaletteOpen}
+        onClose={() => setIsCommandPaletteOpen(false)}
+        commands={commands}
       />
     </div>
   );

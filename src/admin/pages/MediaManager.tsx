@@ -37,6 +37,7 @@ import {
   Skeleton,
   EmptyState,
   useToast,
+  StatCard,
 } from '../../design-system';
 
 export const MediaManager: React.FC = () => {
@@ -366,22 +367,37 @@ export const MediaManager: React.FC = () => {
 
       {/* Quick Stats Summary Row */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <Card className="p-4 flex flex-col justify-between shadow-xs">
-          <span className="text-[11px] font-mono text-muted uppercase">Total Media Files</span>
-          <span className="text-2xl font-bold text-foreground mt-2">{assets.length}</span>
-        </Card>
-        <Card className="p-4 flex flex-col justify-between shadow-xs">
-          <span className="text-[11px] font-mono text-muted uppercase">Storage Utilized</span>
-          <span className="text-2xl font-bold text-foreground mt-2">{totalStorageFormatted}</span>
-        </Card>
-        <Card className="p-4 flex flex-col justify-between shadow-xs">
-          <span className="text-[11px] font-mono text-muted uppercase">Storage Engine</span>
-          <span className="text-xs font-mono font-bold text-emerald-500 mt-3">SUPABASE BUCKET</span>
-        </Card>
-        <Card className="p-4 flex flex-col justify-between shadow-xs">
-          <span className="text-[11px] font-mono text-muted uppercase">Supported Formats</span>
-          <span className="text-xs font-mono font-bold text-muted mt-3">WEBP, JPG, PNG, SVG</span>
-        </Card>
+        <StatCard
+          title="Total Media Files"
+          value={assets.length}
+          subtitle="CDN stored assets"
+          icon={ImageIcon}
+          badgeText="CDN"
+        />
+        <StatCard
+          title="Storage Utilized"
+          value={totalStorageFormatted}
+          subtitle="Compressed asset volume"
+          icon={HardDrive}
+          badgeText="Storage"
+          badgeVariant="info"
+        />
+        <StatCard
+          title="Storage Engine"
+          value="Supabase Bucket"
+          subtitle="PostgreSQL / CDN backed"
+          icon={Sparkles}
+          badgeText="Encrypted"
+          badgeVariant="success"
+        />
+        <StatCard
+          title="Supported Formats"
+          value="WEBP, JPG, PNG"
+          subtitle="Vector SVG supported"
+          icon={Layers}
+          badgeText="Optimized"
+          badgeVariant="neutral"
+        />
       </div>
 
       {/* Drag & Drop Upload Zone */}

@@ -22,6 +22,35 @@ export interface AnimationSettings {
   marqueeEnabled: boolean;
 }
 
+export interface PreloaderSettings {
+  enabled: boolean;
+  duration: number; // Duration in seconds (e.g. 1.2s - 2.0s)
+  animationEnabled: boolean;
+}
+
+export interface HeaderNavItem {
+  id: string;
+  label: string;
+  href: string;
+  visible: boolean;
+  order: number;
+  external?: boolean;
+}
+
+export interface HeaderSettings {
+  brandName?: string;
+  brandSuffix?: string;
+  roleText?: string;
+  showHeader?: boolean;
+  showRole?: boolean;
+  showNavigation?: boolean;
+  showThemeToggle?: boolean;
+  showContactButton?: boolean;
+  contactButtonText?: string;
+  contactButtonHref?: string;
+  navigationItems: HeaderNavItem[];
+}
+
 export interface SEOSettings {
   metaTitle: string;
   metaDescription: string;
@@ -62,6 +91,7 @@ export interface WebsiteSettings {
   lightModeEnabled: boolean;
   colors: ThemeColorSettings;
   animations: AnimationSettings;
+  preloader?: PreloaderSettings;
   // Aliases for compatibility
   enableCustomCursor?: boolean;
   enableSmoothScroll?: boolean;
@@ -299,6 +329,7 @@ export interface PortfolioCategory {
 export interface WebsiteData {
   settings: WebsiteSettings;
   profile?: ProfileContent;
+  header?: HeaderSettings;
   hero: HeroContent;
   marquee: MarqueeContent;
   about: AboutContent;
@@ -317,7 +348,7 @@ export interface WebsiteData {
 
 export interface ContentDiffItem {
   id: string;
-  category: 'Projects' | 'Content' | 'Skills' | 'Services' | 'Sections' | 'Settings' | 'Media' | 'Experience' | 'Categories';
+  category: 'Projects' | 'Content' | 'Skills' | 'Services' | 'Sections' | 'Settings' | 'Media' | 'Experience' | 'Categories' | 'Header';
   title: string;
   description: string;
   type: 'added' | 'modified' | 'deleted' | 'reordered';

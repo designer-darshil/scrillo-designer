@@ -4,6 +4,8 @@ import { gsap } from '../../animations/gsapConfig';
 import { ArrowUpRight } from 'lucide-react';
 import { useTheme } from '../../hooks/useTheme';
 import { useWebsiteData } from '../../hooks/useWebsiteData';
+import { defaultWebsiteData } from '../../data/defaultWebsiteData';
+import { HeaderNavItem } from '../../types';
 
 interface HeaderProps {
   activeSection?: string;
@@ -111,36 +113,75 @@ export const Header: React.FC<HeaderProps> = ({
   const handleNavClick = (
     e: React.MouseEvent<HTMLAnchorElement>,
     id: string,
-    href: string
+    href: string,
+    external?: boolean
   ) => {
+    if (external) {
+      setIsMobileMenuOpen(false);
+      return;
+    }
+
     setActiveItem(id);
-    if (onNavigate) {
+    if (href.startsWith('#') && onNavigate) {
       e.preventDefault();
-      onNavigate(id);
+      const targetId = href.replace(/^#/, '');
+      onNavigate(targetId || 'home');
     }
     setIsMobileMenuOpen(false);
   };
 
-  const sections = data.settings?.sections || ({} as any);
-  const brandText = data.profile?.name || data.footer?.brandText || data.settings?.siteTitle || 'DARSHIL S. BHUVA';
-  const headerTagline = data.profile?.title || data.hero?.subEyebrow || data.settings?.siteDescription || 'UI/UX DESIGNER / WEB DESIGNER';
-  const email = data.profile?.email || data.contact?.email || data.footer?.email || 'darshilbhuva4322@gmail.com';
-  const availability = data.contact?.availabilityStatus || 'AVAILABLE FOR COMMISSIONS';
-  const socialList = (data.footer?.socialLinks || [])
+  // Data-driven values with fallback cascade
+  const headerConfig = data?.header;
+  const profileConfig = data?.profile;
+
+  // Visibility toggles
+  const showHeader = headerConfig?.showHeader !== false;
+  const showRole = headerConfig?.showRole !== false;
+  const showNavigation = headerConfig?.showNavigation !== false;
+  const showThemeToggle = headerConfig?.showThemeToggle !== false;
+  const showContactButton = Boolean(headerConfig?.showContactButton);
+  const contactButtonText = headerConfig?.contactButtonText || "Let's Talk";
+  const contactButtonHref = headerConfig?.contactButtonHref || '#contact';
+
+  // Brand Name & Suffix (Inherits from Profile by default)
+  const defaultProfile = defaultWebsiteData.profile!;
+  const defaultHeader = defaultWebsiteData.header!;
+
+  const brandName =
+    headerConfig?.brandName && headerConfig.brandName.trim().length > 0
+      ? headerConfig.brandName.trim()
+      : profileConfig?.name || defaultProfile.name;
+
+  const brandSuffix =
+    headerConfig?.brandSuffix !== undefined
+      ? headerConfig.brandSuffix
+      : defaultHeader.brandSuffix;
+
+  // Role Text (Inherits from Profile by default)
+  const roleText =
+    headerConfig?.roleText && headerConfig.roleText.trim().length > 0
+      ? headerConfig.roleText.trim()
+      : profileConfig?.title || defaultProfile.title;
+
+  // Managed Navigation Items (Sorted by order and filtered by visible !== false)
+  const rawNavItems: HeaderNavItem[] =
+    headerConfig?.navigationItems && headerConfig.navigationItems.length > 0
+      ? headerConfig.navigationItems
+      : defaultHeader.navigationItems;
+
+  const navigationItems = rawNavItems
+    .filter((item) => item.visible !== false)
+    .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+
+  const email = profileConfig?.email || data?.contact?.email || defaultProfile.email;
+  const availability = data?.contact?.availabilityStatus || defaultWebsiteData.contact.availabilityStatus || 'AVAILABLE FOR COMMISSIONS';
+  const socialList = (data?.footer?.socialLinks || defaultWebsiteData.footer.socialLinks || [])
     .filter((s) => s.visible !== false)
     .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 
-  const allNav = [
-    { id: 'home', label: 'Home', href: '#home', number: '01', visible: sections.hero?.visible !== false },
-    { id: 'about', label: 'About', href: '#about', number: '02', visible: sections.statement?.visible !== false },
-    { id: 'works', label: 'Works', href: '#works', number: '03', visible: sections.projects?.visible !== false },
-    { id: 'experience', label: 'Experience', href: '#experience', number: '04', visible: sections.experience?.visible !== false },
-    { id: 'skills', label: 'Skills', href: '#skills', number: '05', visible: sections.skills?.visible !== false },
-    { id: 'services', label: 'Services', href: '#services', number: '06', visible: sections.services?.visible !== false },
-    { id: 'contact', label: "Let's Talk", href: '#contact', number: '07', visible: sections.contact?.visible !== false },
-  ];
-
-  const navigationItems = allNav.filter((n) => n.visible);
+  if (!showHeader) {
+    return null;
+  }
 
   return (
     <>
@@ -159,60 +200,84 @@ export const Header: React.FC<HeaderProps> = ({
                 className="group inline-flex items-center gap-2.5 text-xs sm:text-[13px] font-mono uppercase tracking-widest text-foreground/90 hover:text-foreground transition-opacity"
               >
                 <span className="w-1.5 h-1.5 bg-foreground rounded-none group-hover:rotate-45 transition-transform duration-300" />
-                <span className="font-semibold">{brandText}</span>
+                <span className="font-semibold">{brandName}</span>
+                {brandSuffix && (
+                  <span className="text-muted/70 text-[11px] font-normal">{brandSuffix}</span>
+                )}
               </a>
             </div>
 
             {/* CENTER: Tagline / Role (Desktop) */}
-            <div className="hidden lg:flex items-center gap-2 text-xs sm:text-[13px] font-mono uppercase tracking-widest text-muted pointer-events-none">
-              <span className="text-muted/40">/</span>
-              <span>{headerTagline}</span>
-            </div>
+            {showRole && (
+              <div className="hidden lg:flex items-center gap-2 text-xs sm:text-[13px] font-mono uppercase tracking-widest text-muted pointer-events-none">
+                <span className="text-muted/40">/</span>
+                <span>{roleText}</span>
+              </div>
+            )}
 
-            {/* RIGHT: Navigation & Theme Toggle (Desktop) */}
+            {/* RIGHT: Navigation, Contact Button & Theme Toggle (Desktop) */}
             <div className="hidden md:flex items-center gap-6 lg:gap-8 pointer-events-auto">
-              <nav className="flex items-center gap-6 lg:gap-8">
-                {navigationItems.map((item) => {
-                  const isActive = activeItem === item.id;
-                  return (
-                    <a
-                      key={item.id}
-                      href={item.href}
-                      onClick={(e) => handleNavClick(e, item.id, item.href)}
-                      className="group relative py-1 text-xs sm:text-[13px] font-mono uppercase tracking-widest text-muted hover:text-foreground transition-colors duration-200"
-                    >
-                      <span className="flex items-center gap-1.5">
-                        {isActive && (
-                          <span className="w-1 h-1 bg-foreground inline-block" />
-                        )}
-                        <span className={isActive ? 'text-foreground font-semibold' : ''}>{item.label}</span>
-                      </span>
+              {showNavigation && (
+                <nav className="flex items-center gap-6 lg:gap-8">
+                  {navigationItems.map((item) => {
+                    const isActive = activeItem === item.id;
+                    return (
+                      <a
+                        key={item.id}
+                        href={item.href}
+                        target={item.external ? '_blank' : undefined}
+                        rel={item.external ? 'noopener noreferrer' : undefined}
+                        onClick={(e) => handleNavClick(e, item.id, item.href, item.external)}
+                        className="group relative py-1 text-xs sm:text-[13px] font-mono uppercase tracking-widest text-muted hover:text-foreground transition-colors duration-200"
+                      >
+                        <span className="flex items-center gap-1.5">
+                          {isActive && (
+                            <span className="w-1 h-1 bg-foreground inline-block" />
+                          )}
+                          <span className={isActive ? 'text-foreground font-semibold' : ''}>
+                            {item.label}
+                          </span>
+                        </span>
 
-                      {/* Hover Underline Animation */}
-                      <span
-                        className={`absolute left-0 bottom-0 w-full h-px bg-foreground origin-left transition-transform duration-300 ease-out ${
-                          isActive
-                            ? 'scale-x-100'
-                            : 'scale-x-0 group-hover:scale-x-100'
-                        }`}
-                      />
-                    </a>
-                  );
-                })}
-              </nav>
+                        {/* Hover Underline Animation */}
+                        <span
+                          className={`absolute left-0 bottom-0 w-full h-px bg-foreground origin-left transition-transform duration-300 ease-out ${
+                            isActive
+                              ? 'scale-x-100'
+                              : 'scale-x-0 group-hover:scale-x-100'
+                          }`}
+                        />
+                      </a>
+                    );
+                  })}
+                </nav>
+              )}
+
+              {/* Optional Managed Contact CTA Button */}
+              {showContactButton && (
+                <a
+                  href={contactButtonHref}
+                  onClick={(e) => handleNavClick(e, 'contact', contactButtonHref)}
+                  className="px-3.5 py-1.5 font-mono text-[11px] uppercase tracking-widest text-background bg-foreground hover:bg-foreground/90 transition-colors focus-visible:outline-2 focus-visible:outline-[var(--color-focus-default)] focus-visible:outline-offset-2"
+                >
+                  {contactButtonText}
+                </a>
+              )}
 
               {/* Theme Toggle (Desktop Minimalist Editorial Control) */}
-              <button
-                type="button"
-                onClick={toggleTheme}
-                data-cursor="link"
-                className="flex items-center gap-1.5 px-2.5 py-1 font-mono text-[11px] uppercase tracking-widest text-foreground/80 hover:text-foreground border border-border/80 hover:border-foreground transition-all duration-200 focus-visible:outline-2 focus-visible:outline-[var(--color-focus-default)] focus-visible:outline-offset-2"
-                aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
-              >
-                <span className={theme === 'dark' ? 'text-foreground font-bold' : 'text-muted/60'}>DARK</span>
-                <span className="text-muted/30">/</span>
-                <span className={theme === 'light' ? 'text-foreground font-bold' : 'text-muted/60'}>LIGHT</span>
-              </button>
+              {showThemeToggle && (
+                <button
+                  type="button"
+                  onClick={toggleTheme}
+                  data-cursor="link"
+                  className="flex items-center gap-1.5 px-2.5 py-1 font-mono text-[11px] uppercase tracking-widest text-foreground/80 hover:text-foreground border border-border/80 hover:border-foreground transition-all duration-200 focus-visible:outline-2 focus-visible:outline-[var(--color-focus-default)] focus-visible:outline-offset-2"
+                  aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
+                >
+                  <span className={theme === 'dark' ? 'text-foreground font-bold' : 'text-muted/60'}>DARK</span>
+                  <span className="text-muted/30">/</span>
+                  <span className={theme === 'light' ? 'text-foreground font-bold' : 'text-muted/60'}>LIGHT</span>
+                </button>
+              )}
             </div>
 
             {/* Mobile Menu Trigger (44px touch target) */}
@@ -234,7 +299,7 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
       </header>
 
-      {/* FULLSCREEN MOBILE OVERLAY MENU */}
+      {/* FULLSCREEN MOBILE OVERLAY MENU (Uses Same Managed Navigation Data) */}
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div
@@ -252,6 +317,7 @@ export const Header: React.FC<HeaderProps> = ({
               <div className="text-meta text-muted mb-2">[INDEX NAVIGATION]</div>
               {navigationItems.map((item, index) => {
                 const isActive = activeItem === item.id;
+                const formattedNum = String(index + 1).padStart(2, '0');
                 return (
                   <motion.div
                     key={item.id}
@@ -266,12 +332,14 @@ export const Header: React.FC<HeaderProps> = ({
                   >
                     <a
                       href={item.href}
-                      onClick={(e) => handleNavClick(e, item.id, item.href)}
+                      target={item.external ? '_blank' : undefined}
+                      rel={item.external ? 'noopener noreferrer' : undefined}
+                      onClick={(e) => handleNavClick(e, item.id, item.href, item.external)}
                       className="group flex items-baseline justify-between py-2 border-b border-border text-foreground hover:text-foreground transition-colors"
                     >
                       <div className="flex items-center gap-3">
                         <span className="font-mono text-xs text-muted">
-                          [{item.number}]
+                          [{formattedNum}]
                         </span>
                         <span className="font-sans text-3xl sm:text-4xl font-bold uppercase tracking-tight">
                           {item.label}
@@ -284,31 +352,33 @@ export const Header: React.FC<HeaderProps> = ({
               })}
 
               {/* Mobile Theme Toggle Item */}
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -10 }}
-                transition={{
-                  delay: 0.08 * navigationItems.length,
-                  duration: 0.4,
-                  ease: [0.16, 1, 0.3, 1],
-                }}
-                className="pt-2"
-              >
-                <div className="flex items-center justify-between py-3 border-b border-border">
-                  <span className="font-mono text-xs text-muted">[APPEARANCE]</span>
-                  <button
-                    type="button"
-                    onClick={toggleTheme}
-                    className="min-h-[44px] flex items-center gap-2 px-3 py-1.5 font-mono text-xs uppercase tracking-widest text-foreground border border-border focus-visible:outline-2 focus-visible:outline-[var(--color-focus-default)] focus-visible:outline-offset-2"
-                    aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
-                  >
-                    <span className={theme === 'dark' ? 'font-bold underline underline-offset-4' : 'text-muted'}>DARK</span>
-                    <span className="text-muted/40">/</span>
-                    <span className={theme === 'light' ? 'font-bold underline underline-offset-4' : 'text-muted'}>LIGHT</span>
-                  </button>
-                </div>
-              </motion.div>
+              {showThemeToggle && (
+                <motion.div
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -10 }}
+                  transition={{
+                    delay: 0.08 * navigationItems.length,
+                    duration: 0.4,
+                    ease: [0.16, 1, 0.3, 1],
+                  }}
+                  className="pt-2"
+                >
+                  <div className="flex items-center justify-between py-3 border-b border-border">
+                    <span className="font-mono text-xs text-muted">[APPEARANCE]</span>
+                    <button
+                      type="button"
+                      onClick={toggleTheme}
+                      className="min-h-[44px] flex items-center gap-2 px-3 py-1.5 font-mono text-xs uppercase tracking-widest text-foreground border border-border focus-visible:outline-2 focus-visible:outline-[var(--color-focus-default)] focus-visible:outline-offset-2"
+                      aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
+                    >
+                      <span className={theme === 'dark' ? 'font-bold underline underline-offset-4' : 'text-muted'}>DARK</span>
+                      <span className="text-muted/40">/</span>
+                      <span className={theme === 'light' ? 'font-bold underline underline-offset-4' : 'text-muted'}>LIGHT</span>
+                    </button>
+                  </div>
+                </motion.div>
+              )}
             </div>
 
             {/* Mobile Menu Footer Information */}
@@ -320,7 +390,7 @@ export const Header: React.FC<HeaderProps> = ({
               className="relative z-10 border-t border-border pt-6 space-y-4"
             >
               <div className="flex items-center justify-between text-meta text-muted">
-                <span>{headerTagline}</span>
+                <span>{roleText}</span>
                 <span className="text-foreground">{availability}</span>
               </div>
 

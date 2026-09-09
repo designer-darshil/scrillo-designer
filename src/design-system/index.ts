@@ -32,3 +32,6 @@ export * from './hooks/useToast';
 // Utilities
 export * from './utils/cn';
 export * from './utils/contrastChecker';
+
+// Adapters (Watermelon UI & vendor components)
+export * from './adapters/watermelon';

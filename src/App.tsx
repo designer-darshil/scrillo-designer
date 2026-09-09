@@ -9,6 +9,7 @@ import { ProtectedRoute } from './admin/components/ProtectedRoute';
 import { AdminLogin } from './admin/pages/AdminLogin';
 import { AdminDashboard } from './admin/pages/AdminDashboard';
 import { ContentManager } from './admin/pages/ContentManager';
+import { HeaderManager } from './admin/pages/HeaderManager';
 import { SectionsManager } from './admin/pages/SectionsManager';
 import { FooterContactManager } from './admin/pages/FooterContactManager';
 import { ProjectsManager } from './admin/pages/ProjectsManager';
@@ -51,6 +52,7 @@ export const App: React.FC = () => {
                 <Route path="dashboard" element={<AdminDashboard />} />
                 <Route path="profile" element={<ProfileOverview />} />
                 <Route path="content" element={<ContentManager />} />
+                <Route path="content/header" element={<HeaderManager />} />
                 <Route path="content/sections" element={<SectionsManager />} />
                 <Route path="content/footer" element={<FooterContactManager />} />
                 <Route path="categories" element={<CategoriesManager />} />

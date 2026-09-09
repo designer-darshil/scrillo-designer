@@ -12,6 +12,7 @@ import {
   ContactCTA,
   FooterContent,
   ProfileContent,
+  HeaderSettings,
   ExperienceItem,
   EducationItem,
   ToolItem,
@@ -38,6 +39,7 @@ interface WebsiteDataContextType {
   publishDraft: () => Promise<boolean>;
   revertToPublished: () => Promise<boolean>;
   updateProfile: (profile: ProfileContent) => Promise<boolean>;
+  updateHeader: (header: HeaderSettings) => Promise<boolean>;
   updateHero: (hero: HeroContent) => Promise<boolean>;
   updateAbout: (about: AboutContent) => Promise<boolean>;
   updateMarquee: (marquee: MarqueeContent) => Promise<boolean>;
@@ -96,6 +98,7 @@ const WebsiteDataContext = createContext<WebsiteDataContextType>({
   publishDraft: async () => true,
   revertToPublished: async () => true,
   updateProfile: async () => true,
+  updateHeader: async () => true,
   updateHero: async () => true,
   updateAbout: async () => true,
   updateMarquee: async () => true,
@@ -156,6 +159,7 @@ export const WebsiteDataProvider: React.FC<{ children: React.ReactNode }> = ({ c
         ...prev,
         settings: settings || prev.settings,
         profile: remoteData.profile || prev.profile,
+        header: remoteData.header || prev.header || defaultWebsiteData.header,
         hero: remoteData.hero || prev.hero,
         about: remoteData.about || prev.about,
         marquee: remoteData.marquee || prev.marquee,
@@ -286,6 +290,18 @@ export const WebsiteDataProvider: React.FC<{ children: React.ReactNode }> = ({ c
       const success = await websiteService.updateProfileContent(profile);
       if (success) {
         setData((prev) => ({ ...prev, profile }));
+      }
+      return success;
+    } catch {
+      return false;
+    }
+  };
+
+  const updateHeader = async (header: HeaderSettings): Promise<boolean> => {
+    try {
+      const success = await websiteService.updateHeaderSettings(header);
+      if (success) {
+        setData((prev) => ({ ...prev, header }));
       }
       return success;
     } catch {
@@ -774,6 +790,7 @@ export const WebsiteDataProvider: React.FC<{ children: React.ReactNode }> = ({ c
         publishDraft,
         revertToPublished,
         updateProfile,
+        updateHeader,
         updateHero,
         updateAbout,
         updateMarquee,
@@ -831,6 +848,7 @@ export const useWebsiteData = () => {
       publishDraft: async () => true,
       revertToPublished: async () => true,
       updateProfile: async () => true,
+      updateHeader: async () => true,
       updateHero: async () => true,
       updateAbout: async () => true,
       updateMarquee: async () => true,

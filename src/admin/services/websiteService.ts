@@ -7,6 +7,7 @@ import {
   ContactCTA,
   FooterContent,
   ProfileContent,
+  HeaderSettings,
   ExperienceItem,
   EducationItem,
   ToolItem,
@@ -18,6 +19,7 @@ import { defaultWebsiteData } from '../../data/defaultWebsiteData';
 // In-memory cache to ensure state persistence across sessions/transitions even if Supabase is offline/unconfigured
 const memoryStore: {
   profile: ProfileContent;
+  header: HeaderSettings;
   hero: HeroContent;
   about: AboutContent;
   marquee: MarqueeContent;
@@ -30,6 +32,7 @@ const memoryStore: {
   categories: PortfolioCategory[];
 } = {
   profile: { ...defaultWebsiteData.profile! },
+  header: { ...defaultWebsiteData.header! },
   hero: { ...defaultWebsiteData.hero },
   about: { ...defaultWebsiteData.about },
   marquee: { ...defaultWebsiteData.marquee },
@@ -49,6 +52,7 @@ export const defaultContactCTAContent: ContactCTA = defaultWebsiteData.contact;
 export const defaultFooterContent: FooterContent = defaultWebsiteData.footer;
 export const defaultMarqueeContent: MarqueeContent = defaultWebsiteData.marquee;
 export const defaultProfileContent: ProfileContent = defaultWebsiteData.profile!;
+export const defaultHeaderSettings: HeaderSettings = defaultWebsiteData.header!;
 
 export const websiteService = {
   /**
@@ -58,6 +62,7 @@ export const websiteService = {
     if (!isSupabaseConfigured) {
       return {
         profile: memoryStore.profile,
+        header: memoryStore.header,
         hero: memoryStore.hero,
         about: memoryStore.about,
         marquee: memoryStore.marquee,
@@ -93,6 +98,7 @@ export const websiteService = {
       });
 
       if (map.profile) memoryStore.profile = map.profile;
+      if (map.header) memoryStore.header = map.header;
       if (map.hero) memoryStore.hero = map.hero;
       if (map.about) memoryStore.about = map.about;
       if (map.marquee) memoryStore.marquee = map.marquee;
@@ -105,6 +111,7 @@ export const websiteService = {
 
       return {
         profile: map.profile || memoryStore.profile,
+        header: map.header || memoryStore.header,
         hero: map.hero || memoryStore.hero,
         about: map.about || memoryStore.about,
         marquee: map.marquee || memoryStore.marquee,
@@ -118,6 +125,7 @@ export const websiteService = {
     } catch {
       return {
         profile: memoryStore.profile,
+        header: memoryStore.header,
         hero: memoryStore.hero,
         about: memoryStore.about,
         marquee: memoryStore.marquee,
@@ -128,6 +136,34 @@ export const websiteService = {
         education: memoryStore.education,
         tools: memoryStore.tools,
       };
+    }
+  },
+
+  /**
+   * Header Settings
+   */
+  async getHeaderSettings(): Promise<HeaderSettings> {
+    if (!isSupabaseConfigured) return memoryStore.header;
+    try {
+      const { data, error } = await supabase.from('website_content').select('content').eq('section', 'header').single();
+      if (error || !data?.content) return memoryStore.header;
+      memoryStore.header = data.content as HeaderSettings;
+      return memoryStore.header;
+    } catch {
+      return memoryStore.header;
+    }
+  },
+
+  async updateHeaderSettings(content: HeaderSettings): Promise<boolean> {
+    memoryStore.header = { ...content };
+    if (!isSupabaseConfigured) return true;
+    try {
+      const { error } = await supabase
+        .from('website_content')
+        .upsert({ section: 'header', content, updated_at: new Date().toISOString() }, { onConflict: 'section' });
+      return !error;
+    } catch {
+      return false;
     }
   },
 

@@ -208,7 +208,29 @@ export const publishService = {
       });
     }
 
-    // 10. Check Section Layout / Reordering / Visibility
+    // 10. Check Profile Information
+    if (JSON.stringify(draft.profile) !== JSON.stringify(published.profile)) {
+      items.push({
+        id: 'diff-profile',
+        category: 'Content',
+        title: 'Personal Profile Details Updated',
+        description: `Name, title, bio, contact credentials, or profile imagery updated.`,
+        type: 'modified',
+      });
+    }
+
+    // 11. Check Header & Navigation
+    if (JSON.stringify(draft.header) !== JSON.stringify(published.header)) {
+      items.push({
+        id: 'diff-header',
+        category: 'Header',
+        title: 'Header & Navigation Updated',
+        description: `Brand styling, role tagline, navigation links, or visibility settings modified.`,
+        type: 'modified',
+      });
+    }
+
+    // 12. Check Section Layout / Reordering / Visibility
     if (JSON.stringify(draft.settings?.sections) !== JSON.stringify(published.settings?.sections)) {
       items.push({
         id: 'diff-sections',
@@ -219,17 +241,19 @@ export const publishService = {
       });
     }
 
-    // 11. Check Global Settings / Colors / SEO / Animations
+    // 13. Check Global Settings / Colors / SEO / Animations / Preloader
     const draftGeneral = {
       theme: draft.settings?.defaultTheme,
       colors: draft.settings?.colors,
       animations: draft.settings?.animations,
+      preloader: draft.settings?.preloader,
       seo: draft.settings?.seo,
     };
     const pubGeneral = {
       theme: published.settings?.defaultTheme,
       colors: published.settings?.colors,
       animations: published.settings?.animations,
+      preloader: published.settings?.preloader,
       seo: published.settings?.seo,
     };
 
@@ -238,7 +262,7 @@ export const publishService = {
         id: 'diff-settings',
         category: 'Settings',
         title: 'Global System Settings Modified',
-        description: `Theme defaults, dynamic CSS color tokens, animation engines, or SEO metadata updated.`,
+        description: `Theme defaults, preloader settings, dynamic CSS color tokens, animation engines, or SEO metadata updated.`,
         type: 'modified',
       });
     }

@@ -19,6 +19,7 @@ import { PublishReviewModal } from '../admin/components/PublishReviewModal';
 import { useWebsiteData } from '../hooks/useWebsiteData';
 import { useAuth } from '../admin/hooks/useAuth';
 import { useTheme } from '../hooks/useTheme';
+import { defaultWebsiteData } from '../data/defaultWebsiteData';
 import { Experience } from '../sections/Experience';
 import { SectionId } from '../types';
 import { ScrollTrigger } from '../animations/gsapConfig';
@@ -59,12 +60,14 @@ export const PortfolioHome: React.FC = () => {
   const { sections, colors, animations, seo } = settings;
   const marquee = activeData.marquee;
 
+  const isPreloaderEnabled = settings.preloader?.enabled !== false;
+
   // Preloader management for public website (runs on initial load)
   const {
     isComplete: isPreloaderComplete,
     shouldShow: shouldShowPreloader,
     onExitComplete: onPreloaderExitComplete,
-  } = usePreloader();
+  } = usePreloader({ forceShow: isPreloaderEnabled });
 
   // Sync admin default theme if no explicit user override is stored
   useEffect(() => {
@@ -236,8 +239,10 @@ export const PortfolioHome: React.FC = () => {
       {/* Full-Screen Editorial Preloader */}
       {!isPreloaderComplete && shouldShowPreloader && (
         <Preloader
-          brandText={activeData.profile?.name || activeData.footer?.brandText || settings.siteTitle || 'DARSHIL S. BHUVA'}
-          brandSubtitle={activeData.profile?.title || activeData.hero?.subEyebrow || settings.siteDescription || 'UI/UX DESIGNER / WEB DESIGNER'}
+          brandText={activeData.header?.brandName || activeData.profile?.name || defaultWebsiteData.profile!.name}
+          brandSuffix={activeData.header?.brandSuffix ?? defaultWebsiteData.header!.brandSuffix}
+          duration={settings.preloader?.duration ?? defaultWebsiteData.settings.preloader!.duration}
+          animationEnabled={settings.preloader?.animationEnabled !== false && animations?.animationsEnabled !== false}
           onExitComplete={onPreloaderExitComplete}
         />
       )}

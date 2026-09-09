@@ -26,6 +26,7 @@ import {
   Card,
   useToast,
   EmptyState,
+  StatCard,
 } from '../../design-system';
 
 export const ProjectsManager: React.FC = () => {
@@ -245,28 +246,41 @@ export const ProjectsManager: React.FC = () => {
 
       {/* Stats & Quick Summary Row */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <Card className="flex flex-col justify-between">
-          <span className="text-[11px] font-mono text-[var(--color-text-tertiary)] uppercase">Total Repositories</span>
-          <span className="text-2xl font-bold text-[var(--color-text-primary)] mt-2">{data.projects.length}</span>
-        </Card>
-        <Card className="flex flex-col justify-between">
-          <span className="text-[11px] font-mono text-[var(--color-text-tertiary)] uppercase">Published (Live)</span>
-          <span className="text-2xl font-bold text-emerald-500 mt-2">
-            {data.projects.filter((p) => p.published !== false).length}
-          </span>
-        </Card>
-        <Card className="flex flex-col justify-between">
-          <span className="text-[11px] font-mono text-[var(--color-text-tertiary)] uppercase">Draft Mode</span>
-          <span className="text-2xl font-bold text-amber-500 mt-2">
-            {data.projects.filter((p) => p.published === false).length}
-          </span>
-        </Card>
-        <Card className="flex flex-col justify-between">
-          <span className="text-[11px] font-mono text-[var(--color-text-tertiary)] uppercase">Featured Works</span>
-          <span className="text-2xl font-bold text-[var(--color-text-primary)] mt-2">
-            {data.projects.filter((p) => p.featured).length}
-          </span>
-        </Card>
+        <StatCard
+          title="Total Repositories"
+          value={data.projects.length}
+          subtitle="All portfolio entries"
+          icon={FolderGit2}
+          badgeText="Catalog"
+        />
+        <StatCard
+          title="Published (Live)"
+          value={data.projects.filter((p) => p.published !== false).length}
+          subtitle="Publicly accessible"
+          icon={Globe}
+          badgeText="Live"
+          badgeVariant="success"
+          trend={{
+            value: `${data.projects.filter((p) => p.published !== false).length} live`,
+            direction: 'up',
+          }}
+        />
+        <StatCard
+          title="Draft Mode"
+          value={data.projects.filter((p) => p.published === false).length}
+          subtitle="Work in progress"
+          icon={AlertTriangle}
+          badgeText={data.projects.filter((p) => p.published === false).length > 0 ? 'Review' : 'Clear'}
+          badgeVariant={data.projects.filter((p) => p.published === false).length > 0 ? 'warning' : 'neutral'}
+        />
+        <StatCard
+          title="Featured Works"
+          value={data.projects.filter((p) => p.featured).length}
+          subtitle="Priority showcase"
+          icon={Star}
+          badgeText="Hero"
+          badgeVariant="warning"
+        />
       </div>
 
       {/* Filter & Search Toolbar */}

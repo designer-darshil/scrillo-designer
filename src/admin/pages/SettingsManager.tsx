@@ -16,7 +16,7 @@ import {
   Repeat,
 } from 'lucide-react';
 import { useWebsiteData } from '../../hooks/useWebsiteData';
-import { WebsiteSettings, ThemeColorPalette } from '../../types';
+import { WebsiteSettings, ThemeColorPalette, PreloaderSettings } from '../../types';
 import { defaultWebsiteData } from '../../data/defaultWebsiteData';
 import { MediaPickerModal } from '../components/MediaPickerModal';
 import { validators } from '../utils/validators';
@@ -36,7 +36,7 @@ export const SettingsManager: React.FC = () => {
   const [form, setForm] = useState<WebsiteSettings>(data.settings);
 
   // Active module tab
-  const [activeTab, setActiveTab] = useState<'theme' | 'colors' | 'animations' | 'site'>('theme');
+  const [activeTab, setActiveTab] = useState<'theme' | 'colors' | 'animations' | 'preloader' | 'site'>('theme');
 
   // Status & feedback
   const [status, setStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
@@ -93,6 +93,19 @@ export const SettingsManager: React.FC = () => {
       // Keep legacy aliases synced
       ...(field === 'cursorEnabled' ? { enableCustomCursor: value } : {}),
       ...(field === 'smoothScrollEnabled' ? { enableSmoothScroll: value } : {}),
+    }));
+  };
+
+  const handlePreloaderChange = (field: keyof PreloaderSettings, value: any) => {
+    markDirty();
+    setForm((prev) => ({
+      ...prev,
+      preloader: {
+        enabled: prev.preloader?.enabled ?? true,
+        duration: prev.preloader?.duration ?? 1.2,
+        animationEnabled: prev.preloader?.animationEnabled ?? true,
+        [field]: value,
+      },
     }));
   };
 
@@ -295,6 +308,16 @@ export const SettingsManager: React.FC = () => {
           leftIcon={<Activity className="w-4 h-4" />}
         >
           Animation Engine
+        </Button>
+
+        <Button
+          type="button"
+          variant={activeTab === 'preloader' ? 'primary' : 'ghost'}
+          size="sm"
+          onClick={() => setActiveTab('preloader')}
+          leftIcon={<Sparkles className="w-4 h-4" />}
+        >
+          Preloader
         </Button>
 
         <Button
@@ -763,7 +786,86 @@ export const SettingsManager: React.FC = () => {
       )}
 
       {/* ================================================== */}
-      {/* 4. SITE & SEO SETTINGS TAB */}
+      {/* 4. PRELOADER SETTINGS TAB */}
+      {/* ================================================== */}
+      {activeTab === 'preloader' && (
+        <div className="space-y-6">
+          <Card className="p-6 sm:p-8 space-y-6">
+            <div className="border-b border-border pb-4">
+              <CardTitle className="flex items-center gap-2 text-sm uppercase tracking-wider">
+                <Sparkles className="w-4 h-4" />
+                <span>Preloader Configuration</span>
+              </CardTitle>
+              <CardDescription className="text-xs">
+                Manage the minimal editorial loading screen that displays on initial page load.
+              </CardDescription>
+            </div>
+
+            <div className="space-y-4">
+              {/* Preloader Enabled */}
+              <div className="p-5 rounded-xl border border-border bg-background flex items-center justify-between">
+                <div className="space-y-1 pr-4">
+                  <p className="text-xs font-bold text-foreground">Preloader Enabled</p>
+                  <p className="text-[11px] text-muted">
+                    Display the minimal full-screen brand loader on first visit before revealing the portfolio hero.
+                  </p>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={form.preloader?.enabled !== false}
+                  onChange={(e) => handlePreloaderChange('enabled', e.target.checked)}
+                  className="w-5 h-5 rounded border-border text-foreground accent-foreground cursor-pointer shrink-0"
+                />
+              </div>
+
+              {/* Preloader Animation Enabled */}
+              <div className="p-5 rounded-xl border border-border bg-background flex items-center justify-between">
+                <div className="space-y-1 pr-4">
+                  <p className="text-xs font-bold text-foreground">Preloader Animation Enabled</p>
+                  <p className="text-[11px] text-muted">
+                    Run smooth GSAP counting and progress animations (skipped automatically if user prefers reduced motion).
+                  </p>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={form.preloader?.animationEnabled !== false}
+                  onChange={(e) => handlePreloaderChange('animationEnabled', e.target.checked)}
+                  className="w-5 h-5 rounded border-border text-foreground accent-foreground cursor-pointer shrink-0"
+                />
+              </div>
+
+              {/* Preloader Duration */}
+              <div className="p-5 rounded-xl border border-border bg-background space-y-3">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs font-bold text-foreground">Preloader Duration</p>
+                    <p className="text-[11px] text-muted">
+                      Total display duration in seconds (recommended 1.0s – 2.0s).
+                    </p>
+                  </div>
+                  <span className="font-mono text-xs font-bold px-2 py-1 bg-surface rounded border border-border">
+                    {form.preloader?.duration ?? 1.2}s
+                  </span>
+                </div>
+                <div className="flex items-center gap-4">
+                  <input
+                    type="range"
+                    min="0.5"
+                    max="3.0"
+                    step="0.1"
+                    value={form.preloader?.duration ?? 1.2}
+                    onChange={(e) => handlePreloaderChange('duration', parseFloat(e.target.value))}
+                    className="w-full h-2 bg-border rounded-lg appearance-none cursor-pointer accent-foreground"
+                  />
+                </div>
+              </div>
+            </div>
+          </Card>
+        </div>
+      )}
+
+      {/* ================================================== */}
+      {/* 5. SITE & SEO SETTINGS TAB */}
       {/* ================================================== */}
       {activeTab === 'site' && (
         <div className="space-y-6">

@@ -235,17 +235,34 @@ CREATE TABLE IF NOT EXISTS public.footer_content (
 -- ==============================================================================
 -- 15. SECTION SETTINGS (HOMEPAGE PIPELINE & REORDERING)
 -- ==============================================================================
+-- Pure architectural decoupling: sectionKey + order + visible
+-- Section CONTENT is stored completely separately in website_content.
 CREATE TABLE IF NOT EXISTS public.section_settings (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   section_key TEXT UNIQUE NOT NULL,
+  name TEXT,
   visible BOOLEAN NOT NULL DEFAULT true,
-  "order" INTEGER NOT NULL DEFAULT 1
+  "order" INTEGER NOT NULL CHECK ("order" > 0),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
 CREATE INDEX IF NOT EXISTS idx_section_settings_order ON public.section_settings("order");
+CREATE UNIQUE INDEX IF NOT EXISTS idx_section_settings_key ON public.section_settings(section_key);
 
 -- ==============================================================================
--- 16. ACTIVITY LOGS (AUDIT TRAIL)
+-- 16. WEBSITE CONTENT (KEY-VALUE DOCUMENT STORE FOR SECTION COPY)
+-- ==============================================================================
+-- Holds raw editorial content for all sections (hero, about, marquee, philosophy,
+-- contact, footer, profile, experience, education, tools, categories) completely
+-- decoupled from layout ordering and visibility.
+CREATE TABLE IF NOT EXISTS public.website_content (
+  section TEXT PRIMARY KEY,
+  content JSONB NOT NULL,
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- ==============================================================================
+-- 17. ACTIVITY LOGS (AUDIT TRAIL)
 -- ==============================================================================
 CREATE TABLE IF NOT EXISTS public.activity_logs (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -383,6 +400,11 @@ CREATE POLICY "Editor/Admin manage footer" ON public.footer_content FOR ALL USIN
 CREATE POLICY "Public read section settings" ON public.section_settings FOR SELECT USING (true);
 CREATE POLICY "Editor/Admin manage section settings" ON public.section_settings FOR ALL USING (public.is_editor_or_admin());
 
+-- Website Content (Decoupled Section Copy)
+ALTER TABLE public.website_content ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Public read website content" ON public.website_content FOR SELECT USING (true);
+CREATE POLICY "Editor/Admin manage website content" ON public.website_content FOR ALL USING (public.is_editor_or_admin());
+
 -- Activity Logs
 CREATE POLICY "Editor/Admin read activity logs" ON public.activity_logs FOR SELECT USING (public.is_editor_or_admin());
 CREATE POLICY "Editor/Admin insert activity logs" ON public.activity_logs FOR INSERT WITH CHECK (public.is_editor_or_admin());
@@ -498,5 +520,6 @@ INSERT INTO public.section_settings (id, section_key, visible, "order") VALUES
   ('00000000-0000-0000-0000-000000000057', 'services', true, 7),
   ('00000000-0000-0000-0000-000000000058', 'image', true, 8),
   ('00000000-0000-0000-0000-000000000059', 'contact', true, 9),
-  ('00000000-0000-0000-0000-000000000060', 'footer', true, 10)
+  ('00000000-0000-0000-0000-000000000060', 'experience', true, 10),
+  ('00000000-0000-0000-0000-000000000061', 'footer', true, 11)
 ON CONFLICT (id) DO NOTHING;

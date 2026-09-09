@@ -196,6 +196,34 @@ export const validators = {
   },
 
   /**
+   * Validate and sanitize homepage section layout settings
+   */
+  sectionSettings(sections: Record<string, any>): ValidationResult {
+    if (!sections || typeof sections !== 'object') {
+      return { isValid: false, error: 'Section settings must be a valid object mapping.' };
+    }
+
+    const seenOrders = new Set<number>();
+    for (const [key, sec] of Object.entries(sections)) {
+      if (!sec || typeof sec !== 'object') {
+        return { isValid: false, error: `Invalid configuration for section "${key}".` };
+      }
+      if (typeof sec.visible !== 'boolean') {
+        return { isValid: false, error: `Section "${key}" must have a boolean visible property.` };
+      }
+      if (typeof sec.order !== 'number' || !Number.isInteger(sec.order) || sec.order < 1) {
+        return { isValid: false, error: `Section "${key}" must have a positive integer order.` };
+      }
+      if (seenOrders.has(sec.order)) {
+        return { isValid: false, error: `Duplicate order ${sec.order} found in section settings.` };
+      }
+      seenOrders.add(sec.order);
+    }
+
+    return { isValid: true };
+  },
+
+  /**
    * Format friendly error messages from system or backend errors
    */
   formatFriendlyError(err: any): string {
